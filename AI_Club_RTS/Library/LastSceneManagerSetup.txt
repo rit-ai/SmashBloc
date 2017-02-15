@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/FirstScene.unity
+- path: C:/Users/Tory/Desktop/poopoo/Assets/Scene.unity
   isLoaded: 1
   isActive: 1

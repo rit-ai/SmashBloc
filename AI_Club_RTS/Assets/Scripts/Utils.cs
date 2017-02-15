@@ -50,16 +50,19 @@ public class Utils : MonoBehaviour {
 	}
 
 	// Creates a bound, based on where the mouse dragged, that will contain the object top be selected
-	public static Bounds GetViewportBounds(Camera camera, Vector3 screenPos1, Vector3 screenPos2) {
-		var v1 = Camera.main.ScreenToViewportPoint(screenPos1);
-		var v2 = Camera.main.ScreenToViewportPoint(screenPos2);
-		var min = Vector3.Min(v1, v2);
-		var max = Vector3.Max(v1, v2);
+	public static Bounds GetViewportBounds( Camera camera, Vector3 screenPosition1, Vector3 screenPosition2 )
+	{
+		var v1 = camera.ScreenToViewportPoint( screenPosition1 );
+		var v2 = camera.ScreenToViewportPoint( screenPosition2 );
+		var min = Vector3.Min( v1, v2 );
+		var max = Vector3.Max( v1, v2 );
 		min.z = camera.nearClipPlane;
 		max.z = camera.farClipPlane;
+		//min.z = 0.0f;
+		//max.z = 1.0f;
 
 		var bounds = new Bounds();
-		bounds.SetMinMax(min, max);
+		bounds.SetMinMax( min, max );
 		return bounds;
 	}
 

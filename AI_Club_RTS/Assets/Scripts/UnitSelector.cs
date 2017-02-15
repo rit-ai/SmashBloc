@@ -6,21 +6,33 @@ public class UnitSelector : MonoBehaviour {
 
 	bool isSelecting = false;
 	Vector3 mousePos;
+	List<SelectableUnit> selectedUnits;
 
 	// Use this for initialization
 	void Start () {
 		
 	}
-	
-	// Update is called once per frame
+
 	void Update () {
+		if(selectedUnits != null) {
+			//Debug.Log(selectedUnits.Count.ToString());
+		}
 		// Saves the mouse location when left mouse is down
 		if(Input.GetMouseButtonDown(0)) {
 			isSelecting = true;
 			mousePos = Input.mousePosition;
 		}
 		// Ends selection when left mouse button is released
+
+		// If we let go of the left mouse button, finish selection
 		if(Input.GetMouseButtonUp(0)) {
+			// Gets all the units that can be selected 
+			selectedUnits = new List<SelectableUnit>();
+			foreach(var s in FindObjectsOfType<SelectableUnit>()) {
+				if(IsWithinSelectionBounds(s.gameObject)) {
+					selectedUnits.Add(s);
+				}
+			}
 			isSelecting = false;
 		}
 	}
@@ -35,13 +47,14 @@ public class UnitSelector : MonoBehaviour {
 
 	}
 
-	public bool IsWithinSelectionBounds(GameObject gameObject) {
-		if(!isSelecting) {
+	public bool IsWithinSelectionBounds( GameObject gameObject )
+	{
+		if( !isSelecting ){
 			return false;
 		}
 
 		Camera camera = Camera.main;
-		Bounds viewPortBounds = Utils.GetViewportBounds(camera, mousePos, Input.mousePosition);
-		return viewPortBounds.Contains(camera.WorldToViewportPoint(gameObject.transform.position));
+		Bounds viewportBounds = Utils.GetViewportBounds( camera, mousePos, Input.mousePosition );
+		return viewportBounds.Contains( camera.WorldToViewportPoint( gameObject.transform.position ) );
 	}
 }
