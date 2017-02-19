@@ -1,4 +1,8 @@
 sceneSetups:
+<<<<<<< HEAD
 - path: Assets/Scenes/NavMeshTest.unity
+=======
+- path: Assets/Scenes/UI_Scene.unity
+>>>>>>> bb7a8d4fa758bc76e5ce44aff3be5faf69fb1dc5
   isLoaded: 1
   isActive: 1
