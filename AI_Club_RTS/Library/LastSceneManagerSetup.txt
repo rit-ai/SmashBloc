@@ -1,4 +1,12 @@
 sceneSetups:
+<<<<<<< HEAD
 - path: Assets/Scenes/Tory's Scene.unity
+=======
+<<<<<<< HEAD
+- path: Assets/Scenes/NavMeshTest.unity
+=======
+- path: Assets/Scenes/UI_Scene.unity
+>>>>>>> bb7a8d4fa758bc76e5ce44aff3be5faf69fb1dc5
+>>>>>>> 39ad034aff7d48d6519ef653c2d0bebc07138f38
   isLoaded: 1
   isActive: 1
