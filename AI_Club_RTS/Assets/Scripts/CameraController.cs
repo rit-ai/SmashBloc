@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnitSelector : MonoBehaviour {
+public class CameraController : MonoBehaviour {
 
-	bool isSelecting = false;
+	private bool isSelecting = false;
 
-	List<SelectableUnit> selectedUnits;  // List of current selected units. "Selectable Unit" can be changed to any class that you want to select
-	Vector3 mousePos;
-//	List<SelectableUnit> selectedUnits;
+	private List<GameObject> selectedUnits;  // List of current selected units. "Selectable Unit" can be changed to any class that you want to select
+	private Vector3 mousePos;
+	private float speed = 0.5f;
+	private float GUISize = 75;
 
 	// Use this for initialization
 	void Start () {
-		selectedUnits = new List<SelectableUnit>();
+		selectedUnits = new List<GameObject>();
 	}
 		
 	void Update () {
@@ -27,10 +28,10 @@ public class UnitSelector : MonoBehaviour {
 		if(Input.GetMouseButtonUp(0)) {
 			// Gets all the units that can be selected 
 			if(! Input.GetKey(KeyCode.LeftShift)) {
-				Debug.Log("new list, components deselected");
-				selectedUnits = new List<SelectableUnit>();
+				Debug.Log("list cleared, components deselected");
+				selectedUnits.Clear();
 			}
-			foreach(SelectableUnit s in FindObjectsOfType<SelectableUnit>()) {
+			foreach(GameObject s in GameObject.FindGameObjectsWithTag("Unit")) {
 				if(IsWithinSelectionBounds(s.gameObject) && !selectedUnits.Contains(s)) {
 					selectedUnits.Add(s);
 					Debug.Log("added");
@@ -38,6 +39,28 @@ public class UnitSelector : MonoBehaviour {
 			}
 			isSelecting = false;
 		}
+
+		// Camera movement
+		Rect recdown = new Rect (0, 0, Screen.width, GUISize);
+
+		Rect recup = new Rect (0, Screen.height - GUISize, Screen.width, GUISize);
+
+		Rect recleft = new Rect (0, 0, GUISize, Screen.height);
+
+		Rect recright = new Rect (Screen.width - GUISize, 0, GUISize, Screen.height);
+
+		if (recdown.Contains (Input.mousePosition) ||
+			recup.Contains (Input.mousePosition) ||
+			recleft.Contains (Input.mousePosition) ||
+			recright.Contains (Input.mousePosition))
+		{
+			//Vector2 middle = new Vector2(Screen.width/2, Screen.height/2);
+			Vector2 v = new Vector2(Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height/2);
+			v.Normalize();
+			v *= speed;
+			transform.Translate(v.x, 0, v.y, Space.World);
+		}
+			
 	}
 
 	void OnGUI() {
