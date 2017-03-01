@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour {
 	private List<GameObject> selectedUnits;  // List of current selected units. "Selectable Unit" can be changed to any class that you want to select
 	private Vector3 mousePos;
 	private float speed = 0.5f;
+	private float scrollSpeed = 5;
 	private float GUISize = 75;
 
 	// Use this for initialization
@@ -54,13 +55,20 @@ public class CameraController : MonoBehaviour {
 			recleft.Contains (Input.mousePosition) ||
 			recright.Contains (Input.mousePosition))
 		{
-			//Vector2 middle = new Vector2(Screen.width/2, Screen.height/2);
 			Vector2 v = new Vector2(Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height/2);
 			v.Normalize();
 			v *= speed;
 			transform.Translate(v.x, 0, v.y, Space.World);
 		}
-			
+
+		// Scroll in or out with the scroll wheel
+		float scroll = Input.GetAxis("Mouse ScrollWheel");
+		transform.Translate(0, scroll * scrollSpeed, scroll * scrollSpeed);
+		if(transform.position.y < 10) {
+			transform.position = new Vector3(transform.position.x, 10f, transform.position.z);
+		} else if(transform.position.y > 15) {
+			transform.position = new Vector3(transform.position.x, 15f, transform.position.z);
+		}
 	}
 
 	void OnGUI() {
