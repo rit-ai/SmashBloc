@@ -11,7 +11,6 @@ public class PathfindingTester : MonoBehaviour {
 	// Fields
 	private GameObject[] points;
 	private UnityEngine.AI.NavMeshAgent agent;
-	private Transform destination;
 
 	// Properties
 	/// <summary>
@@ -22,18 +21,12 @@ public class PathfindingTester : MonoBehaviour {
 		get { return points; }
 	}
 
-	public Transform Destination
-	{
-		get { return destination; }
-		set { destination = value; }
-	}
-
 	// Methods
 	// Use this for initialization
 	void Start () {
 		// Load points, the navAgent, and set a new destination
-		points = GameObject.FindGameObjectsWithTag ("Point");
-		agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+		//points = GameObject.FindGameObjectsWithTag ("Point");
+		//agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
 		//NewDestination ();
 	}
 	
@@ -44,16 +37,12 @@ public class PathfindingTester : MonoBehaviour {
 			NewDestination ();
 		}*/
 
-		// Have object follow mouse
-		if (destination != null) {
-			agent.destination = destination.position;
-		}
 	}
 
 	/// <summary>
 	/// Sets a New Destination.
 	/// </summary>
-	public void NewDestination() {
-		//agent.destination = points [Random.Range (0, points.Length)].transform.position;
+	public void NewDestination(Transform destination) {
+		agent.destination = destination.position;
 	}
 }
