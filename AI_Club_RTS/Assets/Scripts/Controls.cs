@@ -9,6 +9,8 @@ public class Controls : MonoBehaviour {
 
 	// Fields
 	Camera camera;
+	public PathfindingTester unit;
+
 	// Use this for initialization
 	void Start () {
 		camera = GetComponent<Camera> ();
@@ -16,7 +18,11 @@ public class Controls : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		Ray ray = camera.ScreenPointToRay(new Vector3(200, 200, 0));
-		Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
+		Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+		//Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
+		RaycastHit hit;
+		Physics.Raycast (ray, out hit);
+		unit.Destination = hit.transform;
+		Debug.Log (hit.transform.ToString());
 	}
 }
