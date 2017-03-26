@@ -11,6 +11,8 @@ public class PathfindingTester : MonoBehaviour {
 	// Fields
 	private GameObject[] points;
 	private UnityEngine.AI.NavMeshAgent agent;
+	private Camera camera;
+	private Controls controls;
 
 	// Properties
 	/// <summary>
@@ -28,6 +30,13 @@ public class PathfindingTester : MonoBehaviour {
 		//points = GameObject.FindGameObjectsWithTag ("Point");
 		//agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
 		//NewDestination ();
+
+		// Hail-Mary Attempt to get connection between Unit and Controls Scripts
+		/*camera = FindObjectOfType<Camera> ();
+		if (Camera != null) {
+			controls = camera.GetComponent<Controls> ();
+			controls.AttachUnit (this);
+		}*/
 	}
 	
 	// Update is called once per frame
