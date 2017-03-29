@@ -4,17 +4,25 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 
-	private bool isSelecting = false;
-
+	private bool isSelecting;
 	private List<GameObject> selectedUnits;  // List of current selected units. "Selectable Unit" can be changed to any class that you want to select
+	Rect recdown, recup, recleft, recright;
 	private Vector3 mousePos;
-	private float speed = 0.5f;
-	private float scrollSpeed = 5;
-	private float GUISize = 75;
+	private float speed;
+	private float scrollSpeed;
+	private float GUISize;
 
 	// Use this for initialization
 	void Start () {
+		recdown = new Rect (0, 0, Screen.width, GUISize);
+		recup = new Rect (0, Screen.height - GUISize, Screen.width, GUISize);
+		recleft = new Rect (0, 0, GUISize, Screen.height);
+		recright = new Rect (Screen.width - GUISize, 0, GUISize, Screen.height);
 		selectedUnits = new List<GameObject>();
+		isSelecting = false;
+		speed = 0.5f;
+		scrollSpeed = 5;
+		GUISize = 75;
 	}
 		
 	void Update () {
@@ -42,14 +50,10 @@ public class CameraController : MonoBehaviour {
 		}
 
 		// Camera movement
-		Rect recdown = new Rect (0, 0, Screen.width, GUISize);
-
-		Rect recup = new Rect (0, Screen.height - GUISize, Screen.width, GUISize);
-
-		Rect recleft = new Rect (0, 0, GUISize, Screen.height);
-
-		Rect recright = new Rect (Screen.width - GUISize, 0, GUISize, Screen.height);
-
+		recdown = new Rect (0, 0, Screen.width, GUISize);
+		recup = new Rect (0, Screen.height - GUISize, Screen.width, GUISize);
+		recleft = new Rect (0, 0, GUISize, Screen.height);
+		recright = new Rect (Screen.width - GUISize, 0, GUISize, Screen.height);
 		if (recdown.Contains (Input.mousePosition) ||
 			recup.Contains (Input.mousePosition) ||
 			recleft.Contains (Input.mousePosition) ||
@@ -63,12 +67,11 @@ public class CameraController : MonoBehaviour {
 
 		// Scroll in or out with the scroll wheel
 		float scroll = Input.GetAxis("Mouse ScrollWheel");
-		transform.Translate(0, scroll * scrollSpeed, scroll * scrollSpeed);
-		if(transform.position.y < 10) {
-			transform.position = new Vector3(transform.position.x, 10f, transform.position.z);
-		} else if(transform.position.y > 15) {
-			transform.position = new Vector3(transform.position.x, 15f, transform.position.z);
-		}
+		if(scroll < 0 && transform.position.y < 15){
+			transform.Translate(0, scroll * scrollSpeed, scroll * scrollSpeed);
+		} else if (scroll > 0 && transform.position.y > 10) {
+			transform.Translate(0, scroll * scrollSpeed, scroll * scrollSpeed);
+		} 
 	}
 
 	void OnGUI() {
