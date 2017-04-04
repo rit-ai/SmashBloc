@@ -25,4 +25,13 @@ public class Gold_Manager : MonoBehaviour {
 			counter = 0;
 		}
 	}
+
+	public bool SpendGold(int goldAmount ){
+		if(currentGold >= goldAmount) {
+			currentGold -= goldAmount;
+			return true;
+		}
+		return false;
+	}
+
 }

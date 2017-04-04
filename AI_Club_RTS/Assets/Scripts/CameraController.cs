@@ -6,8 +6,9 @@ public class CameraController : MonoBehaviour {
 
 	private bool isSelecting;
 	private List<GameObject> selectedUnits;  // List of current selected units. "Selectable Unit" can be changed to any class that you want to select
-	Rect recdown, recup, recleft, recright;
+	private Rect recdown, recup, recleft, recright;
 	private Vector3 mousePos;
+	private Camera camera;
 	private float speed;
 	private float scrollSpeed;
 	private float GUISize;
@@ -19,6 +20,7 @@ public class CameraController : MonoBehaviour {
 		recleft = new Rect (0, 0, GUISize, Screen.height);
 		recright = new Rect (Screen.width - GUISize, 0, GUISize, Screen.height);
 		selectedUnits = new List<GameObject>();
+		camera = Camera.main;
 		isSelecting = false;
 		speed = 0.5f;
 		scrollSpeed = 5;
@@ -36,7 +38,7 @@ public class CameraController : MonoBehaviour {
 		// Ends selection when left mouse button is released
 		if(Input.GetMouseButtonUp(0)) {
 			// Gets all the units that can be selected 
-			if(! Input.GetKey(KeyCode.LeftShift)) {
+			if(!Input.GetKey(KeyCode.LeftShift)) {
 				Debug.Log("list cleared, components deselected");
 				selectedUnits.Clear();
 			}
@@ -46,25 +48,37 @@ public class CameraController : MonoBehaviour {
 					Debug.Log("added");
 				}
 			}
+
+			RaycastHit hit;
+			Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+
+			// Click to add an object
+			if(Physics.Raycast(ray, out hit)) {
+				if(hit.transform.tag == "Unit" && !selectedUnits.Contains(hit.transform.gameObject)) {
+					selectedUnits.Add(hit.transform.gameObject);
+					Debug.Log("added");
+				}
+			}
 			isSelecting = false;
 		}
 
 		// Camera movement
-		recdown = new Rect (0, 0, Screen.width, GUISize);
-		recup = new Rect (0, Screen.height - GUISize, Screen.width, GUISize);
-		recleft = new Rect (0, 0, GUISize, Screen.height);
-		recright = new Rect (Screen.width - GUISize, 0, GUISize, Screen.height);
-		if (recdown.Contains (Input.mousePosition) ||
-			recup.Contains (Input.mousePosition) ||
-			recleft.Contains (Input.mousePosition) ||
-			recright.Contains (Input.mousePosition))
-		{
-			Vector2 v = new Vector2(Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height/2);
-			v.Normalize();
-			v *= speed;
-			transform.Translate(v.x, 0, v.y, Space.World);
+		if(!isSelecting){
+			recdown = new Rect (0, 0, Screen.width, GUISize);
+			recup = new Rect (0, Screen.height - GUISize, Screen.width, GUISize);
+			recleft = new Rect (0, 0, GUISize, Screen.height);
+			recright = new Rect (Screen.width - GUISize, 0, GUISize, Screen.height);
+			if (recdown.Contains (Input.mousePosition) ||
+				recup.Contains (Input.mousePosition) ||
+				recleft.Contains (Input.mousePosition) ||
+				recright.Contains (Input.mousePosition))
+			{
+				Vector2 v = new Vector2(Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height/2);
+				v.Normalize();
+				v *= speed;
+				transform.Translate(v.x, 0, v.y, Space.World);
+			}
 		}
-
 		// Scroll in or out with the scroll wheel
 		float scroll = Input.GetAxis("Mouse ScrollWheel");
 		if(scroll < 0 && transform.position.y < 15){
@@ -91,7 +105,7 @@ public class CameraController : MonoBehaviour {
 			return false;
 		}
 
-		Camera camera = Camera.main;
+		camera = Camera.main;
 		Bounds viewportBounds = Utils.GetViewportBounds( camera, mousePos, Input.mousePosition );
 		return viewportBounds.Contains( camera.WorldToViewportPoint( gameObject.transform.position ) );
 	}
