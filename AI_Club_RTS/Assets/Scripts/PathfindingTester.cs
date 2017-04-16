@@ -47,4 +47,11 @@ public class PathfindingTester : MonoBehaviour {
 		
 		}
 	}
+
+	/// <summary>
+	/// Sets a New Destination.
+	/// </summary>
+	public void NewDestination(Transform destination) {
+		agent.destination = destination.position;
+	}
 }
