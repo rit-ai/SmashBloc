@@ -13,6 +13,7 @@ public class UI_Manager : MonoBehaviour {
 	Button button;
 
 	void Start () {
+		camera = GameObject.Find("CameraPrefab").GetComponent(typeof(Camera)) as Camera;
 		sceneManager = GameObject.Find ("Scene_Manager");
 		gold = GameObject.Find("Gold_Text").GetComponent<Text> ();
 		gold_Manager = sceneManager.GetComponent<Gold_Manager> ();
@@ -25,19 +26,19 @@ public class UI_Manager : MonoBehaviour {
 	void Update () {
 		gold.text = "" +gold_Manager.currentGold;
 
-		if(Input.GetMouseButtonUp(0)) {
+		if(Input.GetMouseButtonUp(0) && camera != null) {
 			RaycastHit hit;
 			Ray ray = camera.ScreenPointToRay(Input.mousePosition);
 
 			if(Physics.Raycast(ray, out hit)) {
-				if(hit.transform.tag == "Unit") {
+				if(hit.transform.tag == "Spawner") {
 					button.gameObject.SetActive(true);
 					Debug.Log("buttons found: ");
 				} else {
 					button.gameObject.SetActive(false);
 				}
 			}
-		}
+		} 
 	}
 
 	// Spawns a new unit if gold_Manager has enough gold

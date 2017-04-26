@@ -9,6 +9,8 @@ public class CameraController : MonoBehaviour {
 	private Rect recdown, recup, recleft, recright;
 	private Vector3 mousePos;
 	private Camera camera;
+	private float maxScrollHeight;
+	private float minScrollHeight;
 	private float speed;
 	private float scrollSpeed;
 	private float GUISize;
@@ -22,6 +24,8 @@ public class CameraController : MonoBehaviour {
 		selectedUnits = new List<GameObject>();
 		camera = Camera.main;
 		isSelecting = false;
+		maxScrollHeight = 100;
+		minScrollHeight = 60;
 		speed = 0.5f;
 		scrollSpeed = 5;
 		GUISize = 75;
@@ -81,9 +85,9 @@ public class CameraController : MonoBehaviour {
 		}
 		// Scroll in or out with the scroll wheel
 		float scroll = Input.GetAxis("Mouse ScrollWheel");
-		if(scroll < 0 && transform.position.y < 15){
+		if(scroll < 0 && transform.position.y < maxScrollHeight){
 			transform.Translate(0, scroll * scrollSpeed, scroll * scrollSpeed);
-		} else if (scroll > 0 && transform.position.y > 10) {
+		} else if (scroll > 0 && transform.position.y > minScrollHeight) {
 			transform.Translate(0, scroll * scrollSpeed, scroll * scrollSpeed);
 		} 
 	}
