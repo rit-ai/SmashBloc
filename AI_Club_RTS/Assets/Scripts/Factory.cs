@@ -46,48 +46,4 @@ public class Factory : MonoBehaviour {
 		
 	}
 
-	/// <summary>
-	/// Builds an infantry.
-	/// </summary>
-	public void BuildInfantry()
-	{
-		Infantry newInf = new Infantry (team);
-		Instantiate (newInf);
-	}
-
-	/// <summary>
-	/// Builds a tank.
-	/// </summary>
-	public void BuildTank()
-	{
-		Tank newTank = new Tank (team);
-		Instantiate (newTank);
-	}
-
-	/// <summary>
-	/// Builds a bazooka.
-	/// </summary>
-	public void BuildBazooka()
-	{
-		Bazooka newZook = new Bazooka (team);
-		Instantiate (newZook);
-	}
-
-	/// <summary>
-	/// Builds a recon.
-	/// </summary>
-	public void BuildRecon()
-	{
-		Recon newRec = new Recon (team);
-		Instantiate (newRec);
-	}
-
-	/// <summary>
-	/// Builds an artillery.
-	/// </summary>
-	public void BuildArtillery()
-	{
-		Artillery newArt = new Artillery (team);
-		Instantiate (newArt);
-	}
 }
