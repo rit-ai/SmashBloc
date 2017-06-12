@@ -6,24 +6,43 @@ public class SupplyTruck : Unit {
     // Author: Ben Fairlamb
     // Purpose: Supply Truck Class
 
-    private const int MAXHEALTH = 100;
+    // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.L_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
+    private const int SUPPLY_CAPACITY = 100;
+
+    // Default values
+    private const int MAXHEALTH = 100;
     private const int DAMAGE = 20;
     private const int RANGE = 50;
     private const int COST = 200;
 
     // Fields
-    private const int supplyCapacity = 100;
 	private int supplies;
 
-	// Properties
-	/// <summary>
-	/// Gets the supply capacity of the truck.
-	/// </summary>
-	/// <value>The supply capacity of the truck.</value>
-	public int SupplyCapacity {
-		get { return supplyCapacity; }
+    // Methods
+    // Use this for initialization
+    void Start()
+    {
+        // Handle constants
+        armorType = ARMOR_TYPE;
+        dmgType = DMG_TYPE;
+        // Handle default values
+        maxHealth = MAXHEALTH;
+        dmg = DAMAGE;
+        range = RANGE;
+        cost = COST;
+        // Handle private fields
+        supplies = SUPPLY_CAPACITY;
+    }
+
+    // Properties
+    /// <summary>
+    /// Gets the supply capacity of the truck.
+    /// </summary>
+    /// <value>The supply capacity of the truck.</value>
+    public int SupplyCapacity {
+		get { return SUPPLY_CAPACITY; }
 	}
 
 	/// <summary>
@@ -32,23 +51,6 @@ public class SupplyTruck : Unit {
 	/// <value>The amount of supplies in the truck.</value>
 	public int Supplies {
 		get { return supplies; }
-	}
-
-	// Constructor
-	/// <summary>
-	/// Initializes a new instance of the Supply Truck class.
-	/// </summary>
-	/// <param name="team">Team of the truck.</param>
-	public SupplyTruck(string team)
-        : base(team, MAXHEALTH, ARMOR_TYPE, DMG_TYPE, DAMAGE, RANGE, COST)
-    {
-        supplies = supplyCapacity;
-	}
-
-	// Methods
-	// Use this for initialization
-	void Start () {
-		
 	}
 	
 	// Update is called once per frame

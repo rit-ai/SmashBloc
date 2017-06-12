@@ -8,16 +8,19 @@ public abstract class Unit : MonoBehaviour {
 	// Purpose: Base class for all Units
 	// Limitations: Meh
 
-	// fields
-	protected string team;
-	protected int maxHealth;
-	protected int health;
-	protected ArmorType armorType;
-	protected DamageType dmgType;
-	protected int dmg;
-	protected int range;
-	protected int cost;
+	// public fields, can easily be changed for balancing or by gameplay
+	public string team;
+    public float maxHealth;
+    public float health;
+    public float dmg;
+    public float range;
+    public int cost;
 
+    // protected fields, more related to fundamentals of unit type
+    protected ArmorType armorType;
+    protected DamageType dmgType;
+
+    // protected fields related to physics
     protected Rigidbody body;
     protected Collider collision;
 
@@ -29,45 +32,47 @@ public abstract class Unit : MonoBehaviour {
 		get { return team; }
 	}
 
-	/// <summary>
-	/// Gets the unit's Maximum Health.
-	/// </summary>
-	public int MaxHealth {
+    /// <summary>
+    /// Gets the type of the unit.
+    /// </summary>
+    public ArmorType ArmorType
+    {
+        get { return armorType; }
+    }
+
+    /// <summary>
+    /// Gets the unit's Type of Damage. (Possible use for Rock Paper Scissors effect: Temp)
+    /// </summary>
+    public DamageType DmgType
+    {
+        get { return dmgType; }
+    }
+
+    /// <summary>
+    /// Gets the unit's Maximum Health.
+    /// </summary>
+    public float MaxHealth {
 		get { return maxHealth; }
 	}
 
 	/// <summary>
 	/// Gets the unit's current Health.
 	/// </summary>
-	public int Health {
+	public float Health {
 		get { return health; }
-	}
-
-	/// <summary>
-	/// Gets the type of the unit.
-	/// </summary>
-	public ArmorType ArmorType {
-		get { return armorType; }
-	}
-
-	/// <summary>
-	/// Gets the unit's Type of Damage. (Possible use for Rock Paper Scissors effect: Temp)
-	/// </summary>
-	public DamageType DmgType {
-		get { return dmgType; }
 	}
 
 	/// <summary>
 	/// Gets the Damage dealt by the unit.
 	/// </summary>
-	public int Dmg {
+	public float Dmg {
 		get { return dmg; }
 	}
 
 	/// <summary>
 	/// Gets the unit's Range.
 	/// </summary>
-	public int Range {
+	public float Range {
 		get { return range; }
 	}
 
@@ -78,6 +83,7 @@ public abstract class Unit : MonoBehaviour {
 		get { return cost; }
 	}
 
+    /*
 	// Constructor
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Unit"/> class.
@@ -98,6 +104,7 @@ public abstract class Unit : MonoBehaviour {
 
         health = maxHealth;
 	}
+    */
 
     public void ToggleHighlight()
     {
@@ -123,11 +130,17 @@ public abstract class Unit : MonoBehaviour {
 
 }
 
+/// <summary>
+/// Type of armor. Armor type affects unit speed and damage resistance.
+/// </summary>
 public enum ArmorType
 {
     H_ARMOR, M_ARMOR, L_ARMOR
 }
 
+/// <summary>
+/// Type of damage. Explosive damage triggers knockback effects.
+/// </summary>
 public enum DamageType
 {
     EXPLOSIVE, BULLET

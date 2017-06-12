@@ -3,30 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Tank : Unit {
-	// Author: Ben Fairlamb
-	// Purpose: Tank unit
+    // Author: Ben Fairlamb
+    // Purpose: Tank unit
 
-    private const int MAXHEALTH = 200;
+    // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
     private const DamageType DMG_TYPE = DamageType.EXPLOSIVE;
+
+    // Default values
+    private const int MAXHEALTH = 200;
     private const int DAMAGE = 100;
     private const int RANGE = 100;
     private const int COST = 500;
 
-	// Constructor
-	/// <summary>
-	/// Initializes a new instance of the Tank class.
-	/// </summary>
-	public Tank(string team)
-		: base(team, MAXHEALTH, ARMOR_TYPE, DMG_TYPE, DAMAGE, RANGE, COST)
-	{
-	}
-
 	// Methods
 	// Use this for initialization
 	void Start () {
-		
-	}
+        // Handle constants
+        armorType = ARMOR_TYPE;
+        dmgType = DMG_TYPE;
+        // Handle default values
+        maxHealth = MAXHEALTH;
+        dmg = DAMAGE;
+        range = RANGE;
+        cost = COST;
+    }
 	
 	// Update is called once per frame
 	void Update () {

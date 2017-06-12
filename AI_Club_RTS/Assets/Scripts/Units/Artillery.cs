@@ -4,25 +4,30 @@ using UnityEngine;
 
 public class Artillery : Unit {
     // Author: Ben Fairlamb
+    // Author: Paul Galatic
     // Purpose: Artillery unit
 
-    private const int MAXHEALTH = 50;
+    // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
     private const DamageType DMG_TYPE = DamageType.EXPLOSIVE;
-    private const int DAMAGE = 100;
-    private const int RANGE = 200;
-    private const int COST = 400;
 
-    // Constructor
-    public Artillery(string team)
-        : base(team, MAXHEALTH, ARMOR_TYPE, DMG_TYPE, DAMAGE, RANGE, COST)
-    {
-    }
+    // Default values
+    private const float MAXHEALTH = 50f;
+    private const float DAMAGE = 100f;
+    private const float RANGE = 200f;
+    private const int COST = 400;
 
 	// Methods
 	// Use this for initialization
 	void Start () {
-		
+        // Handle constants
+        armorType = ARMOR_TYPE;
+        dmgType = DMG_TYPE;
+        // Handle default values
+        maxHealth = MAXHEALTH;
+        dmg = DAMAGE;
+        range = RANGE;
+        cost = COST;
 	}
 	
 	// Update is called once per frame
