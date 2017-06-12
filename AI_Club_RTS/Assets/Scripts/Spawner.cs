@@ -20,7 +20,7 @@ public class Spawner : MonoBehaviour {
     /// <summary>
     /// Spawns a unit at the position of the object hosting this script.
     /// </summary>
-    public void Spawn(Unit unit)
+    public void Spawn<Unit>(Unit unit)
     {
         // Instantiate(unit, transform);
         if (unit is Infantry)

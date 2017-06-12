@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class State : MonoBehaviour {
+public abstract class State {
 
     /// <summary>
     /// Handles any user input from implementer.

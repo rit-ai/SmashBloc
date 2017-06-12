@@ -6,24 +6,31 @@ public class Bazooka : Unit {
     // Author: Ben Fairlamb
     // Purpose: Bazooka unit
 
-    private const int MAXHEALTH = 100;
+    // NAME -- for external reference purposes
+    public const string NAME = "BAZOOKA";
+
+    // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.EXPLOSIVE;
+
+    // Default values
+    private const int MAXHEALTH = 100;
     private const int DAMAGE = 100;
     private const int RANGE = 100;
     private const int COST = 300;
 
-    // Constructor
-    public Bazooka(string team)
-        : base(team, MAXHEALTH, ARMOR_TYPE, DMG_TYPE, DAMAGE, RANGE, COST)
-    {
-    }
-
 	// Methods
 	// Use this for initialization
 	void Start () {
-		
-	}
+        // Handle constants
+        armorType = ARMOR_TYPE;
+        dmgType = DMG_TYPE;
+        // Handle default values
+        maxHealth = MAXHEALTH;
+        dmg = DAMAGE;
+        range = RANGE;
+        cost = COST;
+    }
 	
 	// Update is called once per frame
 	void Update () {
