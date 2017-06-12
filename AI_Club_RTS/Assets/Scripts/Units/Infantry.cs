@@ -6,6 +6,9 @@ public class Infantry : Unit {
     // Author: Ben Fairlamb
     // Purpose: Artillery unit
 
+    // NAME -- for external reference purposes
+    public const string NAME = "INFANTRY";
+
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;

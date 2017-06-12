@@ -10,17 +10,36 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 
-    private const int GOLD_INCREMENT_RATE = 2; // scale by which gold updates
-    private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
-    private const int UNIT_GOLD_COST = 5; // gold cost for unit
+    // Public constants
+    // Types of units a Player can own
+    public Artillery ARTILLERY;
+    public Bazooka BAZOOKA;
+    public Infantry INFANTRY;
+    public Recon RECON;
+    public SupplyTruck SUPPLY_TRUCK;
+    public Tank TANK;
 
+    // Private Constants
+    private const int GOLD_INCREMENT_RATE = 2;  // scale by which gold updates
+                                                // --higher is faster
+
+    private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
+
+    // Fields
+    private Unit toSpawn;
     private int currentGoldAmount;
     private int currentUnits;
 
-    private Unit unitToSpawn;
-
     // Use this for initialization
     void Start () {
+        // Handle public constants
+        //ARTILLERY =     Instantiate(ARTILLERY)      as Artillery;
+        //BAZOOKA =       Instantiate(BAZOOKA)        as Bazooka;
+        INFANTRY =      Instantiate(INFANTRY)       as Infantry;
+        //RECON =         Instantiate(RECON)          as Recon;
+        //SUPPLY_TRUCK =  Instantiate(SUPPLY_TRUCK)   as SupplyTruck;
+        TANK =          Instantiate(TANK)           as Tank;
+
         currentGoldAmount = 0;
 	}
 	
@@ -31,11 +50,36 @@ public class Player : MonoBehaviour {
 	}
 
     /// <summary>
-    /// Sets the unit to spawn.
+    /// Sets the unit to spawn. Throws an exception on an invalid name being 
+    /// passed.
     /// </summary>
-    public void SetUnitToSpawn(Unit unit)
+    /// <param name="unitName">The name of the unit to spawn, based on 
+    /// Unit.NAME.</param>
+    public void SetUnitToSpawn(string unitName)
     {
-        unitToSpawn = unit;
+        switch (unitName)
+        {
+            case Artillery.NAME:
+                toSpawn = ARTILLERY;
+                break;
+            case Bazooka.NAME:
+                toSpawn = BAZOOKA;
+                break;
+            case Infantry.NAME:
+                toSpawn = INFANTRY;
+                break;
+            case Recon.NAME:
+                toSpawn = RECON;
+                break;
+            case SupplyTruck.NAME:
+                toSpawn = SUPPLY_TRUCK;
+                break;
+            case Tank.NAME:
+                toSpawn = TANK;
+                break;
+            default:
+                throw new KeyNotFoundException("SetUnitToSpawn given invalid string");
+        }
     }
 
     /// <summary>
@@ -44,11 +88,11 @@ public class Player : MonoBehaviour {
     /// <param name="spawner">The spawner at which to spawn the unit.</param>
     public void SpawnUnit(Spawner spawner)
     {
-        if (!(currentGoldAmount < unitToSpawn.Cost))
+        if (!(currentGoldAmount < toSpawn.Cost))
         {
-            currentGoldAmount -= unitToSpawn.Cost;
+            currentGoldAmount -= toSpawn.Cost;
             currentUnits++;
-            spawner.Spawn(unitToSpawn);
+            spawner.Spawn(toSpawn);
         }
     }
 

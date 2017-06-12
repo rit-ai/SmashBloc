@@ -7,9 +7,12 @@ public class Artillery : Unit {
     // Author: Paul Galatic
     // Purpose: Artillery unit
 
+    // NAME -- for external reference purposes
+    public const string NAME = "ARTILLERY";
+
     // CONSTANTS -- intimately related to unit design
-    private const ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
-    private const DamageType DMG_TYPE = DamageType.EXPLOSIVE;
+    private static ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
+    private static DamageType DMG_TYPE = DamageType.EXPLOSIVE;
 
     // Default values
     private const float MAXHEALTH = 50f;

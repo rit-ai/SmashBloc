@@ -6,6 +6,9 @@ public class SupplyTruck : Unit {
     // Author: Ben Fairlamb
     // Purpose: Supply Truck Class
 
+    // NAME -- for external reference purposes
+    public const string NAME = "SUPPLY_TRUCK";
+
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.L_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;

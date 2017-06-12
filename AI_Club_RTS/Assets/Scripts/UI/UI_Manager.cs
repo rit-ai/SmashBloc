@@ -51,14 +51,14 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     public void SetUnitToSpawn()
     {
-        Unit toSpawn;
+        string toSpawn;
         switch (m_UnitSelectDropdown.value)
         {
             case 0:
-                toSpawn = new Infantry("NULL");
+                toSpawn = Infantry.NAME;
                 break;
             default:
-                toSpawn = new Tank("NULL");
+                toSpawn = Tank.NAME;
                 break;
         }
         m_Player.SetUnitToSpawn(toSpawn);

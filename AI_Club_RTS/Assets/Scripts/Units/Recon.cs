@@ -6,6 +6,9 @@ public class Recon : Unit {
     // Author: Ben Fairlamb
     // Purpose: Recon unit
 
+    // NAME -- for external reference purposes
+    public const string NAME = "RECON";
+
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.L_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;

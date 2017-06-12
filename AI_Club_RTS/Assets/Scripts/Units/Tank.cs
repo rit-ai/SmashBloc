@@ -6,6 +6,9 @@ public class Tank : Unit {
     // Author: Ben Fairlamb
     // Purpose: Tank unit
 
+    // NAME -- for external reference purposes
+    public const string NAME = "TANK";
+
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
     private const DamageType DMG_TYPE = DamageType.EXPLOSIVE;

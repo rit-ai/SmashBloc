@@ -6,6 +6,9 @@ public class Bazooka : Unit {
     // Author: Ben Fairlamb
     // Purpose: Bazooka unit
 
+    // NAME -- for external reference purposes
+    public const string NAME = "BAZOOKA";
+
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.EXPLOSIVE;
