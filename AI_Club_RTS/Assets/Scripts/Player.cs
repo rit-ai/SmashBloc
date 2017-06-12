@@ -10,7 +10,13 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 
-    // Public constants
+    // Private Constants
+    private const int GOLD_INCREMENT_RATE = 2;  // scale by which gold updates
+                                                // --higher is faster
+
+    private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
+
+    // Public fields
     // Types of units a Player can own
     public Artillery ARTILLERY;
     public Bazooka BAZOOKA;
@@ -19,13 +25,7 @@ public class Player : MonoBehaviour {
     public SupplyTruck SUPPLY_TRUCK;
     public Tank TANK;
 
-    // Private Constants
-    private const int GOLD_INCREMENT_RATE = 2;  // scale by which gold updates
-                                                // --higher is faster
-
-    private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
-
-    // Fields
+    // Private fields
     private Unit toSpawn;
     private int currentGoldAmount;
     private int currentUnits;

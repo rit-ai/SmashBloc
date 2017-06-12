@@ -4,12 +4,16 @@ using UnityEngine;
 
 public abstract class Unit : MonoBehaviour {
 
-	// Author: Ben Fairlamb
-	// Purpose: Base class for all Units
-	// Limitations: Meh
+    // Author: Ben Fairlamb
+    // Author: Paul Galatic
+    // Purpose: Base class for all Units
+    // Limitations: Meh
 
-	// public fields, can easily be changed for balancing or by gameplay
-	public string team;
+    // public component fields
+    public Canvas m_Canvas;
+
+    // public fields, can easily be changed for balancing or by gameplay
+    public string team;
     public float maxHealth;
     public float health;
     public float dmg;
@@ -83,32 +87,20 @@ public abstract class Unit : MonoBehaviour {
 		get { return cost; }
 	}
 
-    /*
-	// Constructor
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Unit"/> class.
-	/// </summary>
-	/// <param name="maxhealth">Unit's Maximum Health.</param>
-	/// <param name="dmgType">Unit's Damage Type.</param>
-	/// <param name="dmg">Unit's Damage.</param>
-	/// <param name="range">Unit's Range.</param>
-	/// <param name="cost">Unit's Cost.</param>
-	public Unit(string team, int maxHealth, ArmorType armorType, DamageType dmgType, int dmg, int range, int cost) {
-		this.team = team;
-		this.maxHealth = maxHealth;
-		this.armorType = armorType;
-		this.dmgType = dmgType;
-		this.dmg = dmg;
-		this.range = range;
-		this.cost = cost;
-
-        health = maxHealth;
-	}
-    */
-
-    public void ToggleHighlight()
+    /// <summary>
+    /// Selects the unit.
+    /// </summary>
+    public void Select()
     {
+        m_Canvas.enabled = true; // highlight unit
+    }
 
+    /// <summary>
+    /// Deselects the unit.
+    /// </summary>
+    public void Deselect()
+    {
+        m_Canvas.enabled = false; // remove highlight
     }
 
 	/// <summary>

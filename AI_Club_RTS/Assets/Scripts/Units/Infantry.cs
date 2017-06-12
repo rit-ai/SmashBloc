@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Infantry : Unit {
     // Author: Ben Fairlamb
+    // Author: Paul Galatic
     // Purpose: Artillery unit
 
     // NAME -- for external reference purposes
@@ -12,16 +13,18 @@ public class Infantry : Unit {
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
-
     // Default values
     private const int MAXHEALTH = 100;
     private const int DAMAGE = 10;
     private const int RANGE = 25;
     private const int COST = 50;
 
-	// Methods
-	// Use this for initialization
-	void Start () {
+    // Public fields
+
+
+    // Methods
+    // Use this for initialization
+    void Start () {
         // Handle constants
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;

@@ -22,10 +22,17 @@ public class CameraController : MonoBehaviour {
     public void Start () {
         DESELECT_KEY = KeyCode.LeftShift; // TODO make custom binds
 
-        m_CurrentState = new DrawingState(this);
+        m_CurrentState = new SelectionState(this);
     }
-		
-	public void Update () {
+
+    void OnGUI()
+    {
+        Rect rect = Utils.GetScreenRect(m_MousePos, Input.mousePosition);
+        Utils.DrawScreenRect(rect, new Color(0.8f, 0.8f, 0.95f, 0.25f));
+        Utils.DrawScreenRectBorder(rect, 2, new Color(.8f, .0f, 0.95f));
+    }
+
+    public void Update () {
         m_CurrentState.HandleInput();
         m_CurrentState.StateUpdate();
         Scroll();
@@ -44,13 +51,6 @@ public class CameraController : MonoBehaviour {
 		    }
     }
 
-    void OnGUI()
-    {
-        Rect rect = Utils.GetScreenRect(m_MousePos, Input.mousePosition);
-        Utils.DrawScreenRect(rect, new Color(0.8f, 0.8f, 0.95f, 0.25f));
-        Utils.DrawScreenRectBorder(rect, 2, new Color(.8f, .0f, 0.95f));
-    }
-
     /// <summary>
     /// Stores the mouse position variable.
     /// </summary>
@@ -61,10 +61,21 @@ public class CameraController : MonoBehaviour {
     }
 
     /// <summary>
-    /// State that handles all behavior involving drawing a box, but NOT with
-    /// selecting units.
+    /// Deselects all units.
     /// </summary>
-    class DrawingState : State
+    private void DeselectAll()
+    {
+        foreach (Unit s in GameObject.FindObjectsOfType<Unit>())
+        {
+            s.Deselect();
+        }
+    }
+
+    /// <summary>
+    /// Handles all state involved with selected units after drawing the 
+    /// selection rectangle is completed.
+    /// </summary>
+    class SelectionState : State
     {
         private CameraController m_CameraController;
 
@@ -72,7 +83,7 @@ public class CameraController : MonoBehaviour {
         private static float GUI_SIZE;
         private static float SPEED;
 
-        public DrawingState(CameraController controller)
+        public SelectionState(CameraController controller)
         {
             m_CameraController = controller;
 
@@ -87,18 +98,23 @@ public class CameraController : MonoBehaviour {
 
         public override void HandleInput()
         {
-            // Ends drawing when left mouse button is pressed and switches
-            // to SelectionState
+            // Deselect units when the deselect key is pressed
+            if (Input.GetKey(DESELECT_KEY))
+            {
+                m_CameraController.DeselectAll();
+            }
+
+            // Starts drawing when left mouse button is pressed by switching
+            // to DrawingState
             if (Input.GetMouseButtonDown(0))
             {
-                m_CameraController.m_CurrentState = new SelectionState(m_CameraController);
+                m_CameraController.m_CurrentState = new DrawingState(m_CameraController);
                 return;
             }
 
             m_CameraController.StoreMousePos(Input.mousePosition);
 
-            // Grabs the relative dimensions of the rectangles to draw and
-            // draws them
+            // Edge panning functionality FIXME
             recdown = new Rect(0, 0, Screen.width, GUI_SIZE);
             recup = new Rect(0, Screen.height - GUI_SIZE, Screen.width, GUI_SIZE);
             recleft = new Rect(0, 0, GUI_SIZE, Screen.height);
@@ -108,7 +124,6 @@ public class CameraController : MonoBehaviour {
                 recleft.Contains(Input.mousePosition) ||
                 recright.Contains(Input.mousePosition))
             {
-                // Edge panning functionality FIXME
                 Vector2 v = new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2);
                 v.Normalize();
                 v *= SPEED;
@@ -124,22 +139,19 @@ public class CameraController : MonoBehaviour {
     }
 
     /// <summary>
-    /// Handles all state involved with selecting units after drawing the 
-    /// selection rectangle is completed.
+    /// State that handles all behavior involving drawing a box, but NOT with
+    /// selecting units.
     /// </summary>
-    class SelectionState : State
+    class DrawingState : State
     {
         private CameraController m_CameraController;
 
         private Camera m_Camera;
-        private HashSet<Unit> m_SelectedUnits;  // List of current selected units. "Selectable Unit" can be changed to any class that you want to select
 
-        public SelectionState(CameraController controller)
+        public DrawingState(CameraController controller)
         {
             m_CameraController = controller;
-
             m_Camera = controller.m_Camera;
-            m_SelectedUnits = new HashSet<Unit>();
         }
 
         public override void HandleInput()
@@ -147,24 +159,17 @@ public class CameraController : MonoBehaviour {
             // When mouse button is up, switch back to drawing state.
             if (Input.GetMouseButtonUp(0))
             {
-                m_CameraController.m_CurrentState = new DrawingState(m_CameraController);
+                m_CameraController.m_CurrentState = new SelectionState(m_CameraController);
                 return;
-            }
-
-            // Deselect units when the deselect key is pressed
-            if (Input.GetKey(DESELECT_KEY))
-            {
-                Debug.Log("list cleared, components deselected");
-                m_SelectedUnits.Clear();
             }
 
             // Take the selection box and highlight all the objects inside
             foreach (Unit s in GameObject.FindObjectsOfType<Unit>())
-            {
-                if (IsWithinSelectionBounds(s) && !m_SelectedUnits.Contains(s))
+               {
+                s.Deselect();
+                if (IsWithinSelectionBounds(s))
                 {
-                    m_SelectedUnits.Add(s);
-                    Debug.Log("added");
+                    s.Select();
                 }
             }
         }

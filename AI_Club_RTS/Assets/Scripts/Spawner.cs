@@ -4,11 +4,16 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour {
 
-    public GameObject m_Cube;
-    public GameObject m_Pill;
+    // Public 
+    public Artillery ARTILLERY;
+    public Bazooka BAZOOKA;
+    public Infantry INFANTRY;
+    public Recon RECON;
+    public SupplyTruck SUPPLY_TRUCK;
+    public Tank TANK;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 
     }
 	
@@ -25,10 +30,10 @@ public class Spawner : MonoBehaviour {
         // Instantiate(unit, transform);
         if (unit is Infantry)
         {
-            Instantiate(m_Cube, transform);
+            Instantiate(INFANTRY, transform.position, transform.rotation);
         } else if (unit is Tank)
         {
-            Instantiate(m_Pill, transform);
+            Instantiate(TANK, transform.position, transform.rotation);
         }
     }
 
