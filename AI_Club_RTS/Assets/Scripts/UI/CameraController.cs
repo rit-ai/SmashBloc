@@ -5,22 +5,32 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 
-	
-	private Vector3 _mousePos;
-	private static float MAX_SCROLL_HEIGHT = 100;
-	private static float MIN_SCROLL_HEIGHT = 60;
-	private static float SCROLLSPEED = 5;
-
+    // Public constants
     public static KeyCode DESELECT_KEY;
 
+    // Private constants
+    private static float MAX_SCROLL_HEIGHT = 100;
+    private static float MIN_SCROLL_HEIGHT = 60;
+    private static float SCROLLSPEED = 5;
+    private static float BORDER_SIZE = 20f;
+    private static float SPEED = 1f;
+
+    // Public fields
     public Camera m_Camera;
 
+    // Private fields
     private State m_CurrentState;
     private Vector3 m_MousePos;
+    private Rect screenBorderInverse;
 
     // Use this for initialization
     public void Start () {
+        // Handle public constants
         DESELECT_KEY = KeyCode.LeftShift; // TODO make custom binds
+
+        // Handle private fields
+        // Rectangle that contains everything EXCEPT the screen border
+        screenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
 
         m_CurrentState = new SelectionState(this);
     }
@@ -36,6 +46,7 @@ public class CameraController : MonoBehaviour {
         m_CurrentState.HandleInput();
         m_CurrentState.StateUpdate();
         Scroll();
+        EdgePan();
     }
 
     /// <summary>
@@ -49,6 +60,21 @@ public class CameraController : MonoBehaviour {
 		    } else if (scroll > 0 && transform.position.y > MIN_SCROLL_HEIGHT) {
 			    transform.Translate(0, scroll* SCROLLSPEED, scroll * SCROLLSPEED);
 		    }
+    }
+
+    /// <summary>
+    /// Handles edge panning, based on the position of the mouse.
+    /// </summary>
+    private void EdgePan()
+    {
+        // Is the mouse at the edge of the screen?
+        if (!screenBorderInverse.Contains(m_MousePos))
+        {
+            Vector2 v = new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2);
+            v.Normalize();
+            v *= SPEED;
+            transform.Translate(v.x, 0, v.y, Space.World);
+        }
     }
 
     /// <summary>
@@ -79,21 +105,9 @@ public class CameraController : MonoBehaviour {
     {
         private CameraController m_CameraController;
 
-        private Rect recdown, recup, recleft, recright;
-        private static float GUI_SIZE;
-        private static float SPEED;
-
         public SelectionState(CameraController controller)
         {
             m_CameraController = controller;
-
-            GUI_SIZE = 75;
-            SPEED = 0.5f;
-
-            recdown = new Rect(0, 0, Screen.width, GUI_SIZE);
-            recup = new Rect(0, Screen.height - GUI_SIZE, Screen.width, GUI_SIZE);
-            recleft = new Rect(0, 0, GUI_SIZE, Screen.height);
-            recright = new Rect(Screen.width - GUI_SIZE, 0, GUI_SIZE, Screen.height);
         }
 
         public override void HandleInput()
@@ -113,22 +127,6 @@ public class CameraController : MonoBehaviour {
             }
 
             m_CameraController.StoreMousePos(Input.mousePosition);
-
-            // Edge panning functionality FIXME
-            recdown = new Rect(0, 0, Screen.width, GUI_SIZE);
-            recup = new Rect(0, Screen.height - GUI_SIZE, Screen.width, GUI_SIZE);
-            recleft = new Rect(0, 0, GUI_SIZE, Screen.height);
-            recright = new Rect(Screen.width - GUI_SIZE, 0, GUI_SIZE, Screen.height);
-            if (recdown.Contains(Input.mousePosition) ||
-                recup.Contains(Input.mousePosition) ||
-                recleft.Contains(Input.mousePosition) ||
-                recright.Contains(Input.mousePosition))
-            {
-                Vector2 v = new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2);
-                v.Normalize();
-                v *= SPEED;
-                //m_CameraController.transform.Translate(v.x, 0, v.y, Space.World);
-            }
         }
 
         public override void StateUpdate()
