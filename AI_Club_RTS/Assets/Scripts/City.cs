@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class City : MonoBehaviour {
-	// Author: Ben Fairlamb
-	// Purpose: City functionality
-	// Limitations: Meh
+    // Author: Ben Fairlamb
+    // Purpose: City functionality
+    // Limitations: Meh
 
-	// Fields
-	private string team;
-	private int income;
+    // Constants
+    private int DEFAULT_INCOME = 1;
+
+    // Fields
+    private string team;
+    private int income;
 
 	// Properties
 	/// <summary>
@@ -27,20 +30,13 @@ public class City : MonoBehaviour {
 	public int Income {
 		get { return income; }
 	}
-	// Constructor
-	public City(int income)
-	{
-		team = "nuetral";
-		this.income = income;
-	}
 
 	// Use this for initialization
 	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+        income = DEFAULT_INCOME;
+    }
+
+    // Update is called once per frame
+    void Update () {
 	}
 }
