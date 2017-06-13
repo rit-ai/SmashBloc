@@ -11,7 +11,7 @@ public class City : MonoBehaviour {
     private int DEFAULT_INCOME = 1;
 
     // Fields
-    private string team;
+    // private string team;
     private int income;
 
 	// Properties
@@ -19,9 +19,9 @@ public class City : MonoBehaviour {
 	/// Gets the Team that currently owns the city.
 	/// </summary>
 	/// <value>The Team that owns the city.</value>
-	public string Team {
-		get { return team; }
-	}
+	//public string Team {
+		//get { return team; }
+	//}
 
 	/// <summary>
 	/// Gets the Income the city generates per second.

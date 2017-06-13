@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class State {
+public interface State {
 
     /// <summary>
     /// Handles any user input from implementer.
     /// </summary>
-    public abstract void HandleInput();
+    void HandleInput();
 
     /// <summary>
     /// Handles Update() delegation from implementer.
@@ -15,5 +15,5 @@ public abstract class State {
     /// This is the function that will be called instead of Update() when a 
     /// class implementing this pattern needs to update.
     /// </summary>
-    public abstract void StateUpdate();
+    void StateUpdate();
 }

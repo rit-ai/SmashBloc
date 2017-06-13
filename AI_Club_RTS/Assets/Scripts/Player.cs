@@ -65,7 +65,7 @@ public class Player : MonoBehaviour {
             case Bazooka.NAME:
                 toSpawn = BAZOOKA;
                 break;
-            case Infantry.NAME:
+            case Infantry.IDENTITY:
                 toSpawn = INFANTRY;
                 break;
             case Recon.NAME:
@@ -74,7 +74,7 @@ public class Player : MonoBehaviour {
             case SupplyTruck.NAME:
                 toSpawn = SUPPLY_TRUCK;
                 break;
-            case Tank.NAME:
+            case Tank.IDENTITY:
                 toSpawn = TANK;
                 break;
             default:

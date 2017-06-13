@@ -6,43 +6,61 @@ using UnityEngine.UI;
 /**
  * @author Paul Galatic
  * 
- * Class designed to manage all UI-specific elements by communicating with 
- * any other classes that hold such information, particularly Player.
+ * Class designed to handle any UI-specific information that shows up on the
+ * main overlay. Should **avoid** logic on what to display or what to pass
+ * along if possible.
  */
-
 public class UI_Manager : MonoBehaviour {
 
+    // Private constants
     private const string CAMERA_NAME = "Main Camera";
     private const string SPAWNUNITBUTTON_NAME = "SpawnUnitButton";
     private const string GOLDAMOUNTTEXT_NAME = "GoldAmountText";
     private const string PLAYER_NAME = "Player";
 
+    // Public fields
+    // GENERAL
     public Camera m_Camera;
+    // HEADER
     public Button m_SpawnUnitButton;
     public Dropdown m_UnitSelectDropdown;
     public Text m_CurrentGoldAmountText;
     public Text m_CurrentUnitAmountText;
+    // UNIT MENU
+    public Canvas m_UnitMenuCanvas;
+    public InputField m_UnitMenuNameInput;
+    public Slider m_UnitMenuHealthSlider;
 
+    // Private fields
     private Player m_Player;
     private Spawner m_Spawner;
+    private Unit unitCurrentlyDisplayed;
 
+    // Initialize only once
     private void Awake()
     {
+        // Set handler for when the Player accesses the dropdown
         m_UnitSelectDropdown.onValueChanged.AddListener(delegate { SetUnitToSpawn(); });
     }
 
+    // Initialize whenever this object loads
     void Start ()
     {
+        // Handle private fields
         m_Spawner = GameObject.FindObjectOfType<Spawner>();
-        m_Player = GetComponentInParent<Player>();
+        m_Player = GameObject.FindObjectOfType<Player>();
 
         SetUnitToSpawn();
 	}
 
+    /// <summary>
+    /// Update the UI display.
+    /// </summary>
 	void Update ()
     {
         UpdateGoldText();
         UpdateUnitText();
+        UpdateUnitMenu();
 	}
 
     /// <summary>
@@ -55,10 +73,10 @@ public class UI_Manager : MonoBehaviour {
         switch (m_UnitSelectDropdown.value)
         {
             case 0:
-                toSpawn = Infantry.NAME;
+                toSpawn = Infantry.IDENTITY;
                 break;
             default:
-                toSpawn = Tank.NAME;
+                toSpawn = Tank.IDENTITY;
                 break;
         }
         m_Player.SetUnitToSpawn(toSpawn);
@@ -70,6 +88,49 @@ public class UI_Manager : MonoBehaviour {
     public void SpawnUnit()
     {
         m_Player.SpawnUnit(m_Spawner);
+    }
+
+    /// <summary>
+    /// Brings up the unit menu and displays unit's info. Handles any display
+    /// info that won't require dynamic updating.
+    /// </summary>
+    /// <param name="unit">The unit whose info is to be displayed.</param>
+    public void DisplayUnitInfo(Unit unit)
+    {
+        unitCurrentlyDisplayed = unit;
+        //float damage = unitCurrentlyDisplayed.Damage;
+        //float range = unitCurrentlyDisplayed.Range;
+        //int cost = unitCurrentlyDisplayed.Cost;
+
+        // Handle unit name input field
+        m_UnitMenuNameInput.text = unit.Name;
+
+        // Handle health slider
+        m_UnitMenuHealthSlider.maxValue = unit.MaxHealth;
+  
+        // Once processing is finished, enable display
+        m_UnitMenuCanvas.enabled = true;
+    }
+
+    /// <summary>
+    /// Updates the unit menu based on the dynamic status of the unit.
+    /// </summary>
+    public void UpdateUnitMenu()
+    {
+        if (!m_UnitMenuCanvas.enabled) { return;  }
+
+        float health = unitCurrentlyDisplayed.Health;
+
+        // Handle health slider
+        m_UnitMenuHealthSlider.value = health;
+    }
+
+    /// <summary>
+    /// Hides the unit menu.
+    /// </summary>
+    public void HideUnitInfo()
+    {
+        m_UnitMenuCanvas.enabled = false;
     }
 
     /// <summary>
@@ -91,8 +152,6 @@ public class UI_Manager : MonoBehaviour {
         string unitText = units.ToString();
         m_CurrentUnitAmountText.text = unitText;
     }
-
-
 
 
 }

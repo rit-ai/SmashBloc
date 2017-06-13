@@ -3,6 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * @author Paul Galatic
+ * 
+ * This class handles logic involving the movement of the camera, and player 
+ * interaction with the world space (NOT menus).
+ * 
+ * If a menu is opened, CameraController defers to its observer, UIManager.
+ * **/
 public class CameraController : MonoBehaviour {
 
     // Public constants
@@ -32,7 +40,7 @@ public class CameraController : MonoBehaviour {
         // Rectangle that contains everything EXCEPT the screen border
         screenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
 
-        m_CurrentState = new SelectionState(this);
+        m_CurrentState = new GroupSelectedState(this);
     }
 
     void OnGUI()
@@ -93,7 +101,29 @@ public class CameraController : MonoBehaviour {
     {
         foreach (Unit s in GameObject.FindObjectsOfType<Unit>())
         {
-            s.Deselect();
+            s.RemoveHighlight();
+        }
+    }
+
+    class SingleSelectedState : State
+    {
+        private CameraController m_CameraController;
+
+
+
+        public SingleSelectedState(Unit selected)
+        {
+
+        }
+
+        public void HandleInput()
+        {
+
+        }
+
+        public void StateUpdate()
+        {
+            
         }
     }
 
@@ -101,16 +131,16 @@ public class CameraController : MonoBehaviour {
     /// Handles all state involved with selected units after drawing the 
     /// selection rectangle is completed.
     /// </summary>
-    class SelectionState : State
+    class GroupSelectedState : State
     {
         private CameraController m_CameraController;
 
-        public SelectionState(CameraController controller)
+        public GroupSelectedState(CameraController controller)
         {
             m_CameraController = controller;
         }
 
-        public override void HandleInput()
+        public void HandleInput()
         {
             // Deselect units when the deselect key is pressed
             if (Input.GetKey(DESELECT_KEY))
@@ -129,7 +159,7 @@ public class CameraController : MonoBehaviour {
             m_CameraController.StoreMousePos(Input.mousePosition);
         }
 
-        public override void StateUpdate()
+        public void StateUpdate()
         {
         }
 
@@ -143,36 +173,46 @@ public class CameraController : MonoBehaviour {
     class DrawingState : State
     {
         private CameraController m_CameraController;
-
         private Camera m_Camera;
+
+        private List<Unit> selectedUnits;
 
         public DrawingState(CameraController controller)
         {
             m_CameraController = controller;
             m_Camera = controller.m_Camera;
+
+            selectedUnits = new List<Unit>();
         }
 
-        public override void HandleInput()
+        public void HandleInput()
         {
             // When mouse button is up, switch back to drawing state.
             if (Input.GetMouseButtonUp(0))
             {
-                m_CameraController.m_CurrentState = new SelectionState(m_CameraController);
+                if (selectedUnits.Count == 1)
+                {
+                    // TODO HERE
+                }
+
+                m_CameraController.m_CurrentState = new GroupSelectedState(m_CameraController);
                 return;
             }
 
             // Take the selection box and highlight all the objects inside
             foreach (Unit s in GameObject.FindObjectsOfType<Unit>())
-               {
-                s.Deselect();
+            {
+                s.RemoveHighlight();
+                selectedUnits.Remove(s); //FIXME
                 if (IsWithinSelectionBounds(s))
                 {
-                    s.Select();
+                    s.Highlight();
+                    selectedUnits.Add(s);
                 }
             }
         }
 
-        public override void StateUpdate()
+        public void StateUpdate()
         {
         }
 
