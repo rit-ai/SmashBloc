@@ -16,11 +16,7 @@ using UnityEngine;
  * Any other UI elements should be handled by Observers.
  * **/
 public abstract class Unit : MonoBehaviour {
-    // Author: Ben Fairlamb
-    // Author: Paul Galatic
-    // Purpose: Base class for all Units
-    // Limitations: Meh
-
+    
     // public component fields
     public Canvas m_Canvas;
     public UI_Manager m_UI_Manager;
@@ -55,6 +51,13 @@ public abstract class Unit : MonoBehaviour {
         observers.Add(new MenuObserver(m_UI_Manager));
     }
 
+    public void NotifyObservers(string data)
+    {
+        foreach (Observer o in observers){
+            o.OnNotify(this, data);
+        }
+    }
+
     /// <summary>
     /// Highlights the unit.
     /// </summary>
@@ -69,6 +72,15 @@ public abstract class Unit : MonoBehaviour {
     public void RemoveHighlight()
     {
         m_Canvas.enabled = false;
+    }
+
+    /// <summary>
+    /// Logic handler for when the unit is individually selected, including
+    /// notifying proper menu observers.
+    /// </summary>
+    public void SoloSelected()
+    {
+        NotifyObservers(MenuObserver.INVOKE_UNIT_DATA);
     }
 
     /// <summary>

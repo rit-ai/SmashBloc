@@ -11,8 +11,7 @@ using UnityEngine;
 public class Player : MonoBehaviour {
 
     // Private Constants
-    private const int GOLD_INCREMENT_RATE = 2;  // scale by which gold updates
-                                                // --higher is faster
+    private const float GOLD_INCREMENT_RATE = 0.01f; // higher is slower
 
     private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
 
@@ -25,7 +24,10 @@ public class Player : MonoBehaviour {
     public SupplyTruck SUPPLY_TRUCK;
     public Tank TANK;
 
+    public City defaultCity; // REMOVEME
+
     // Private fields
+    private List<City> m_Cities;
     private Unit toSpawn;
     private int currentGoldAmount;
     private int currentUnits;
@@ -33,19 +35,27 @@ public class Player : MonoBehaviour {
     // Use this for initialization
     void Start () {
         // Handle public constants
-        //ARTILLERY =     Instantiate(ARTILLERY)      as Artillery;
-        //BAZOOKA =       Instantiate(BAZOOKA)        as Bazooka;
-        INFANTRY =      Instantiate(INFANTRY)       as Infantry;
-        //RECON =         Instantiate(RECON)          as Recon;
-        //SUPPLY_TRUCK =  Instantiate(SUPPLY_TRUCK)   as SupplyTruck;
-        TANK =          Instantiate(TANK)           as Tank;
+        //ARTILLERY =         Instantiate(ARTILLERY)      as Artillery;
+        //BAZOOKA =           Instantiate(BAZOOKA)        as Bazooka;
+        INFANTRY =          Instantiate(INFANTRY)       as Infantry;
+        //RECON =             Instantiate(RECON)          as Recon;
+        //SUPPLY_TRUCK =      Instantiate(SUPPLY_TRUCK)   as SupplyTruck;
+        TANK =              Instantiate(TANK)           as Tank;
 
+        // Handle fields
+        m_Cities = new List<City>();
         currentGoldAmount = 0;
+        currentUnits = 0;
+
+        // Handle function setup
+        InvokeRepeating("UpdateGold", 0.0f, GOLD_INCREMENT_RATE);
+
+        // Debug
+        m_Cities.Add(defaultCity);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        UpdateGold();
         Verify();
 	}
 
@@ -127,11 +137,7 @@ public class Player : MonoBehaviour {
     /// 
     private void UpdateGold()
     {
-        var time = Time.deltaTime;
-        if (time > 1 / GOLD_INCREMENT_RATE)
-        {
-            currentGoldAmount++;
-        }
+        currentGoldAmount += m_Cities.Count;
     }
 
     /// <summary>

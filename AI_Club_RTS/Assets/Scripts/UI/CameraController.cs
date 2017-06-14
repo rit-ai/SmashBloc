@@ -17,6 +17,8 @@ public class CameraController : MonoBehaviour {
     public static KeyCode DESELECT_KEY;
 
     // Private constants
+    private static Color BOX_INTERIOR_COLOR = new Color(0.74f, 0.71f, 0.27f, 0.5f);
+    private static Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
     private static float MAX_SCROLL_HEIGHT = 100;
     private static float MIN_SCROLL_HEIGHT = 60;
     private static float SCROLLSPEED = 5;
@@ -28,8 +30,10 @@ public class CameraController : MonoBehaviour {
 
     // Private fields
     private State m_CurrentState;
+    public LayerMask UI_mask;
     private Vector3 m_MousePos;
-    private Rect screenBorderInverse;
+    private Rect m_ScreenBorderInverse;
+    private List<Unit> m_SelectedUnits;
 
     // Use this for initialization
     public void Start () {
@@ -38,16 +42,18 @@ public class CameraController : MonoBehaviour {
 
         // Handle private fields
         // Rectangle that contains everything EXCEPT the screen border
-        screenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
+        m_ScreenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
 
-        m_CurrentState = new GroupSelectedState(this);
+        m_SelectedUnits = new List<Unit>();
+        m_CurrentState = new SelectedState(this);
+        UI_mask = ~UI_mask; // Invert, since we want our raycasts to look for UI elements.
     }
 
     void OnGUI()
     {
         Rect rect = Utils.GetScreenRect(m_MousePos, Input.mousePosition);
-        Utils.DrawScreenRect(rect, new Color(0.8f, 0.8f, 0.95f, 0.25f));
-        Utils.DrawScreenRectBorder(rect, 2, new Color(.8f, .0f, 0.95f));
+        Utils.DrawScreenRect(rect, BOX_INTERIOR_COLOR);
+        Utils.DrawScreenRectBorder(rect, 2, BOX_BORDER_COLOR);
     }
 
     public void Update () {
@@ -76,7 +82,7 @@ public class CameraController : MonoBehaviour {
     private void EdgePan()
     {
         // Is the mouse at the edge of the screen?
-        if (!screenBorderInverse.Contains(m_MousePos))
+        if (!m_ScreenBorderInverse.Contains(m_MousePos))
         {
             Vector2 v = new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2);
             v.Normalize();
@@ -99,43 +105,26 @@ public class CameraController : MonoBehaviour {
     /// </summary>
     private void DeselectAll()
     {
-        foreach (Unit s in GameObject.FindObjectsOfType<Unit>())
+        // If there's a menu up displaying unit info, close it
+        FindObjectOfType<Unit>().NotifyObservers(MenuObserver.SUPPRESS_UNIT_DATA);
+        // Remove highlight from all units
+        foreach (Unit s in m_SelectedUnits)
         {
             s.RemoveHighlight();
         }
-    }
-
-    class SingleSelectedState : State
-    {
-        private CameraController m_CameraController;
-
-
-
-        public SingleSelectedState(Unit selected)
-        {
-
-        }
-
-        public void HandleInput()
-        {
-
-        }
-
-        public void StateUpdate()
-        {
-            
-        }
+        // Clear the list of selected units
+        m_SelectedUnits.Clear();
     }
 
     /// <summary>
     /// Handles all state involved with selected units after drawing the 
     /// selection rectangle is completed.
     /// </summary>
-    class GroupSelectedState : State
+    class SelectedState : State
     {
         private CameraController m_CameraController;
 
-        public GroupSelectedState(CameraController controller)
+        public SelectedState(CameraController controller)
         {
             m_CameraController = controller;
         }
@@ -152,11 +141,24 @@ public class CameraController : MonoBehaviour {
             // to DrawingState
             if (Input.GetMouseButtonDown(0))
             {
+                // Ignore input if the user clicks on a UI element FIXME
+                /*
+                Ray ray = Camera.main.ScreenPointToRay(m_CameraController.m_MousePos);
+                RaycastHit hit = new RaycastHit();
+                Physics.RaycastAll(ray, 10000f, m_CameraController.UI_mask);
+                if (Physics.Raycast(ray, out hit, m_CameraController.UI_mask))
+                {
+                    return;
+                }
+                */
+                // Start drawing.
                 m_CameraController.m_CurrentState = new DrawingState(m_CameraController);
                 return;
             }
 
+            // Store the current mouse position.
             m_CameraController.StoreMousePos(Input.mousePosition);
+
         }
 
         public void StateUpdate()
@@ -182,7 +184,7 @@ public class CameraController : MonoBehaviour {
             m_CameraController = controller;
             m_Camera = controller.m_Camera;
 
-            selectedUnits = new List<Unit>();
+            selectedUnits = controller.m_SelectedUnits;
         }
 
         public void HandleInput()
@@ -190,25 +192,36 @@ public class CameraController : MonoBehaviour {
             // When mouse button is up, switch back to drawing state.
             if (Input.GetMouseButtonUp(0))
             {
+                // Handle for if a unit is solo selected
                 if (selectedUnits.Count == 1)
                 {
-                    // TODO HERE
+                    selectedUnits[0].SoloSelected();
                 }
 
-                m_CameraController.m_CurrentState = new GroupSelectedState(m_CameraController);
+                m_CameraController.m_CurrentState = new SelectedState(m_CameraController);
                 return;
             }
+
+            foreach (Unit s in selectedUnits)
+            {
+                s.RemoveHighlight();
+            }
+            selectedUnits.Clear();
 
             // Take the selection box and highlight all the objects inside
             foreach (Unit s in GameObject.FindObjectsOfType<Unit>())
             {
-                s.RemoveHighlight();
-                selectedUnits.Remove(s); //FIXME
                 if (IsWithinSelectionBounds(s))
                 {
                     s.Highlight();
                     selectedUnits.Add(s);
                 }
+            }
+
+            // If the selection box is empty, deselect everyone
+            if (selectedUnits.Count == 0)
+            {
+                m_CameraController.DeselectAll();
             }
         }
 

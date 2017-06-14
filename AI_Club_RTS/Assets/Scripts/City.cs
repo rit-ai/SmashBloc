@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * @author Ben Fairlamb
+ * @author Paul Galatic
+ * 
+ * Class designed to handle City-specific functionality and state. Like with 
+ * other game objects, menus and UI elements should be handled by observers.
+ * **/
 public class City : MonoBehaviour {
-    // Author: Ben Fairlamb
-    // Purpose: City functionality
-    // Limitations: Meh
-
-    // Constants
+    // Private constants
     private int DEFAULT_INCOME = 1;
 
-    // Fields
+    // Private fields
     // private string team;
     private int income;
 

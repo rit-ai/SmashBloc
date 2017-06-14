@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * @author Paul Galatic
+ * 
+ * This class listens to other classes to determine which menus should be
+ * displayed.
+ * **/
 public class MenuObserver : Observer {
 
     // Constants that refer to different possible operations of MenuObserver
@@ -9,6 +15,7 @@ public class MenuObserver : Observer {
     public const string SUPPRESS_UNIT_DATA = "SUPPRESS_UNIT_DATA";
 
     // Private constant fields
+    // We keep a reference to the UI Manager to tell it what we want it to show
     private static UI_Manager m_UI_Manager;
 
     /// <summary>
@@ -42,8 +49,9 @@ public class MenuObserver : Observer {
             case SUPPRESS_UNIT_DATA:
                 m_UI_Manager.HideUnitInfo();
                 break;
+            // Invalid tag received? Must be for someone else. Ignore.
             default:
-                throw new KeyNotFoundException("SetUnitToSpawn given invalid string");
+                break;
 
         }
     }

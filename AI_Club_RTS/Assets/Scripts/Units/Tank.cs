@@ -33,6 +33,8 @@ public class Tank : Unit {
         dmg = DAMAGE;
         range = RANGE;
         cost = COST;
+        // Handle fields
+        health = MAXHEALTH;
     }
 	
 	// Update is called once per frame

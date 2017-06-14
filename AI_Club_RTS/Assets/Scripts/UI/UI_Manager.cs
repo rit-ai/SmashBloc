@@ -41,6 +41,7 @@ public class UI_Manager : MonoBehaviour {
     {
         // Set handler for when the Player accesses the dropdown
         m_UnitSelectDropdown.onValueChanged.AddListener(delegate { SetUnitToSpawn(); });
+        m_UnitMenuCanvas.enabled = false;
     }
 
     // Initialize whenever this object loads
@@ -58,8 +59,8 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
 	void Update ()
     {
-        UpdateGoldText();
-        UpdateUnitText();
+        UpdateGoldAmountText();
+        UpdateUnitAmountText();
         UpdateUnitMenu();
 	}
 
@@ -103,6 +104,7 @@ public class UI_Manager : MonoBehaviour {
         //int cost = unitCurrentlyDisplayed.Cost;
 
         // Handle unit name input field
+        m_UnitMenuNameInput.placeholder.GetComponent<Text>().text = unit.name;
         m_UnitMenuNameInput.text = unit.Name;
 
         // Handle health slider
@@ -113,16 +115,22 @@ public class UI_Manager : MonoBehaviour {
     }
 
     /// <summary>
-    /// Updates the unit menu based on the dynamic status of the unit.
+    /// Updates the unit menu based on the dynamic status of the unit, if a 
+    /// unit is being displayed.
     /// </summary>
     public void UpdateUnitMenu()
     {
-        if (!m_UnitMenuCanvas.enabled) { return;  }
+        if (!m_UnitMenuCanvas.enabled) { return; }
 
         float health = unitCurrentlyDisplayed.Health;
 
         // Handle health slider
         m_UnitMenuHealthSlider.value = health;
+    }
+
+    public void UpdateUnitName()
+    {
+        unitCurrentlyDisplayed.setCustomName(m_UnitMenuNameInput.text);
     }
 
     /// <summary>
@@ -136,7 +144,7 @@ public class UI_Manager : MonoBehaviour {
     /// <summary>
     /// Updates the amount of gold a Player has in the overlay.
     /// </summary>
-    private void UpdateGoldText()
+    private void UpdateGoldAmountText()
     {
         int gold = m_Player.GetGold();
         string goldText = gold.ToString();
@@ -146,7 +154,7 @@ public class UI_Manager : MonoBehaviour {
     /// <summary>
     /// Updates the number of units a Player has in the overlay.
     /// </summary>
-    private void UpdateUnitText()
+    private void UpdateUnitAmountText()
     {
         int units = m_Player.GetUnits();
         string unitText = units.ToString();
