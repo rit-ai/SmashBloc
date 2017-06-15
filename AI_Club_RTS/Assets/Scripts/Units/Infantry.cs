@@ -8,7 +8,10 @@ public class Infantry : Unit {
     // Purpose: Artillery unit
 
     // NAME -- for external reference purposes
-    public const string IDENTITY = "INFANTRY";
+    public const string IDENTITY = "Infantry";
+
+    // Public fields
+    public Rigidbody m_Prefab;
 
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
@@ -18,9 +21,6 @@ public class Infantry : Unit {
     private const int MAXHEALTH = 100;
     private const int DAMAGE = 10;
     private const int RANGE = 25;
-    private const int COST = 50;
-
-    // Public fields
 
 
     // Methods
@@ -32,11 +32,10 @@ public class Infantry : Unit {
         dmgType = DMG_TYPE;
         // Handle default values
         // team = "NULL";
-        name = NAME;
+        unitName = NAME;
         maxHealth = MAXHEALTH;
         dmg = DAMAGE;
         range = RANGE;
-        cost = COST;
         // Handle fields
         health = MAXHEALTH;
     }
@@ -45,6 +44,8 @@ public class Infantry : Unit {
 	void Update () {
 		
 	}
+
+    
 
 	/// <summary>
 	/// Attack the specified target.

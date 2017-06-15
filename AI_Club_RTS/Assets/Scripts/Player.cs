@@ -11,7 +11,7 @@ using UnityEngine;
 public class Player : MonoBehaviour {
 
     // Private Constants
-    private const float GOLD_INCREMENT_RATE = 0.01f; // higher is slower
+    private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
 
     private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
 
@@ -29,18 +29,14 @@ public class Player : MonoBehaviour {
     // Private fields
     private List<City> m_Cities;
     private Unit toSpawn;
+    private Rigidbody toSpawnPrefab; 
     private int currentGoldAmount;
     private int currentUnits;
 
     // Use this for initialization
     void Start () {
         // Handle public constants
-        //ARTILLERY =         Instantiate(ARTILLERY)      as Artillery;
-        //BAZOOKA =           Instantiate(BAZOOKA)        as Bazooka;
-        INFANTRY =          Instantiate(INFANTRY)       as Infantry;
-        //RECON =             Instantiate(RECON)          as Recon;
-        //SUPPLY_TRUCK =      Instantiate(SUPPLY_TRUCK)   as SupplyTruck;
-        TANK =              Instantiate(TANK)           as Tank;
+
 
         // Handle fields
         m_Cities = new List<City>();
@@ -90,19 +86,55 @@ public class Player : MonoBehaviour {
             default:
                 throw new KeyNotFoundException("SetUnitToSpawn given invalid string");
         }
+
+        
     }
 
     /// <summary>
-    /// Spawns a unit based on unitToSpawn.
+    /// Spawns a unit based on toSpawn.
     /// </summary>
-    /// <param name="spawner">The spawner at which to spawn the unit.</param>
-    public void SpawnUnit(Spawner spawner)
+    /// <param name="spawner">The city at which to spawn the unit.</param>
+    public void SpawnUnit(City city)
     {
-        if (!(currentGoldAmount < toSpawn.Cost))
+        if (currentGoldAmount > toSpawn.Cost)
         {
+            Debug.Assert(toSpawn.Cost > 0);
             currentGoldAmount -= toSpawn.Cost;
             currentUnits++;
-            spawner.Spawn(toSpawn);
+
+            city.SpawnUnit(toSpawn);
+        }
+    }
+
+    /// <summary>
+    /// Modifies the current amount of gold.
+    /// </summary>
+    /// <param name="amount">The amount to modify by.</param>
+    public void UpdateGold(int amount)
+    {
+        currentGoldAmount += amount;
+    }
+
+    /// <summary>
+    /// Updates the current gold amount, reflecting passive gold gain.
+    /// </summary>
+    /// 
+    private void UpdateGold()
+    {
+        foreach (City c in m_Cities)
+        {
+            currentGoldAmount += c.IncomeLevel;
+        }
+    }
+
+    /// <summary>
+    /// Cleans up any loose ends left by Update()'s sequential operation.
+    /// </summary>
+    private void Verify()
+    {
+        if (currentGoldAmount > MAX_GOLD_AMOUNT)
+        {
+            currentGoldAmount = MAX_GOLD_AMOUNT;
         }
     }
 
@@ -122,32 +154,4 @@ public class Player : MonoBehaviour {
         return currentUnits;
     }
 
-    /// <summary>
-    /// Modifies the current amount of gold.
-    /// </summary>
-    /// <param name="amount">The amount to modify by.</param>
-    public void UpdateGold(int amount)
-    {
-        currentGoldAmount += amount;
-    }
-
-    /// <summary>
-    /// Updates the current gold amount, reflecting passive gold gain.
-    /// </summary>
-    /// 
-    private void UpdateGold()
-    {
-        currentGoldAmount += m_Cities.Count;
-    }
-
-    /// <summary>
-    /// Cleans up any loose ends left by Update()'s sequential operation.
-    /// </summary>
-    private void Verify()
-    {
-        if (currentGoldAmount > MAX_GOLD_AMOUNT)
-        {
-            currentGoldAmount = MAX_GOLD_AMOUNT;
-        }
-    }
 }

@@ -56,7 +56,7 @@ public class CameraController : MonoBehaviour {
         Utils.DrawScreenRectBorder(rect, 2, BOX_BORDER_COLOR);
     }
 
-    public void Update () {
+    void Update () {
         m_CurrentState.HandleInput();
         m_CurrentState.StateUpdate();
         Scroll();
@@ -106,7 +106,7 @@ public class CameraController : MonoBehaviour {
     private void DeselectAll()
     {
         // If there's a menu up displaying unit info, close it
-        FindObjectOfType<Unit>().NotifyObservers(MenuObserver.SUPPRESS_UNIT_DATA);
+        FindObjectOfType<Unit>().NotifyAll<String>(MenuObserver.CLOSE_ALL);
         // Remove highlight from all units
         foreach (Unit s in m_SelectedUnits)
         {
@@ -191,13 +191,7 @@ public class CameraController : MonoBehaviour {
         {
             // When mouse button is up, switch back to drawing state.
             if (Input.GetMouseButtonUp(0))
-            {
-                // Handle for if a unit is solo selected
-                if (selectedUnits.Count == 1)
-                {
-                    selectedUnits[0].SoloSelected();
-                }
-
+            { 
                 m_CameraController.m_CurrentState = new SelectedState(m_CameraController);
                 return;
             }
@@ -216,12 +210,6 @@ public class CameraController : MonoBehaviour {
                     s.Highlight();
                     selectedUnits.Add(s);
                 }
-            }
-
-            // If the selection box is empty, deselect everyone
-            if (selectedUnits.Count == 0)
-            {
-                m_CameraController.DeselectAll();
             }
         }
 

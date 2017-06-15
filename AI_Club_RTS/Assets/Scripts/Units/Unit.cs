@@ -15,24 +15,23 @@ using UnityEngine;
  *  * Basic transformation (particle effects, highlighting)
  * Any other UI elements should be handled by Observers.
  * **/
-public abstract class Unit : MonoBehaviour {
+public abstract class Unit : MonoBehaviour, Observable {
     
-    // public component fields
+    // public fields
     public Canvas m_Canvas;
-    public UI_Manager m_UI_Manager;
+    public int cost;
 
     // protected fields related to unit management
     protected List<Observer> observers;
 
     // protected fields intended to be changed for balancing or by gameplay
     protected string team;
-    protected string name;
+    protected string unitName;
     protected string customName; // user-assigned names
     protected float maxHealth;
     protected float health;
     protected float dmg;
     protected float range;
-    protected int cost;
 
     // protected fields related to fundamentals of unit type
     protected ArmorType armorType;
@@ -48,14 +47,24 @@ public abstract class Unit : MonoBehaviour {
     public void Init()
     {
         observers = new List<Observer>();
-        observers.Add(new MenuObserver(m_UI_Manager));
+        observers.Add(new MenuObserver());
     }
 
-    public void NotifyObservers(string data)
+    public void NotifyAll<T>(T data)
     {
         foreach (Observer o in observers){
             o.OnNotify(this, data);
         }
+    }
+
+    /// <summary>
+    /// Logic handler for when the unit is individually selected, including
+    /// notifying proper menu observers.
+    /// </summary>
+    public void OnMouseDown()
+    {
+        Highlight();
+        NotifyAll(MenuObserver.INVOKE_UNIT_DATA);
     }
 
     /// <summary>
@@ -72,15 +81,6 @@ public abstract class Unit : MonoBehaviour {
     public void RemoveHighlight()
     {
         m_Canvas.enabled = false;
-    }
-
-    /// <summary>
-    /// Logic handler for when the unit is individually selected, including
-    /// notifying proper menu observers.
-    /// </summary>
-    public void SoloSelected()
-    {
-        NotifyObservers(MenuObserver.INVOKE_UNIT_DATA);
     }
 
     /// <summary>
@@ -112,14 +112,14 @@ public abstract class Unit : MonoBehaviour {
     /// <summary>
     /// Gets the name of the unit.
     /// </summary>
-    public string Name
+    public string UnitName
     {
         get {
             if (!(customName == null))
             {
                 return customName;
             }
-            return name;
+            return unitName;
         }
     }
 

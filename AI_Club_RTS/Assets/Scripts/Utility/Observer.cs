@@ -16,6 +16,6 @@ public interface Observer {
     /// </summary>
     /// <param name="entity">The entity notifying the Observer.</param>
     /// <param name="data">Any additional data or state that may be useful.</param>
-    void OnNotify(Object entity, string data);
+    void OnNotify<T>(Object entity, T data);
 
 }

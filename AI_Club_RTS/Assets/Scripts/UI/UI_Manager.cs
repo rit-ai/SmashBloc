@@ -22,7 +22,6 @@ public class UI_Manager : MonoBehaviour {
     // GENERAL
     public Camera m_Camera;
     // HEADER
-    public Button m_SpawnUnitButton;
     public Dropdown m_UnitSelectDropdown;
     public Text m_CurrentGoldAmountText;
     public Text m_CurrentUnitAmountText;
@@ -30,27 +29,38 @@ public class UI_Manager : MonoBehaviour {
     public Canvas m_UnitMenuCanvas;
     public InputField m_UnitMenuNameInput;
     public Slider m_UnitMenuHealthSlider;
+    // CITY MENU
+    public Canvas m_CityMenuCanvas;
+    public InputField m_CityMenuNameInput;
+    public Slider m_CityMenuIncomeSlider;
+    public Button m_CityMenuSpawnButton;
 
     // Private fields
     private Player m_Player;
-    private Spawner m_Spawner;
     private Unit unitCurrentlyDisplayed;
+    private City cityCurrentlyDisplayed;
 
     // Initialize only once
     private void Awake()
     {
-        // Set handler for when the Player accesses the dropdown
+        // Set UI handlers
+        // Handlers for changing a dropdown value
         m_UnitSelectDropdown.onValueChanged.AddListener(delegate { SetUnitToSpawn(); });
-        m_UnitMenuCanvas.enabled = false;
+        // Handlers for finishing changing a name field
+        m_UnitMenuNameInput.onEndEdit.AddListener(delegate { UpdateUnitName(); });
+        m_UnitMenuNameInput.onEndEdit.AddListener(delegate { UpdateCityName(); });
+        // Handlers for pressing a button on a menu
+        m_CityMenuSpawnButton.onClick.AddListener(delegate { SpawnUnit(); });
     }
 
     // Initialize whenever this object loads
     void Start ()
     {
         // Handle private fields
-        m_Spawner = GameObject.FindObjectOfType<Spawner>();
         m_Player = GameObject.FindObjectOfType<Player>();
+        m_UnitMenuCanvas.enabled = false;
 
+        // Initialization
         SetUnitToSpawn();
 	}
 
@@ -84,11 +94,11 @@ public class UI_Manager : MonoBehaviour {
     }
 
     /// <summary>
-    /// Communicates that Player pressed the SpawnUnit button.
+    /// Communicates that Player pressed the SpawnUnit button in a CityMenu.
     /// </summary>
     public void SpawnUnit()
     {
-        m_Player.SpawnUnit(m_Spawner);
+        m_Player.SpawnUnit(cityCurrentlyDisplayed);
     }
 
     /// <summary>
@@ -104,14 +114,35 @@ public class UI_Manager : MonoBehaviour {
         //int cost = unitCurrentlyDisplayed.Cost;
 
         // Handle unit name input field
-        m_UnitMenuNameInput.placeholder.GetComponent<Text>().text = unit.name;
-        m_UnitMenuNameInput.text = unit.Name;
+        m_UnitMenuNameInput.placeholder.GetComponent<Text>().text = unit.UnitName;
+        m_UnitMenuNameInput.text = unit.UnitName;
 
         // Handle health slider
         m_UnitMenuHealthSlider.maxValue = unit.MaxHealth;
+        m_UnitMenuHealthSlider.value = unit.Health;
   
         // Once processing is finished, enable display
         m_UnitMenuCanvas.enabled = true;
+    }
+
+    /// <summary>
+    /// Displays the city menu.
+    /// </summary>
+    /// <param name="city">The city to display.</param>
+    public void DisplayCityInfo(City city)
+    {
+        cityCurrentlyDisplayed = city;
+
+        // Handle city name input field
+        m_CityMenuNameInput.placeholder.GetComponent<Text>().text = city.Name;
+        m_CityMenuNameInput.text = city.Name;
+
+        // Handle income slider
+        m_CityMenuIncomeSlider.maxValue = City.MAX_INCOME_LEVEL;
+        m_CityMenuIncomeSlider.value = city.IncomeLevel;
+
+        // Once processing is finished, enable display
+        m_CityMenuCanvas.enabled = true;
     }
 
     /// <summary>
@@ -128,17 +159,48 @@ public class UI_Manager : MonoBehaviour {
         m_UnitMenuHealthSlider.value = health;
     }
 
+    /// <summary>
+    /// Updates the city menu based on the dynamic status of the city, if a
+    /// city is being displayed.
+    /// </summary>
+    private void UpdateCityInfo()
+    {
+        if (!m_CityMenuCanvas.enabled) { return; }
+
+        int incomeLevel = cityCurrentlyDisplayed.IncomeLevel;
+
+        // Handle income slider
+        m_CityMenuIncomeSlider.value = incomeLevel;
+    }
+
+    /// <summary>
+    /// Updates the currently displayed unit with a custom name.
+    /// </summary>
     public void UpdateUnitName()
     {
         unitCurrentlyDisplayed.setCustomName(m_UnitMenuNameInput.text);
     }
 
     /// <summary>
-    /// Hides the unit menu.
+    /// Updates the currently displayed city with a custom name.
     /// </summary>
-    public void HideUnitInfo()
+    private void UpdateCityName()
+    {
+        cityCurrentlyDisplayed.SetCustomName(m_CityMenuNameInput.text);
+    }
+
+    /// <summary>
+    /// Hides all currently displayed menus.
+    /// </summary>
+    public void CloseAll()
     {
         m_UnitMenuCanvas.enabled = false;
+        
+    }
+
+    public void MoveMenuOnDrag(Canvas menu)
+    {
+        menu.transform.position = Input.mousePosition;
     }
 
     /// <summary>

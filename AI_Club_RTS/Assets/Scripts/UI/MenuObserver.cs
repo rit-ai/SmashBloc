@@ -12,22 +12,12 @@ public class MenuObserver : Observer {
 
     // Constants that refer to different possible operations of MenuObserver
     public const string INVOKE_UNIT_DATA = "INVOKE_UNIT_DATA";
-    public const string SUPPRESS_UNIT_DATA = "SUPPRESS_UNIT_DATA";
+    public const string INVOKE_CITY_DATA = "INVOKE_CITY_DATA";
+    public const string CLOSE_ALL = "CLOSE_ALL";
 
     // Private constant fields
     // We keep a reference to the UI Manager to tell it what we want it to show
-    private static UI_Manager m_UI_Manager;
-
-    /// <summary>
-    /// Constructor.
-    /// </summary>
-    /// <param name="manager">Since we're displaying menus on the overlay, we 
-    /// need access to the UI Manager. But, we don't want the UI Manager to 
-    /// have to worry about handling menu display logic.</param>
-    public MenuObserver(UI_Manager manager)
-    {
-        m_UI_Manager = manager;
-    }
+    private static UI_Manager m_UI_Manager = GameObject.FindObjectOfType<UI_Manager>();
 
     /// <summary>
     /// Determines which type of menu to raise, depending on the entity 
@@ -36,22 +26,25 @@ public class MenuObserver : Observer {
     /// </summary>
     /// <param name="entity">The entity performing the invocation.</param>
     /// <param name="data">The type of invocation.</param>
-    public void OnNotify(Object entity, string data)
+    public void OnNotify<T>(Object entity, T data)
     {
-        switch (data)
+        if (!(data is string)) { return; }  // irrelevant data, ignore
+        switch (data.ToString())            // Convert data to string (it should already be a string)
         {
             // Display unit info
             case INVOKE_UNIT_DATA:
-                Debug.Assert(entity is Unit);
+                Debug.Assert(entity is Unit); // don't pass bad objects
                 m_UI_Manager.DisplayUnitInfo((Unit)entity);
                 break;
             // Hide unit info
-            case SUPPRESS_UNIT_DATA:
-                m_UI_Manager.HideUnitInfo();
+            case CLOSE_ALL:
+                m_UI_Manager.CloseAll();
+                break;
+            case INVOKE_CITY_DATA:
+                Debug.Assert(entity is City); // don't pass bad objects
+                m_UI_Manager.DisplayCityInfo((City)entity);
                 break;
             // Invalid tag received? Must be for someone else. Ignore.
-            default:
-                break;
 
         }
     }

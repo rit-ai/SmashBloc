@@ -7,7 +7,10 @@ public class Tank : Unit {
     // Purpose: Tank unit
 
     // NAME -- for external reference purposes
-    public const string IDENTITY = "TANK";
+    public const string IDENTITY = "Tank";
+
+    // Public fields
+    public Rigidbody m_Prefab;
 
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
@@ -28,7 +31,7 @@ public class Tank : Unit {
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
         // Handle default values
-        name = NAME;
+        unitName = NAME;
         maxHealth = MAXHEALTH;
         dmg = DAMAGE;
         range = RANGE;
