@@ -59,25 +59,25 @@ public class Player : MonoBehaviour {
     /// Sets the unit to spawn. Throws an exception on an invalid name being 
     /// passed.
     /// </summary>
-    /// <param name="unitName">The name of the unit to spawn, based on 
+    /// <param name="unitIdentity">The name of the unit to spawn, based on 
     /// Unit.NAME.</param>
-    public void SetUnitToSpawn(string unitName)
+    public void SetUnitToSpawn(string unitIdentity)
     {
-        switch (unitName)
+        switch (unitIdentity)
         {
-            case Artillery.NAME:
+            case Artillery.IDENTITY:
                 toSpawn = ARTILLERY;
                 break;
-            case Bazooka.NAME:
+            case Bazooka.IDENTITY:
                 toSpawn = BAZOOKA;
                 break;
             case Infantry.IDENTITY:
                 toSpawn = INFANTRY;
                 break;
-            case Recon.NAME:
+            case Recon.IDENTITY:
                 toSpawn = RECON;
                 break;
-            case SupplyTruck.NAME:
+            case SupplyTruck.IDENTITY:
                 toSpawn = SUPPLY_TRUCK;
                 break;
             case Tank.IDENTITY:
@@ -102,7 +102,7 @@ public class Player : MonoBehaviour {
             currentGoldAmount -= toSpawn.Cost;
             currentUnits++;
 
-            city.SpawnUnit(toSpawn);
+            city.SpawnUnit(toSpawn, currentUnits);
         }
     }
 

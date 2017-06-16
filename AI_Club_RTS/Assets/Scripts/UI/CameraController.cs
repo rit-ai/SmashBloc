@@ -33,7 +33,6 @@ public class CameraController : MonoBehaviour {
     public LayerMask Terrain_mask;
     private Vector3 m_MousePos;
     private Rect m_ScreenBorderInverse;
-    private List<Unit> m_SelectedUnits;
 
     // Use this for initialization
     public void Start () {
@@ -44,7 +43,6 @@ public class CameraController : MonoBehaviour {
         // Rectangle that contains everything EXCEPT the screen border
         m_ScreenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
 
-        m_SelectedUnits = new List<Unit>();
         m_CurrentState = new SelectedState(this);
     }
 
@@ -105,14 +103,7 @@ public class CameraController : MonoBehaviour {
     private void DeselectAll()
     {
         // If there's a menu up displaying unit info, close it
-        FindObjectOfType<Unit>().NotifyAll<String>(MenuObserver.CLOSE_ALL);
-        // Remove highlight from all units
-        foreach (Unit s in m_SelectedUnits)
-        {
-            s.RemoveHighlight();
-        }
-        // Clear the list of selected units
-        m_SelectedUnits.Clear();
+        FindObjectOfType<RTS_Terrain>().NotifyAll<String>(MenuObserver.CLOSE_ALL);
     }
 
     /// <summary>
@@ -144,7 +135,7 @@ public class CameraController : MonoBehaviour {
             if (Input.GetMouseButtonDown(0))
             {
                 // Ignore user clicking on UI
-                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+                if (Utils.MouseIsOverUI())
                 {
                     return;
                 }
@@ -179,7 +170,7 @@ public class CameraController : MonoBehaviour {
             m_CameraController = controller;
             m_Camera = controller.m_Camera;
 
-            selectedUnits = controller.m_SelectedUnits;
+            selectedUnits = new List<Unit>();
         }
 
         public void HandleInput()
@@ -191,6 +182,7 @@ public class CameraController : MonoBehaviour {
                 return;
             }
 
+            // Clear all units currently selected.
             foreach (Unit s in selectedUnits)
             {
                 s.RemoveHighlight();

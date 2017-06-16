@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,11 +7,7 @@ public class Tank : Unit {
     // Author: Ben Fairlamb
     // Purpose: Tank unit
 
-    // NAME -- for external reference purposes
     public const string IDENTITY = "Tank";
-
-    // Public fields
-    public Rigidbody m_Prefab;
 
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
@@ -39,17 +36,20 @@ public class Tank : Unit {
         // Handle fields
         health = MAXHEALTH;
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
-	/// <summary>
-	/// Attack the specified target.
-	/// </summary>
-	/// <param name="target">Target to attack.</param>
-	public override void Attack(Unit target)
+    /// <summary>
+    /// Returns identity of the unit, for disambiguation purposes.
+    /// </summary>
+    public override string Identity()
+    {
+        return IDENTITY;
+    }
+
+    /// <summary>
+    /// Attack the specified target.
+    /// </summary>
+    /// <param name="target">Target to attack.</param>
+    public override void Attack(Unit target)
 	{
 	}
 

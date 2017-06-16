@@ -16,7 +16,7 @@ using UnityEngine;
  * Any other UI elements should be handled by Observers.
  * **/
 public abstract class Unit : MonoBehaviour, Observable {
-    
+
     // public fields
     public Canvas m_Canvas;
     public int cost;
@@ -61,7 +61,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// Logic handler for when the unit is individually selected, including
     /// notifying proper menu observers.
     /// </summary>
-    public void OnMouseDown()
+    private void OnMouseDown()
     {
         Highlight();
         NotifyAll(MenuObserver.INVOKE_UNIT_DATA);
@@ -123,8 +123,13 @@ public abstract class Unit : MonoBehaviour, Observable {
         }
     }
 
+    public void setUnitName(string newName)
+    {
+        unitName = newName;
+    }
+
     /// <summary>
-    /// Sets a custom name for this unit.
+    /// Sets a permanent custom name for this unit.
     /// </summary>
     public void setCustomName(string newName)
     {
@@ -186,6 +191,14 @@ public abstract class Unit : MonoBehaviour, Observable {
     {
         get { return cost; }
     }
+
+
+
+    /// <summary>
+    /// Returns the "identity" of the unit, a unique identifier for the purpose
+    /// of disambiguation.
+    /// </summary>
+    public abstract string Identity();
 
 }
 

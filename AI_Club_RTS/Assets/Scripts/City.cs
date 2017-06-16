@@ -68,9 +68,11 @@ public class City : MonoBehaviour, Observable {
     /// <summary>
     /// Spawns the unit at the spawn point.
     /// </summary>
-    public void SpawnUnit(Unit unit)
+    public void SpawnUnit(Unit unit, int numUnits)
     {
-        Instantiate(unit, m_SpawnPoint.transform.position, Quaternion.identity);
+        Unit newUnit = Utils.UnitToPrefab(unit);
+        newUnit = Instantiate(newUnit, m_SpawnPoint.transform.position, Quaternion.identity);
+        newUnit.setUnitName(newUnit.UnitName + numUnits.ToString());
     }
 
     /// <summary>

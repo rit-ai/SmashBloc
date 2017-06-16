@@ -40,6 +40,7 @@ public class UI_Manager : MonoBehaviour {
     private Unit unitCurrentlyDisplayed;
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
+    private Vector3 menuSpawnPos;
 
     // Initialize only once
     private void Awake()
@@ -60,6 +61,7 @@ public class UI_Manager : MonoBehaviour {
         // Handle private fields
         m_Player = GameObject.FindObjectOfType<Player>();
         m_UnitMenuCanvas.enabled = false;
+        menuSpawnPos = m_UnitMenuCanvas.transform.position;
 
         // Initialization
         SetUnitToSpawn();
@@ -116,6 +118,9 @@ public class UI_Manager : MonoBehaviour {
         //float range = unitCurrentlyDisplayed.Range;
         //int cost = unitCurrentlyDisplayed.Cost;
 
+        // Set position to wherever menus are supposed to appear
+        m_UnitMenuCanvas.transform.position = menuSpawnPos;
+
         // Handle unit name input field
         m_UnitMenuNameInput.placeholder.GetComponent<Text>().text = unit.UnitName;
 
@@ -134,6 +139,9 @@ public class UI_Manager : MonoBehaviour {
     public void DisplayCityInfo(City city)
     {
         cityCurrentlyDisplayed = city;
+
+        // Set position to wherever menus are supposed to appear
+        m_CityMenuCanvas.transform.position = menuSpawnPos;
 
         // Handle city name input field
         m_CityMenuNameInput.placeholder.GetComponent<Text>().text = city.CityName;
@@ -180,7 +188,6 @@ public class UI_Manager : MonoBehaviour {
     public void UpdateUnitName()
     {
         unitCurrentlyDisplayed.setCustomName(m_UnitMenuNameInput.text);
-        Debug.Log(unitCurrentlyDisplayed.UnitName);
     }
 
     /// <summary>
@@ -196,6 +203,8 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     public void CloseAll()
     {
+        m_CityMenuCanvas.transform.position = new Vector3();
+        m_UnitMenuCanvas.transform.position = new Vector3();
         m_UnitMenuCanvas.enabled = false;
         m_CityMenuCanvas.enabled = false;
     }

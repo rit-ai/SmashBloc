@@ -2,10 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Class used to draw rectangles on the screen
+/*
+ * @author Paul Galatic
+ * 
+ * Class used to condense often-called methods into smaller chunks / lines such
+ * to reduce cluttering of other files.
+ * **/
 public class Utils : MonoBehaviour {
-	static Texture2D whiteTexture;
 
+    private static Unit InfantryPrefab = (Unit)Resources.Load("Prefabs/Units/" + Infantry.IDENTITY, typeof(Unit));
+    private static Unit TankPrefab = (Unit)Resources.Load("Prefabs/Units/" + Tank.IDENTITY, typeof(Unit));
+
+	static Texture2D whiteTexture;
 	public static Texture2D WhiteTexture {
 		get {
 			if(whiteTexture == null) {
@@ -17,15 +25,19 @@ public class Utils : MonoBehaviour {
 		}
 	}
 
-	// Draws a rectangle with the passed in color to the screen
-	public static void DrawScreenRect(Rect rect, Color color) {
+    /// <summary>
+    /// Draws a rectangle with the passed in color to the screen
+    /// </summary>
+    public static void DrawScreenRect(Rect rect, Color color) {
 		GUI.color = color;
 		GUI.DrawTexture(rect, WhiteTexture);
 		GUI.color = Color.white;
 	}
 
-	// Creates a border of a rectangle with color, color and with a border thickness, thickness
-	public static void DrawScreenRectBorder( Rect rect, float thickness, Color color )
+    /// <summary>
+    /// Creates a border of a rectangle
+    /// </summary>
+    public static void DrawScreenRectBorder( Rect rect, float thickness, Color color )
 	{
 		// Top
 		Utils.DrawScreenRect( new Rect( rect.xMin, rect.yMin, rect.width, thickness ), color );
@@ -37,8 +49,10 @@ public class Utils : MonoBehaviour {
 		Utils.DrawScreenRect( new Rect( rect.xMin, rect.yMax - thickness, rect.width, thickness ), color );
 	}
 
-	// Returns a rectangle based on the 2 input screen positions
-	public static Rect GetScreenRect(Vector3 screenPos1, Vector3 screenPos2){
+    /// <summary>
+    /// Returns a rectangle based on the 2 input screen positions
+    /// </summary>
+    public static Rect GetScreenRect(Vector3 screenPos1, Vector3 screenPos2){
 		// Move origin from bottom left to top left
 		screenPos1.y = Screen.height - screenPos1.y;
 		screenPos2.y = Screen.height - screenPos2.y;
@@ -49,8 +63,11 @@ public class Utils : MonoBehaviour {
 		return Rect.MinMaxRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
 	}
 
-	// Creates a bound, based on where the mouse dragged, that will contain the object top be selected
-	public static Bounds GetViewportBounds( Camera camera, Vector3 screenPosition1, Vector3 screenPosition2 )
+    /// <summary>
+    /// Creates a bound, based on where the mouse dragged, that will contain 
+    /// the object top be selected
+    /// </summary>
+    public static Bounds GetViewportBounds( Camera camera, Vector3 screenPosition1, Vector3 screenPosition2 )
 	{
 		var v1 = camera.ScreenToViewportPoint( screenPosition1 );
 		var v2 = camera.ScreenToViewportPoint( screenPosition2 );
@@ -65,5 +82,40 @@ public class Utils : MonoBehaviour {
 		bounds.SetMinMax( min, max );
 		return bounds;
 	}
+
+    /// <summary>
+    /// Returns whether or not the mouse is currently over a UI object.
+    /// </summary>
+    /// <returns>True if over UI, false otherwise.</returns>
+    public static bool MouseIsOverUI()
+    {
+        return UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+    }
+
+    /// <summary>
+    /// Returns a list of all units currently in the scene.
+    /// </summary>
+    public static List<Unit> AllUnits()
+    {
+        return new List<Unit>(FindObjectsOfType<Unit>());
+    }
+
+    /// <summary>
+    /// Returns the prefab associated with a particular type of Unit.
+    /// </summary>
+    public static Unit UnitToPrefab(Unit unit)
+    {
+        switch (unit.Identity())
+        {
+            case Infantry.IDENTITY:
+                Debug.Assert(InfantryPrefab);
+                return InfantryPrefab;
+            case Tank.IDENTITY:
+                Debug.Assert(TankPrefab);
+                return TankPrefab;
+        }
+
+        throw new KeyNotFoundException("Bad value passed to UnitToPrefab()");
+    }
 
 }

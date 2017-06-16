@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ public class SupplyTruck : Unit {
     // Purpose: Supply Truck Class
 
     // NAME -- for external reference purposes
-    public const string NAME = "SUPPLY_TRUCK";
+    public const string IDENTITY = "SupplyTruck";
 
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.L_ARMOR;
@@ -15,6 +16,7 @@ public class SupplyTruck : Unit {
     private const int SUPPLY_CAPACITY = 100;
 
     // Default values
+    private const string NAME = "SupplyTruck";
     private const int MAXHEALTH = 100;
     private const int DAMAGE = 20;
     private const int RANGE = 50;
@@ -37,6 +39,14 @@ public class SupplyTruck : Unit {
         cost = COST;
         // Handle private fields
         supplies = SUPPLY_CAPACITY;
+    }
+
+    /// <summary>
+    /// Returns identity of the unit, for disambiguation purposes.
+    /// </summary>
+    public override string Identity()
+    {
+        return IDENTITY;
     }
 
     // Properties

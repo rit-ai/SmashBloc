@@ -36,15 +36,19 @@ public class MenuObserver : Observer {
                 Debug.Assert(entity is Unit); // don't pass bad objects
                 m_UI_Manager.DisplayUnitInfo((Unit)entity);
                 break;
-            // Hide unit info
-            case CLOSE_ALL:
-                m_UI_Manager.CloseAll();
-                break;
+            // Hides all menus and selection elements
             case INVOKE_CITY_DATA:
                 Debug.Assert(entity is City); // don't pass bad objects
                 m_UI_Manager.DisplayCityInfo((City)entity);
                 break;
-            // Invalid tag received? Must be for someone else. Ignore.
+            case CLOSE_ALL:
+                foreach (Unit u in Utils.AllUnits())
+                {
+                    u.RemoveHighlight();
+                }
+                m_UI_Manager.CloseAll();
+                break;
+                // Invalid tag received? Must be for someone else. Ignore.
 
         }
     }
