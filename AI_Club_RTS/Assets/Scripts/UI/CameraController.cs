@@ -30,7 +30,7 @@ public class CameraController : MonoBehaviour {
 
     // Private fields
     private State m_CurrentState;
-    public LayerMask UI_mask;
+    public LayerMask Terrain_mask;
     private Vector3 m_MousePos;
     private Rect m_ScreenBorderInverse;
     private List<Unit> m_SelectedUnits;
@@ -46,7 +46,6 @@ public class CameraController : MonoBehaviour {
 
         m_SelectedUnits = new List<Unit>();
         m_CurrentState = new SelectedState(this);
-        UI_mask = ~UI_mask; // Invert, since we want our raycasts to look for UI elements.
     }
 
     void OnGUI()
@@ -131,6 +130,9 @@ public class CameraController : MonoBehaviour {
 
         public void HandleInput()
         {
+            // Store the current mouse position.
+            m_CameraController.StoreMousePos(Input.mousePosition);
+
             // Deselect units when the deselect key is pressed
             if (Input.GetKey(DESELECT_KEY))
             {
@@ -141,23 +143,16 @@ public class CameraController : MonoBehaviour {
             // to DrawingState
             if (Input.GetMouseButtonDown(0))
             {
-                // Ignore input if the user clicks on a UI element FIXME
-                /*
-                Ray ray = Camera.main.ScreenPointToRay(m_CameraController.m_MousePos);
-                RaycastHit hit = new RaycastHit();
-                Physics.RaycastAll(ray, 10000f, m_CameraController.UI_mask);
-                if (Physics.Raycast(ray, out hit, m_CameraController.UI_mask))
+                // Ignore user clicking on UI
+                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
                 {
                     return;
                 }
-                */
+                
                 // Start drawing.
                 m_CameraController.m_CurrentState = new DrawingState(m_CameraController);
                 return;
             }
-
-            // Store the current mouse position.
-            m_CameraController.StoreMousePos(Input.mousePosition);
 
         }
 

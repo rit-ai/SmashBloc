@@ -39,6 +39,7 @@ public class UI_Manager : MonoBehaviour {
     private Player m_Player;
     private Unit unitCurrentlyDisplayed;
     private City cityCurrentlyDisplayed;
+    private Vector3 oldMousePos;
 
     // Initialize only once
     private void Awake()
@@ -72,6 +73,8 @@ public class UI_Manager : MonoBehaviour {
         UpdateGoldAmountText();
         UpdateUnitAmountText();
         UpdateUnitMenu();
+
+        oldMousePos = Input.mousePosition;
 	}
 
     /// <summary>
@@ -115,7 +118,6 @@ public class UI_Manager : MonoBehaviour {
 
         // Handle unit name input field
         m_UnitMenuNameInput.placeholder.GetComponent<Text>().text = unit.UnitName;
-        m_UnitMenuNameInput.text = unit.UnitName;
 
         // Handle health slider
         m_UnitMenuHealthSlider.maxValue = unit.MaxHealth;
@@ -134,8 +136,7 @@ public class UI_Manager : MonoBehaviour {
         cityCurrentlyDisplayed = city;
 
         // Handle city name input field
-        m_CityMenuNameInput.placeholder.GetComponent<Text>().text = city.Name;
-        m_CityMenuNameInput.text = city.Name;
+        m_CityMenuNameInput.placeholder.GetComponent<Text>().text = city.CityName;
 
         // Handle income slider
         m_CityMenuIncomeSlider.maxValue = City.MAX_INCOME_LEVEL;
@@ -179,12 +180,13 @@ public class UI_Manager : MonoBehaviour {
     public void UpdateUnitName()
     {
         unitCurrentlyDisplayed.setCustomName(m_UnitMenuNameInput.text);
+        Debug.Log(unitCurrentlyDisplayed.UnitName);
     }
 
     /// <summary>
     /// Updates the currently displayed city with a custom name.
     /// </summary>
-    private void UpdateCityName()
+    public void UpdateCityName()
     {
         cityCurrentlyDisplayed.SetCustomName(m_CityMenuNameInput.text);
     }
@@ -195,12 +197,18 @@ public class UI_Manager : MonoBehaviour {
     public void CloseAll()
     {
         m_UnitMenuCanvas.enabled = false;
-        
+        m_CityMenuCanvas.enabled = false;
     }
 
+    /// <summary>
+    /// Moves a menu when the player drags it.
+    /// </summary>
+    /// <param name="menu">The menu to move.</param>
     public void MoveMenuOnDrag(Canvas menu)
     {
-        menu.transform.position = Input.mousePosition;
+        Vector3 newMousePos = Input.mousePosition;
+        Vector3 relativePos = newMousePos - oldMousePos;
+        menu.transform.position += relativePos;
     }
 
     /// <summary>

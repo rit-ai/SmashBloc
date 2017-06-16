@@ -16,7 +16,7 @@ public class City : MonoBehaviour, Observable {
     public const int MIN_INCOME_LEVEL = 1;
 
     // Public fields
-    public Spawner m_Spawner;
+    public Transform m_SpawnPoint;
 
     // Private constants
     private static string DEFAULT_NAME = "Dylantown";
@@ -66,11 +66,11 @@ public class City : MonoBehaviour, Observable {
     }
 
     /// <summary>
-    /// Spawns the unit at the gate of the city.
+    /// Spawns the unit at the spawn point.
     /// </summary>
     public void SpawnUnit(Unit unit)
     {
-        Instantiate(unit, m_Spawner.transform.position, Quaternion.identity);
+        Instantiate(unit, m_SpawnPoint.transform.position, Quaternion.identity);
     }
 
     /// <summary>
@@ -91,7 +91,7 @@ public class City : MonoBehaviour, Observable {
     /// <summary>
     /// Gets the name of the city.
     /// </summary>
-    public string Name
+    public string CityName
     {
         get
         {
