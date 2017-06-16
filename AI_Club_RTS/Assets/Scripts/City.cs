@@ -17,10 +17,12 @@ public class City : MonoBehaviour, Observable {
 
     // Public fields
     public Transform m_SpawnPoint;
+    public Canvas m_HighlightCanvas;
 
     // Private constants
-    private static string DEFAULT_NAME = "Dylantown";
-    private static int DEFAULT_INCOME_LEVEL = 8;
+    private const string DEFAULT_NAME = "Dylanto";
+    private const int DEFAULT_INCOME_LEVEL = 8;
+    private static Quaternion SPAWN_ROTATION = Quaternion.FromToRotation(Vector3.up, Vector3.zero);
 
     // Private fields
     private List<Observer> m_Observers;
@@ -61,8 +63,33 @@ public class City : MonoBehaviour, Observable {
     public void NotifyAll<T>(T data)
     {
         foreach (Observer o in m_Observers){
-            o.OnNotify<T>(this, data);
+            o.OnNotify(this, data);
         }
+    }
+
+    /// <summary>
+    /// Pull up the menu when the unit is clicked.
+    /// </summary>
+    private void OnMouseDown()
+    {
+        Highlight();
+        NotifyAll(MenuObserver.INVOKE_CITY_DATA);
+    }
+
+    /// <summary>
+    /// Highlights the unit.
+    /// </summary>
+    public void Highlight()
+    {
+        m_HighlightCanvas.enabled = true;
+    }
+
+    /// <summary>
+    /// Removes highlighting on the unit.
+    /// </summary>
+    public void RemoveHighlight()
+    {
+        m_HighlightCanvas.enabled = false;
     }
 
     /// <summary>
@@ -71,17 +98,11 @@ public class City : MonoBehaviour, Observable {
     public void SpawnUnit(Unit unit, int numUnits)
     {
         Unit newUnit = Utils.UnitToPrefab(unit);
-        newUnit = Instantiate(newUnit, m_SpawnPoint.transform.position, Quaternion.identity);
+        newUnit = Instantiate(newUnit, m_SpawnPoint.transform.position, SPAWN_ROTATION);
         newUnit.setUnitName(newUnit.UnitName + numUnits.ToString());
     }
 
-    /// <summary>
-    /// Pull up the menu when the unit is clicked.
-    /// </summary>
-    private void OnMouseDown()
-    {
-        NotifyAll(MenuObserver.INVOKE_CITY_DATA);
-    }
+
 
     /// <summary>
     /// Gets the Income Level of the city.

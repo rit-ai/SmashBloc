@@ -101,6 +101,14 @@ public class Utils : MonoBehaviour {
     }
 
     /// <summary>
+    /// Returns a list of all cities currently in the scene.
+    /// </summary>
+    public static List<City> AllCities()
+    {
+        return new List<City>(FindObjectsOfType<City>());
+    }
+
+    /// <summary>
     /// Returns the prefab associated with a particular type of Unit.
     /// </summary>
     public static Unit UnitToPrefab(Unit unit)

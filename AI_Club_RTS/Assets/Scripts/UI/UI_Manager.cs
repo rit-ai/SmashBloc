@@ -127,8 +127,9 @@ public class UI_Manager : MonoBehaviour {
         // Handle health slider
         m_UnitMenuHealthSlider.maxValue = unit.MaxHealth;
         m_UnitMenuHealthSlider.value = unit.Health;
-  
-        // Once processing is finished, enable display
+
+        // Once processing is finished, bring to front and enable display
+        m_UnitMenuCanvas.transform.SetAsLastSibling();
         m_UnitMenuCanvas.enabled = true;
     }
 
@@ -150,7 +151,8 @@ public class UI_Manager : MonoBehaviour {
         m_CityMenuIncomeSlider.maxValue = City.MAX_INCOME_LEVEL;
         m_CityMenuIncomeSlider.value = city.IncomeLevel;
 
-        // Once processing is finished, enable display
+        // Once processing is finished, bring to front and enable display
+        m_CityMenuCanvas.transform.SetAsLastSibling();
         m_CityMenuCanvas.enabled = true;
     }
 

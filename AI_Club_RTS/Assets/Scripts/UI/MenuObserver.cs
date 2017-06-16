@@ -36,15 +36,20 @@ public class MenuObserver : Observer {
                 Debug.Assert(entity is Unit); // don't pass bad objects
                 m_UI_Manager.DisplayUnitInfo((Unit)entity);
                 break;
-            // Hides all menus and selection elements
+            // Display city info
             case INVOKE_CITY_DATA:
                 Debug.Assert(entity is City); // don't pass bad objects
                 m_UI_Manager.DisplayCityInfo((City)entity);
                 break;
+            // Hides all menus and selection elements
             case CLOSE_ALL:
                 foreach (Unit u in Utils.AllUnits())
                 {
                     u.RemoveHighlight();
+                }
+                foreach (City c in Utils.AllCities())
+                {
+                    c.RemoveHighlight();
                 }
                 m_UI_Manager.CloseAll();
                 break;

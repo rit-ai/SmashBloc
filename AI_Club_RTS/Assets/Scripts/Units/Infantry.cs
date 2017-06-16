@@ -10,6 +10,9 @@ public class Infantry : Unit {
     // Public constants
     public const string IDENTITY = "Infantry";
 
+    // Public fields
+    public Rigidbody m_HoverPull;
+
     // Private constants
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
@@ -33,7 +36,16 @@ public class Infantry : Unit {
         dmg = DAMAGE;
         range = RANGE;
         // Handle fields
-        health = MAXHEALTH;
+        health = Random.Range(10f, 90f);
+    }
+
+    /// <summary>
+    /// Handles general physics properties of units.
+    /// </summary>
+    public void FixedUpdate()
+    {
+        // Units will hover.
+        m_HoverPull.AddRelativeForce(Vector3.up * (m_HoverPull.mass * 100f * Mathf.Abs(Physics.gravity.y)));
     }
 
     /// <summary>
