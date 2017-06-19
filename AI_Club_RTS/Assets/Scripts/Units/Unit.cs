@@ -18,7 +18,8 @@ using UnityEngine;
 public abstract class Unit : MonoBehaviour, Observable {
 
     // public fields
-    public Canvas m_Canvas;
+    public MeshRenderer m_HighlightInner;
+    public MeshRenderer m_HighlightOuter;
     public int cost;
 
     // protected fields related to unit management
@@ -72,7 +73,8 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     public void Highlight()
     {
-        m_Canvas.enabled = true;
+        m_HighlightInner.enabled = true;
+        m_HighlightOuter.enabled = true;
     }
 
     /// <summary>
@@ -80,7 +82,8 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     public void RemoveHighlight()
     {
-        m_Canvas.enabled = false;
+        m_HighlightInner.enabled = false;
+        m_HighlightOuter.enabled = false;
     }
 
     /// <summary>

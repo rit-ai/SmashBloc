@@ -17,7 +17,8 @@ public class City : MonoBehaviour, Observable {
 
     // Public fields
     public Transform m_SpawnPoint;
-    public Canvas m_HighlightCanvas;
+    public Material m_DefaultMaterial;
+    public Material m_HighlightedMaterial;
 
     // Private constants
     private const string DEFAULT_NAME = "Dylanto";
@@ -81,7 +82,7 @@ public class City : MonoBehaviour, Observable {
     /// </summary>
     public void Highlight()
     {
-        m_HighlightCanvas.enabled = true;
+        GetComponent<Renderer>().material = m_HighlightedMaterial;
     }
 
     /// <summary>
@@ -89,7 +90,7 @@ public class City : MonoBehaviour, Observable {
     /// </summary>
     public void RemoveHighlight()
     {
-        m_HighlightCanvas.enabled = false;
+        GetComponent<Renderer>().material = m_DefaultMaterial;
     }
 
     /// <summary>

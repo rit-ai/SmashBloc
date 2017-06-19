@@ -14,6 +14,7 @@ public class Infantry : Unit {
     public Rigidbody m_HoverPull;
 
     // Private constants
+    private const float HOVER_QUOTIENT_MODIFIER = 100f;
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
     // Default values
@@ -36,16 +37,26 @@ public class Infantry : Unit {
         dmg = DAMAGE;
         range = RANGE;
         // Handle fields
-        health = Random.Range(10f, 90f);
+        health = Random.Range(10f, 90f); //FIXME
     }
 
     /// <summary>
     /// Handles general physics properties of units.
-    /// </summary>
+    /// </summary>S
     public void FixedUpdate()
     {
-        // Units will hover.
-        m_HoverPull.AddRelativeForce(Vector3.up * (m_HoverPull.mass * 100f * Mathf.Abs(Physics.gravity.y)));
+        // Units will hover based on their current distance from the floor.
+        // The farther a unit is from the floor, the less upward force is applied.
+        RaycastHit hit;
+        Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity);
+        if (!(hit.normal.magnitude == 0))
+        {
+            Vector3 hoverQuotient = Vector3.up * m_HoverPull.mass * Mathf.Abs(Physics.gravity.y);
+            hoverQuotient = hoverQuotient / (hit.normal.magnitude * HOVER_QUOTIENT_MODIFIER);
+            hoverQuotient.Scale(hit.normal);
+            m_HoverPull.AddForce(hoverQuotient, ForceMode.Acceleration);
+        }
+
     }
 
     /// <summary>
