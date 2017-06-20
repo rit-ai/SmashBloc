@@ -11,10 +11,10 @@ public class Infantry : Unit {
     public const string IDENTITY = "Infantry";
 
     // Public fields
-    public Rigidbody m_HoverPull;
+    public Rigidbody m_Hoverball;
 
     // Private constants
-    private const float HOVER_QUOTIENT_MODIFIER = 100f;
+    private InfantryPhysics physics;
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
     // Default values
@@ -22,15 +22,14 @@ public class Infantry : Unit {
     private const int DAMAGE = 10;
     private const int RANGE = 25;
 
-
     // Methods
     // Use this for initialization
     void Start () {
-        base.Init();
-        // Handle constants
+        Init();
+        // Handle default values
+        physics = new InfantryPhysics(this);
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
-        // Handle default values
         // team = "NULL";
         unitName = IDENTITY;
         maxHealth = MAXHEALTH;
@@ -41,22 +40,12 @@ public class Infantry : Unit {
     }
 
     /// <summary>
-    /// Handles general physics properties of units.
-    /// </summary>S
+    /// Handles general physics properties of units through the physics 
+    /// component.
+    /// </summary>
     public void FixedUpdate()
     {
-        // Units will hover based on their current distance from the floor.
-        // The farther a unit is from the floor, the less upward force is applied.
-        RaycastHit hit;
-        Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity);
-        if (!(hit.normal.magnitude == 0))
-        {
-            Vector3 hoverQuotient = Vector3.up * m_HoverPull.mass * Mathf.Abs(Physics.gravity.y);
-            hoverQuotient = hoverQuotient / (hit.normal.magnitude * HOVER_QUOTIENT_MODIFIER);
-            hoverQuotient.Scale(hit.normal);
-            m_HoverPull.AddForce(hoverQuotient, ForceMode.Acceleration);
-        }
-
+        physics.ComponentUpdate();
     }
 
     /// <summary>

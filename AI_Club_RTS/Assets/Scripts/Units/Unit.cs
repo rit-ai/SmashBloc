@@ -10,9 +10,9 @@ using UnityEngine;
  * This abstract class is designed to organize each child Unit. Logic that 
  * should be handled in Unit-type classes include:
  *  * State tracking
- *  * Decision making (AI)
- *  * Behavior execution
- *  * Basic transformation (particle effects, highlighting)
+ *  * Decision making (AI) / Behavior Execution
+ *  * Physics
+ *  * Effects (particles, highlighting)
  * Any other UI elements should be handled by Observers.
  * **/
 public abstract class Unit : MonoBehaviour, Observable {
@@ -45,12 +45,16 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// <summary>
     /// Sets up Observers and other state common between Units.
     /// </summary>
-    public void Init()
+    protected void Init()
     {
         observers = new List<Observer>();
         observers.Add(new MenuObserver());
     }
 
+    /// <summary>
+    /// Notifies all observers.
+    /// </summary>
+    /// <param name="data">Content of notification.</param>
     public void NotifyAll<T>(T data)
     {
         foreach (Observer o in observers){
