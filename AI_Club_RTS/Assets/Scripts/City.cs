@@ -2,41 +2,135 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class City : MonoBehaviour {
-    // Author: Ben Fairlamb
-    // Purpose: City functionality
-    // Limitations: Meh
+/*
+ * @author Ben Fairlamb
+ * @author Paul Galatic
+ * 
+ * Class designed to handle City-specific functionality and state. Like with 
+ * other game objects, menus and UI elements should be handled by observers.
+ * **/
+public class City : MonoBehaviour, Observable {
 
-    // Constants
-    private int DEFAULT_INCOME = 1;
+    // Public constants
+    public const int MAX_INCOME_LEVEL = 8;
+    public const int MIN_INCOME_LEVEL = 1;
 
-    // Fields
-    private string team;
-    private int income;
+    // Public fields
+    public Transform m_SpawnPoint;
+    public MeshRenderer m_HighlightInner;
+    public MeshRenderer m_HighlightOuter;
 
-	// Properties
-	/// <summary>
-	/// Gets the Team that currently owns the city.
-	/// </summary>
-	/// <value>The Team that owns the city.</value>
-	public string Team {
-		get { return team; }
-	}
+    // Private constants
+    private const string DEFAULT_NAME = "Dylanto";
+    private const int DEFAULT_INCOME_LEVEL = 8;
 
-	/// <summary>
-	/// Gets the Income the city generates per second.
-	/// </summary>
-	/// <value>The Income the city generates per second.</value>
-	public int Income {
-		get { return income; }
-	}
+    // Private fields
+    private List<Observer> m_Observers;
+    // private string team;
+    private string cityName;
+    private string customName;
+    private int incomeLevel;
 
-	// Use this for initialization
-	void Start () {
-        income = DEFAULT_INCOME;
+    // Properties
+    /// <summary>
+    /// Gets the Team that currently owns the city.
+    /// </summary>
+    /// <value>The Team that owns the city.</value>
+    //public string Team {
+    //get { return team; }
+    //}
+
+    // Use this for initialization
+    void Start()
+    {
+        // Handle private fields
+        m_Observers = new List<Observer>();
+        m_Observers.Add(new MenuObserver());
+
+        incomeLevel = DEFAULT_INCOME_LEVEL;
+        cityName = DEFAULT_NAME;
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update()
+    {
+    }
+
+    /// <summary>
+    /// Notifies all observers.
+    /// </summary>
+    /// <param name="data">The type of notification.</param>
+    public void NotifyAll<T>(string invocation, params T[] data)
+    {
+        foreach (Observer o in m_Observers){
+            o.OnNotify(this, invocation, data);
+        }
+    }
+
+    /// <summary>
+    /// Pull up the menu when the unit is clicked.
+    /// </summary>
+    private void OnMouseDown()
+    {
+        Highlight();
+        NotifyAll<VoidObject>(MenuObserver.INVOKE_CITY_DATA);
+    }
+
+    /// <summary>
+    /// Highlights the unit.
+    /// </summary>
+    public void Highlight()
+    {
+        m_HighlightInner.enabled = true;
+        m_HighlightOuter.enabled = true;
+    }
+
+    /// <summary>
+    /// Removes highlighting on the unit.
+    /// </summary>
+    public void RemoveHighlight()
+    {
+        m_HighlightInner.enabled = false;
+        m_HighlightOuter.enabled = false;
+    }
+
+    /// <summary>
+    /// Returns the location at which to spawn units.
+    /// </summary>
+    public Transform SpawnPoint
+    {
+        get { return m_SpawnPoint; }
+    }
+
+    /// <summary>
+    /// Gets the Income Level of the city.
+    /// </summary>
+    public int IncomeLevel {
+		get { return incomeLevel; }
 	}
+
+    /// <summary>
+    /// Gets the name of the city.
+    /// </summary>
+    public string CityName
+    {
+        get
+        {
+            if (customName == null)
+            {
+                return cityName;
+            }
+            return customName;
+        }
+    }
+
+    /// <summary>
+    /// Sets the custom name of the city.
+    /// </summary>
+    public void SetCustomName(string newName)
+    {
+        customName = newName;
+    }
+
+
 }

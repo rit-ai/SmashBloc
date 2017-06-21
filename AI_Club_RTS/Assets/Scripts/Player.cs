@@ -10,7 +10,12 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 
-    // Public constants
+    // Private Constants
+    private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
+
+    private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
+
+    // Public fields
     // Types of units a Player can own
     public Artillery ARTILLERY;
     public Bazooka BAZOOKA;
@@ -19,97 +24,101 @@ public class Player : MonoBehaviour {
     public SupplyTruck SUPPLY_TRUCK;
     public Tank TANK;
 
-    // Private Constants
-    private const int GOLD_INCREMENT_RATE = 2;  // scale by which gold updates
-                                                // --higher is faster
+    public City defaultCity; // REMOVEME
 
-    private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
-
-    // Fields
+    // Private fields
+    private List<City> m_Cities;
+    private List<Unit> m_Units;
     private Unit toSpawn;
     private int currentGoldAmount;
-    private int currentUnits;
+    private int currentNumUnits;
 
     // Use this for initialization
     void Start () {
         // Handle public constants
-        //ARTILLERY =     Instantiate(ARTILLERY)      as Artillery;
-        //BAZOOKA =       Instantiate(BAZOOKA)        as Bazooka;
-        INFANTRY =      Instantiate(INFANTRY)       as Infantry;
-        //RECON =         Instantiate(RECON)          as Recon;
-        //SUPPLY_TRUCK =  Instantiate(SUPPLY_TRUCK)   as SupplyTruck;
-        TANK =          Instantiate(TANK)           as Tank;
 
+
+        // Handle fields
+        m_Cities = new List<City>();
+        m_Units = new List<Unit>();
         currentGoldAmount = 0;
+        currentNumUnits = 0;
+
+        // Handle function setup
+        InvokeRepeating("UpdateGold", 0.0f, GOLD_INCREMENT_RATE);
+
+        // Debug
+        m_Cities.Add(defaultCity);
 	}
 	
 	// Update is called once per frame
-	void Update () {
-        UpdateGold();
-        Verify();
-	}
+	void Update ()
+    {
+
+    }
 
     /// <summary>
     /// Sets the unit to spawn. Throws an exception on an invalid name being 
     /// passed.
     /// </summary>
-    /// <param name="unitName">The name of the unit to spawn, based on 
+    /// <param name="unitIdentity">The name of the unit to spawn, based on 
     /// Unit.NAME.</param>
-    public void SetUnitToSpawn(string unitName)
+    public void SetUnitToSpawn(string unitIdentity)
     {
-        switch (unitName)
+        switch (unitIdentity)
         {
-            case Artillery.NAME:
+            case Artillery.IDENTITY:
                 toSpawn = ARTILLERY;
                 break;
-            case Bazooka.NAME:
+            case Bazooka.IDENTITY:
                 toSpawn = BAZOOKA;
                 break;
-            case Infantry.NAME:
+            case Infantry.IDENTITY:
                 toSpawn = INFANTRY;
                 break;
-            case Recon.NAME:
+            case Recon.IDENTITY:
                 toSpawn = RECON;
                 break;
-            case SupplyTruck.NAME:
+            case SupplyTruck.IDENTITY:
                 toSpawn = SUPPLY_TRUCK;
                 break;
-            case Tank.NAME:
+            case Tank.IDENTITY:
                 toSpawn = TANK;
                 break;
             default:
                 throw new KeyNotFoundException("SetUnitToSpawn given invalid string");
         }
+
+        
     }
 
     /// <summary>
-    /// Spawns a unit based on unitToSpawn.
+    /// Spawns a unit based on toSpawn, if the Player has enough gold.
     /// </summary>
-    /// <param name="spawner">The spawner at which to spawn the unit.</param>
-    public void SpawnUnit(Spawner spawner)
+    public void SpawnUnit(City city)
     {
-        if (!(currentGoldAmount < toSpawn.Cost))
+        if (currentGoldAmount > toSpawn.Cost)
         {
+            Debug.Assert(toSpawn.Cost > 0);
             currentGoldAmount -= toSpawn.Cost;
-            currentUnits++;
-            spawner.Spawn(toSpawn);
+
+            Unit newUnit = Utils.UnitToPrefab(toSpawn);
+            Transform spawnPoint = city.SpawnPoint;
+            newUnit = Instantiate(newUnit, spawnPoint.transform.position, Quaternion.identity);
+            newUnit.setUnitName(newUnit.UnitName + currentNumUnits.ToString());
+            m_Units.Add(newUnit);
+
+            currentNumUnits++;
         }
     }
 
     /// <summary>
-    /// Returns the player's current amount of gold.
+    /// Removes a unit from the list of units this player controls.
     /// </summary>
-    public int GetGold()
+    /// <param name="unit">The unit to remove.</param>
+    public void RemoveUnit(Unit unit)
     {
-        return currentGoldAmount;
-    }
-
-    /// <summary>
-    /// Returns the player's current amount of gold.
-    /// </summary>
-    public int GetUnits()
-    {
-        return currentUnits;
+        m_Units.Remove(unit);
     }
 
     /// <summary>
@@ -122,26 +131,35 @@ public class Player : MonoBehaviour {
     }
 
     /// <summary>
+    /// Returns the player's current amount of gold.
+    /// </summary>
+    public int Gold
+    {
+        get { return currentGoldAmount; }
+    }
+
+    /// <summary>
+    /// Returns the player's current amount of gold.
+    /// </summary>
+    public int NumUnits
+    {
+        get { return currentNumUnits; }
+    }
+
+    /// <summary>
     /// Updates the current gold amount, reflecting passive gold gain.
     /// </summary>
     /// 
     private void UpdateGold()
     {
-        var time = Time.deltaTime;
-        if (time > 1 / GOLD_INCREMENT_RATE)
+        foreach (City c in m_Cities)
         {
-            currentGoldAmount++;
+            currentGoldAmount += c.IncomeLevel;
         }
-    }
-
-    /// <summary>
-    /// Cleans up any loose ends left by Update()'s sequential operation.
-    /// </summary>
-    private void Verify()
-    {
         if (currentGoldAmount > MAX_GOLD_AMOUNT)
         {
             currentGoldAmount = MAX_GOLD_AMOUNT;
         }
     }
+
 }

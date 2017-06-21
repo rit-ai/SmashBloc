@@ -7,7 +7,7 @@ public class Recon : Unit {
     // Purpose: Recon unit
 
     // NAME -- for external reference purposes
-    public const string NAME = "RECON";
+    public const string IDENTITY = "RECON";
 
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.L_ARMOR;
@@ -31,17 +31,20 @@ public class Recon : Unit {
         range = RANGE;
         cost = COST;
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
-	/// <summary>
-	/// Attack the specified target.
-	/// </summary>
-	/// <param name="target">Target to attack.</param>
-	public override void Attack(Unit target)
+    /// <summary>
+    /// Returns identity of the unit, for disambiguation purposes.
+    /// </summary>
+    public override string Identity()
+    {
+        return IDENTITY;
+    }
+
+    /// <summary>
+    /// Attack the specified target.
+    /// </summary>
+    /// <param name="target">Target to attack.</param>
+    public override void Attack(Unit target)
 	{
 	}
 

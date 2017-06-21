@@ -8,7 +8,7 @@ public class Artillery : Unit {
     // Purpose: Artillery unit
 
     // NAME -- for external reference purposes
-    public const string NAME = "ARTILLERY";
+    public const string IDENTITY = "ARTILLERY";
 
     // CONSTANTS -- intimately related to unit design
     private static ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
@@ -32,17 +32,20 @@ public class Artillery : Unit {
         range = RANGE;
         cost = COST;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
-	/// <summary>
-	/// Attack the specified target.
-	/// </summary>
-	/// <param name="target">Target to attack.</param>
-	public override void Attack(Unit target)
+    /// <summary>
+    /// Returns identity of the unit, for disambiguation purposes.
+    /// </summary>
+    public override string Identity()
+    {
+        return IDENTITY;
+    }
+
+    /// <summary>
+    /// Attack the specified target.
+    /// </summary>
+    /// <param name="target">Target to attack.</param>
+    public override void Attack(Unit target)
 	{
 	}
 
