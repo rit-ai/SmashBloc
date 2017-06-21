@@ -30,7 +30,7 @@ public class RTS_Terrain : MonoBehaviour, Observable
     }
 
     /// <summary>
-    /// When the terrain is clicked, close all menus.
+    /// When the terrain is left clicked, close all menus.
     /// </summary>
     public void OnMouseDown()
     {

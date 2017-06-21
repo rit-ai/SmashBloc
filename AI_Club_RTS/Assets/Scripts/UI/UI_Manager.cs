@@ -227,7 +227,7 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     private void UpdateGoldAmountText()
     {
-        int gold = m_Player.GetGold();
+        int gold = m_Player.Gold;
         string goldText = gold.ToString();
         m_CurrentGoldAmountText.text = goldText;
     }
@@ -237,7 +237,7 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     private void UpdateUnitAmountText()
     {
-        int units = m_Player.GetUnits();
+        int units = m_Player.NumUnits;
         string unitText = units.ToString();
         m_CurrentUnitAmountText.text = unitText;
     }

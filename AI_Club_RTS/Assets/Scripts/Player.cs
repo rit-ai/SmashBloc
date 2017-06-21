@@ -28,10 +28,10 @@ public class Player : MonoBehaviour {
 
     // Private fields
     private List<City> m_Cities;
+    private List<Unit> m_Units;
     private Unit toSpawn;
-    private Rigidbody toSpawnPrefab; 
     private int currentGoldAmount;
-    private int currentUnits;
+    private int currentNumUnits;
 
     // Use this for initialization
     void Start () {
@@ -40,8 +40,9 @@ public class Player : MonoBehaviour {
 
         // Handle fields
         m_Cities = new List<City>();
+        m_Units = new List<Unit>();
         currentGoldAmount = 0;
-        currentUnits = 0;
+        currentNumUnits = 0;
 
         // Handle function setup
         InvokeRepeating("UpdateGold", 0.0f, GOLD_INCREMENT_RATE);
@@ -51,9 +52,10 @@ public class Player : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-        Verify();
-	}
+	void Update ()
+    {
+
+    }
 
     /// <summary>
     /// Sets the unit to spawn. Throws an exception on an invalid name being 
@@ -91,7 +93,7 @@ public class Player : MonoBehaviour {
     }
 
     /// <summary>
-    /// Spawns a unit based on toSpawn.
+    /// Spawns a unit based on toSpawn, if the Player has enough gold.
     /// </summary>
     /// <param name="spawner">The city at which to spawn the unit.</param>
     public void SpawnUnit(City city)
@@ -100,9 +102,14 @@ public class Player : MonoBehaviour {
         {
             Debug.Assert(toSpawn.Cost > 0);
             currentGoldAmount -= toSpawn.Cost;
-            currentUnits++;
 
-            city.SpawnUnit(toSpawn, currentUnits);
+            Unit newUnit = Utils.UnitToPrefab(toSpawn);
+            Transform spawnPoint = city.SpawnPoint;
+            newUnit = Instantiate(newUnit, spawnPoint.transform.position, Quaternion.identity);
+            newUnit.setUnitName(newUnit.UnitName + currentNumUnits.ToString());
+            m_Units.Add(newUnit);
+
+            currentNumUnits++;
         }
     }
 
@@ -125,13 +132,6 @@ public class Player : MonoBehaviour {
         {
             currentGoldAmount += c.IncomeLevel;
         }
-    }
-
-    /// <summary>
-    /// Cleans up any loose ends left by Update()'s sequential operation.
-    /// </summary>
-    private void Verify()
-    {
         if (currentGoldAmount > MAX_GOLD_AMOUNT)
         {
             currentGoldAmount = MAX_GOLD_AMOUNT;
@@ -141,17 +141,17 @@ public class Player : MonoBehaviour {
     /// <summary>
     /// Returns the player's current amount of gold.
     /// </summary>
-    public int GetGold()
+    public int Gold
     {
-        return currentGoldAmount;
+        get { return currentGoldAmount; }
     }
 
     /// <summary>
     /// Returns the player's current amount of gold.
     /// </summary>
-    public int GetUnits()
+    public int NumUnits
     {
-        return currentUnits;
+        get { return currentNumUnits; }
     }
 
 }

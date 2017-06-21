@@ -12,6 +12,7 @@ public class Infantry : Unit {
 
     // Public fields
     public Rigidbody m_Hoverball;
+    public Rigidbody m_BottomWeight;
 
     // Private constants
     private InfantryPhysics physics;

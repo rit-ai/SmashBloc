@@ -23,7 +23,6 @@ public class City : MonoBehaviour, Observable {
     // Private constants
     private const string DEFAULT_NAME = "Dylanto";
     private const int DEFAULT_INCOME_LEVEL = 8;
-    private static Quaternion SPAWN_ROTATION = Quaternion.FromToRotation(Vector3.up, Vector3.zero);
 
     // Private fields
     private List<Observer> m_Observers;
@@ -96,16 +95,12 @@ public class City : MonoBehaviour, Observable {
     }
 
     /// <summary>
-    /// Spawns the unit at the spawn point.
+    /// Returns the location at which to spawn units.
     /// </summary>
-    public void SpawnUnit(Unit unit, int numUnits)
+    public Transform SpawnPoint
     {
-        Unit newUnit = Utils.UnitToPrefab(unit);
-        newUnit = Instantiate(newUnit, m_SpawnPoint.transform.position, SPAWN_ROTATION);
-        newUnit.setUnitName(newUnit.UnitName + numUnits.ToString());
+        get { return m_SpawnPoint; }
     }
-
-
 
     /// <summary>
     /// Gets the Income Level of the city.

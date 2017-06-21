@@ -42,6 +42,9 @@ public abstract class Unit : MonoBehaviour, Observable {
     protected Rigidbody body;
     protected Collider collision;
 
+    // protected fields related to behavior
+    protected Vector3 destination;
+
     /// <summary>
     /// Sets up Observers and other state common between Units.
     /// </summary>
@@ -49,6 +52,9 @@ public abstract class Unit : MonoBehaviour, Observable {
     {
         observers = new List<Observer>();
         observers.Add(new MenuObserver());
+
+        // Sets default destination to be the location the unit spawns
+        SetDestination(transform.position);
     }
 
     /// <summary>
@@ -141,6 +147,26 @@ public abstract class Unit : MonoBehaviour, Observable {
     public void setCustomName(string newName)
     {
         customName = newName;
+    }
+
+    /// <summary>
+    /// Sets a new destination, which the unit will attempt to navigate toward.
+    /// </summary>
+    /// <param name="newDest"></param>
+    public void SetDestination(Vector3 newDest)
+    {
+        destination = newDest;
+    }
+
+    /// <summary>
+    /// Returns this unit's destination.
+    /// </summary>
+    public Vector3 Destination
+    {
+        get
+        {
+            return destination;
+        }
     }
 
     /// <summary>
