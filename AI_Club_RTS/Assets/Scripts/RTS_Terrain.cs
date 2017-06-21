@@ -21,11 +21,11 @@ public class RTS_Terrain : MonoBehaviour, Observable
         m_Observers.Add(new MenuObserver());
     }
 
-    public void NotifyAll<T>(T data)
+    public void NotifyAll<T>(string invocation, params T[] data)
     {
         foreach (Observer o in m_Observers)
         {
-            o.OnNotify(this, data);
+            o.OnNotify(this, invocation, data);
         }
     }
 
@@ -35,7 +35,7 @@ public class RTS_Terrain : MonoBehaviour, Observable
     public void OnMouseDown()
     {
         if (Utils.MouseIsOverUI()) { return; }
-        NotifyAll(MenuObserver.CLOSE_ALL);
+        NotifyAll<VoidObject>(MenuObserver.CLOSE_ALL);
 
     }
 }

@@ -11,7 +11,7 @@ using UnityEngine;
  * 
  * If a menu is opened, CameraController defers to its observer, UIManager.
  * **/
-public class CameraController : MonoBehaviour {
+public class CameraController : MonoBehaviour, Observable {
 
     // Public constants
     public static KeyCode DESELECT_KEY;
@@ -27,19 +27,26 @@ public class CameraController : MonoBehaviour {
 
     // Public fields
     public Camera m_Camera;
+    public LayerMask Terrain_mask;
 
     // Private fields
+    private List<Observer> m_Observers;
+    private List<Unit> m_SelectedUnits;
     private State m_CurrentState;
-    public LayerMask Terrain_mask;
     private Vector3 m_MousePos;
     private Rect m_ScreenBorderInverse;
 
     // Use this for initialization
-    public void Start () {
+    void Start () {
         // Handle public constants
         DESELECT_KEY = KeyCode.LeftShift; // TODO make custom binds
 
         // Handle private fields
+        m_Observers = new List<Observer>();
+        m_Observers.Add(new MenuObserver());
+        m_Observers.Add(new GameObserver());
+        m_SelectedUnits = new List<Unit>();
+
         // Rectangle that contains everything EXCEPT the screen border
         m_ScreenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
 
@@ -58,6 +65,14 @@ public class CameraController : MonoBehaviour {
         m_CurrentState.StateUpdate();
         Scroll();
         EdgePan();
+    }
+
+    public void NotifyAll<T>(string invocation, params T[] data)
+    {
+        foreach (Observer o in m_Observers)
+        {
+            o.OnNotify(this, invocation, data);
+        }
     }
 
     /// <summary>
@@ -103,7 +118,8 @@ public class CameraController : MonoBehaviour {
     private void DeselectAll()
     {
         // If there's a menu up displaying unit info, close it
-        FindObjectOfType<RTS_Terrain>().NotifyAll<String>(MenuObserver.CLOSE_ALL);
+        NotifyAll<VoidObject>(MenuObserver.CLOSE_ALL);
+        NotifyAll<VoidObject>(GameObserver.UNITS_DESELECTED);
     }
 
     /// <summary>
@@ -162,15 +178,14 @@ public class CameraController : MonoBehaviour {
     {
         private CameraController m_CameraController;
         private Camera m_Camera;
-
-        private List<Unit> selectedUnits;
+        private List<Unit> m_SelectedUnits;
 
         public DrawingState(CameraController controller)
         {
             m_CameraController = controller;
             m_Camera = controller.m_Camera;
 
-            selectedUnits = new List<Unit>();
+            m_SelectedUnits = controller.m_SelectedUnits;
         }
 
         public void HandleInput()
@@ -183,21 +198,23 @@ public class CameraController : MonoBehaviour {
             }
 
             // Clear all units currently selected.
-            foreach (Unit s in selectedUnits)
+            m_CameraController.NotifyAll<VoidObject>(GameObserver.UNITS_DESELECTED);
+            foreach (Unit s in m_SelectedUnits)
             {
                 s.RemoveHighlight();
             }
-            selectedUnits.Clear();
+            m_SelectedUnits.Clear();
 
             // Take the selection box and highlight all the objects inside
-            foreach (Unit s in GameObject.FindObjectsOfType<Unit>())
+            foreach (Unit s in FindObjectsOfType<Unit>())
             {
                 if (IsWithinSelectionBounds(s))
                 {
                     s.Highlight();
-                    selectedUnits.Add(s);
+                    m_SelectedUnits.Add(s);
                 }
             }
+            m_CameraController.NotifyAll<List<Unit>>(GameObserver.UNITS_SELECTED, m_SelectedUnits);
         }
 
         public void StateUpdate()

@@ -60,10 +60,10 @@ public class City : MonoBehaviour, Observable {
     /// Notifies all observers.
     /// </summary>
     /// <param name="data">The type of notification.</param>
-    public void NotifyAll<T>(T data)
+    public void NotifyAll<T>(string invocation, params T[] data)
     {
         foreach (Observer o in m_Observers){
-            o.OnNotify(this, data);
+            o.OnNotify(this, invocation, data);
         }
     }
 
@@ -73,7 +73,7 @@ public class City : MonoBehaviour, Observable {
     private void OnMouseDown()
     {
         Highlight();
-        NotifyAll(MenuObserver.INVOKE_CITY_DATA);
+        NotifyAll<VoidObject>(MenuObserver.INVOKE_CITY_DATA);
     }
 
     /// <summary>

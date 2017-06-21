@@ -95,7 +95,6 @@ public class Player : MonoBehaviour {
     /// <summary>
     /// Spawns a unit based on toSpawn, if the Player has enough gold.
     /// </summary>
-    /// <param name="spawner">The city at which to spawn the unit.</param>
     public void SpawnUnit(City city)
     {
         if (currentGoldAmount > toSpawn.Cost)
@@ -114,28 +113,21 @@ public class Player : MonoBehaviour {
     }
 
     /// <summary>
+    /// Removes a unit from the list of units this player controls.
+    /// </summary>
+    /// <param name="unit">The unit to remove.</param>
+    public void RemoveUnit(Unit unit)
+    {
+        m_Units.Remove(unit);
+    }
+
+    /// <summary>
     /// Modifies the current amount of gold.
     /// </summary>
     /// <param name="amount">The amount to modify by.</param>
     public void UpdateGold(int amount)
     {
         currentGoldAmount += amount;
-    }
-
-    /// <summary>
-    /// Updates the current gold amount, reflecting passive gold gain.
-    /// </summary>
-    /// 
-    private void UpdateGold()
-    {
-        foreach (City c in m_Cities)
-        {
-            currentGoldAmount += c.IncomeLevel;
-        }
-        if (currentGoldAmount > MAX_GOLD_AMOUNT)
-        {
-            currentGoldAmount = MAX_GOLD_AMOUNT;
-        }
     }
 
     /// <summary>
@@ -152,6 +144,22 @@ public class Player : MonoBehaviour {
     public int NumUnits
     {
         get { return currentNumUnits; }
+    }
+
+    /// <summary>
+    /// Updates the current gold amount, reflecting passive gold gain.
+    /// </summary>
+    /// 
+    private void UpdateGold()
+    {
+        foreach (City c in m_Cities)
+        {
+            currentGoldAmount += c.IncomeLevel;
+        }
+        if (currentGoldAmount > MAX_GOLD_AMOUNT)
+        {
+            currentGoldAmount = MAX_GOLD_AMOUNT;
+        }
     }
 
 }

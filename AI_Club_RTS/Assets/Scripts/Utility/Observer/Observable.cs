@@ -15,8 +15,8 @@ public interface Observable {
     /// <summary>
     /// Notify all observers.
     /// </summary>
-    /// <param name="data">A generic piece of data that tells the observer what
-    /// event is actually occurring.</param>
-    void NotifyAll<T>(T data);
+    /// <param name="invocation">The title of the event.</param>
+    /// <param name="data">Any other useful data.</param>
+    void NotifyAll<T>(string invocation, params T[] data);
 
 }

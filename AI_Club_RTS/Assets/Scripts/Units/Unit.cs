@@ -60,11 +60,12 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// <summary>
     /// Notifies all observers.
     /// </summary>
-    /// <param name="data">Content of notification.</param>
-    public void NotifyAll<T>(T data)
+    /// <param name="invocation">The name of the invocation.</param>
+    /// <param name="data">Any additional data.</param>
+    public void NotifyAll<T>(string invocation, params T[] data)
     {
         foreach (Observer o in observers){
-            o.OnNotify(this, data);
+            o.OnNotify<T>(this, invocation);
         }
     }
 
@@ -75,7 +76,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     private void OnMouseDown()
     {
         Highlight();
-        NotifyAll(MenuObserver.INVOKE_UNIT_DATA);
+        NotifyAll<VoidObject>(MenuObserver.INVOKE_UNIT_DATA);
     }
 
     /// <summary>
@@ -136,6 +137,10 @@ public abstract class Unit : MonoBehaviour, Observable {
         }
     }
 
+    /// <summary>
+    /// Sets the default unit name.
+    /// </summary>
+    /// <param name="newName"></param>
     public void setUnitName(string newName)
     {
         unitName = newName;

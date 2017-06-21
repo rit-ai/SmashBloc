@@ -15,7 +15,8 @@ public interface Observer {
     /// How should the Observer behave when it is notified?
     /// </summary>
     /// <param name="entity">The entity notifying the Observer.</param>
+    /// <param name="invocation">The type of invocation.</param>
     /// <param name="data">Any additional data or state that may be useful.</param>
-    void OnNotify<T>(Object entity, T data);
+    void OnNotify<T>(Object entity, string invocation, params T[] data);
 
 }

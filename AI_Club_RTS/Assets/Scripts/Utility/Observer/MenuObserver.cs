@@ -17,19 +17,18 @@ public class MenuObserver : Observer {
 
     // Private constant fields
     // We keep a reference to the UI Manager to tell it what we want it to show
-    private static UI_Manager m_UI_Manager = GameObject.FindObjectOfType<UI_Manager>();
+    private static UI_Manager m_UI_Manager = Object.FindObjectOfType<UI_Manager>();
 
     /// <summary>
     /// Determines which type of menu to raise, depending on the entity 
-    /// performing the invocation (if any) and the data representing the 
-    /// call.
+    /// performing the invocation and the data representing the call.
     /// </summary>
     /// <param name="entity">The entity performing the invocation.</param>
-    /// <param name="data">The type of invocation.</param>
-    public void OnNotify<T>(Object entity, T data)
+    /// <param name="invocation">The type of invocation.</param>
+    /// <param name="data">Optional misc data.</param>
+    public void OnNotify<T>(Object entity, string invocation, params T[] data)
     {
-        if (!(data is string)) { return; }  // irrelevant data, ignore
-        switch (data.ToString())            // Convert data to string (it should already be a string)
+        switch (invocation)
         {
             // Display unit info
             case INVOKE_UNIT_DATA:
@@ -53,7 +52,7 @@ public class MenuObserver : Observer {
                 }
                 m_UI_Manager.CloseAll();
                 break;
-                // Invalid tag received? Must be for someone else. Ignore.
+            // Invocation not found? Must be for someone else. Ignore.
 
         }
     }
