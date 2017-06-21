@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Microsoft;
 
 /*
  * @author Paul Galatic
@@ -48,13 +49,22 @@ public class GameObserver : Observer {
             case UNITS_DESELECTED:
                 selectedUnits.Clear();
                 break;
+            // Invocation not found? Must be for someone else. Ignore.
+        }
+    }
+
+    /// <summary>
+    /// Overloaded because Unity doesn't currently support <<dynamic>>.
+    /// </summary>
+    public void OnNotify(Object entity, string invocation, Vector3 data)
+    {
+        switch (invocation)
+        {
             // Set the destination of all selected units
             case DESTINATION_SET:
-                Debug.Assert(data != null);
-                Debug.Assert(data[0] is Vector3);
                 foreach (Unit u in selectedUnits)
                 {
-                    u.SetDestination((dynamic)data[0]);
+                    u.SetDestination(data);
                 }
                 break;
             // Invocation not found? Must be for someone else. Ignore.

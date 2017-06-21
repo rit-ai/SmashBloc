@@ -163,6 +163,11 @@ public abstract class Unit : MonoBehaviour, Observable {
         destination = newDest;
     }
 
+    public void SetDestination(float x, float y, float z)
+    {
+        destination = new Vector3(x, y, z);
+    }
+
     /// <summary>
     /// Returns this unit's destination.
     /// </summary>
