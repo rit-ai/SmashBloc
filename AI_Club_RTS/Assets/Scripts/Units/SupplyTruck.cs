@@ -27,8 +27,9 @@ public class SupplyTruck : Unit {
 
     // Methods
     // Use this for initialization
-    void Start()
+    public override void Start()
     {
+        base.Start();
         // Handle constants
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
@@ -39,6 +40,15 @@ public class SupplyTruck : Unit {
         cost = COST;
         // Handle private fields
         supplies = SUPPLY_CAPACITY;
+    }
+
+    /// <summary>
+    /// Sets a new destination, which the unit will attempt to navigate toward.
+    /// </summary>
+    /// <param name="newDest"></param>
+    public override void SetDestination(Vector3 newDest)
+    {
+        ai.SetDestChanged();
     }
 
     /// <summary>

@@ -37,6 +37,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     // protected fields related to fundamentals of unit type
     protected ArmorType armorType;
     protected DamageType dmgType;
+    protected UnitAI ai;
 
     // protected fields related to physics
     protected Rigidbody body;
@@ -48,7 +49,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// <summary>
     /// Sets up Observers and other state common between Units.
     /// </summary>
-    protected void Init()
+    public virtual void Start()
     {
         observers = new List<Observer>();
         observers.Add(new UIObserver());
@@ -155,20 +156,6 @@ public abstract class Unit : MonoBehaviour, Observable {
     }
 
     /// <summary>
-    /// Sets a new destination, which the unit will attempt to navigate toward.
-    /// </summary>
-    /// <param name="newDest"></param>
-    public void SetDestination(Vector3 newDest)
-    {
-        destination = newDest;
-    }
-
-    public void SetDestination(float x, float y, float z)
-    {
-        destination = new Vector3(x, y, z);
-    }
-
-    /// <summary>
     /// Returns this unit's destination.
     /// </summary>
     public Vector3 Destination
@@ -235,7 +222,11 @@ public abstract class Unit : MonoBehaviour, Observable {
         get { return cost; }
     }
 
-
+    /// <summary>
+    /// Sets a new destination, which the unit will attempt to navigate toward.
+    /// </summary>
+    /// <param name="newDest"></param>
+    public abstract void SetDestination(Vector3 newDest);
 
     /// <summary>
     /// Returns the "identity" of the unit, a unique identifier for the purpose

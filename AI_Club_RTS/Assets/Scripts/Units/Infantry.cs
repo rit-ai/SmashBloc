@@ -11,7 +11,6 @@ public class Infantry : Unit {
     public const string IDENTITY = "Infantry";
 
     // Public fields
-    public float m_Speed;
     public Rigidbody m_Hoverball;
     public Rigidbody m_BottomWeight;
 
@@ -26,19 +25,25 @@ public class Infantry : Unit {
 
     // Methods
     // Use this for initialization
-    void Start () {
-        Init();
-        // Handle default values
+    public override void Start () {
+        // Handle components
         physics = new InfantryPhysics(this);
+        ai = new InfantryAI(this);
+        // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
         // team = "NULL";
-        unitName = IDENTITY;
         maxHealth = MAXHEALTH;
         dmg = DAMAGE;
         range = RANGE;
         // Handle fields
         health = Random.Range(10f, 90f); //FIXME
+        base.Start();
+    }
+
+    public void Update()
+    {
+        ai.ComponentUpdate();
     }
 
     /// <summary>
@@ -48,6 +53,16 @@ public class Infantry : Unit {
     public void FixedUpdate()
     {
         physics.ComponentUpdate();
+    }
+
+    /// <summary>
+    /// Sets a new destination, which the unit will attempt to navigate toward.
+    /// </summary>
+    /// <param name="newDest"></param>
+    public override void SetDestination(Vector3 newDest)
+    {
+        destination = newDest;
+        ai.SetDestChanged();
     }
 
     /// <summary>

@@ -22,7 +22,11 @@ public class Artillery : Unit {
 
 	// Methods
 	// Use this for initialization
-	void Start () {
+	public override void Start () {
+        base.Start();
+        // Handle components
+        // physics = new ArtilleryPhysics();
+        // ai = new ArtilleryAI();
         // Handle constants
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
@@ -32,6 +36,15 @@ public class Artillery : Unit {
         range = RANGE;
         cost = COST;
 	}
+
+    /// <summary>
+    /// Sets a new destination, which the unit will attempt to navigate toward.
+    /// </summary>
+    /// <param name="newDest"></param>
+    public override void SetDestination(Vector3 newDest)
+    {
+        ai.SetDestChanged();
+    }
 
     /// <summary>
     /// Returns identity of the unit, for disambiguation purposes.

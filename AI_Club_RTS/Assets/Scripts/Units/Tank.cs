@@ -22,8 +22,8 @@ public class Tank : Unit {
 
 	// Methods
 	// Use this for initialization
-	void Start () {
-        base.Init();
+	public override void Start () {
+        base.Start();
         // Handle constants
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
@@ -35,6 +35,15 @@ public class Tank : Unit {
         cost = COST;
         // Handle fields
         health = MAXHEALTH;
+    }
+
+    /// <summary>
+    /// Sets a new destination, which the unit will attempt to navigate toward.
+    /// </summary>
+    /// <param name="newDest"></param>
+    public override void SetDestination(Vector3 newDest)
+    {
+        ai.SetDestChanged();
     }
 
     /// <summary>

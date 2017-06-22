@@ -61,7 +61,6 @@ public class CameraController : MonoBehaviour, Observable {
     }
 
     void Update () {
-        m_CurrentState.HandleInput();
         m_CurrentState.StateUpdate();
         Scroll();
         EdgePan();
@@ -165,6 +164,7 @@ public class CameraController : MonoBehaviour, Observable {
 
         public void StateUpdate()
         {
+            HandleInput();
         }
 
 
@@ -202,6 +202,8 @@ public class CameraController : MonoBehaviour, Observable {
 
         public void StateUpdate()
         {
+            HandleInput();
+
             // Take the selection box and highlight all the objects inside
             foreach (Unit s in FindObjectsOfType<Unit>())
             {
