@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /*
+ * @author 
  * @author Paul Galatic
  * 
  * Class used to condense often-called methods into smaller chunks / lines such
@@ -40,17 +41,19 @@ public class Utils : MonoBehaviour {
     public static void DrawScreenRectBorder( Rect rect, float thickness, Color color )
 	{
 		// Top
-		Utils.DrawScreenRect( new Rect( rect.xMin, rect.yMin, rect.width, thickness ), color );
+		DrawScreenRect( new Rect( rect.xMin, rect.yMin, rect.width, thickness ), color );
 		// Left
-		Utils.DrawScreenRect( new Rect( rect.xMin, rect.yMin, thickness, rect.height ), color );
+		DrawScreenRect( new Rect( rect.xMin, rect.yMin, thickness, rect.height ), color );
 		// Right
-		Utils.DrawScreenRect( new Rect( rect.xMax - thickness, rect.yMin, thickness, rect.height ), color);
+		DrawScreenRect( new Rect( rect.xMax - thickness, rect.yMin, thickness, rect.height ), color);
 		// Bottom
-		Utils.DrawScreenRect( new Rect( rect.xMin, rect.yMax - thickness, rect.width, thickness ), color );
+		DrawScreenRect( new Rect( rect.xMin, rect.yMax - thickness, rect.width, thickness ), color );
 	}
 
     /// <summary>
     /// Returns a rectangle based on the 2 input screen positions
+    /// 
+    /// FIXME Currently unused
     /// </summary>
     public static Rect GetScreenRect(Vector3 screenPos1, Vector3 screenPos2){
 		// Move origin from bottom left to top left

@@ -16,6 +16,10 @@ public class CameraController : MonoBehaviour, Observable {
     // Public constants
     public static KeyCode DESELECT_KEY;
 
+    // Public fields
+    public Camera m_Camera;
+    public LayerMask Terrain_mask;
+
     // Private constants
     private static Color BOX_INTERIOR_COLOR = new Color(0.74f, 0.71f, 0.27f, 0.5f);
     private static Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
@@ -25,13 +29,9 @@ public class CameraController : MonoBehaviour, Observable {
     private static float BORDER_SIZE = 20f;
     private static float SPEED = 1f;
 
-    // Public fields
-    public Camera m_Camera;
-    public LayerMask Terrain_mask;
-
     // Private fields
     private List<Observer> m_Observers;
-    private List<Unit> m_SelectedUnits;
+    private HashSet<Unit> m_SelectedUnits;
     private State m_CurrentState;
     private Vector3 m_MousePos;
     private Rect m_ScreenBorderInverse;
@@ -43,9 +43,9 @@ public class CameraController : MonoBehaviour, Observable {
 
         // Handle private fields
         m_Observers = new List<Observer>();
-        m_Observers.Add(new MenuObserver());
+        m_Observers.Add(new UIObserver());
         m_Observers.Add(new GameObserver());
-        m_SelectedUnits = new List<Unit>();
+        m_SelectedUnits = new HashSet<Unit>();
 
         // Rectangle that contains everything EXCEPT the screen border
         m_ScreenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
@@ -61,7 +61,6 @@ public class CameraController : MonoBehaviour, Observable {
     }
 
     void Update () {
-        m_CurrentState.HandleInput();
         m_CurrentState.StateUpdate();
         Scroll();
         EdgePan();
@@ -118,7 +117,7 @@ public class CameraController : MonoBehaviour, Observable {
     private void DeselectAll()
     {
         // If there's a menu up displaying unit info, close it
-        NotifyAll<VoidObject>(MenuObserver.CLOSE_ALL);
+        NotifyAll<VoidObject>(UIObserver.CLOSE_ALL);
         NotifyAll<VoidObject>(GameObserver.UNITS_DESELECTED);
     }
 
@@ -165,6 +164,7 @@ public class CameraController : MonoBehaviour, Observable {
 
         public void StateUpdate()
         {
+            HandleInput();
         }
 
 
@@ -178,32 +178,31 @@ public class CameraController : MonoBehaviour, Observable {
     {
         private CameraController m_CameraController;
         private Camera m_Camera;
-        private List<Unit> m_SelectedUnits;
+        //private HashSet<Unit> m_SelectedUnits;
 
         public DrawingState(CameraController controller)
         {
             m_CameraController = controller;
             m_Camera = controller.m_Camera;
 
-            m_SelectedUnits = controller.m_SelectedUnits;
+            //m_SelectedUnits = controller.m_SelectedUnits;
         }
 
         public void HandleInput()
         {
             // When mouse button is up, switch back to drawing state.
             if (Input.GetMouseButtonUp(0))
-            { 
+            {
+                m_CameraController.NotifyAll(GameObserver.UNITS_SELECTED, m_CameraController.m_SelectedUnits);
                 m_CameraController.m_CurrentState = new SelectedState(m_CameraController);
                 return;
             }
 
-            // Clear all units currently selected.
-            m_CameraController.NotifyAll<VoidObject>(GameObserver.UNITS_DESELECTED);
-            foreach (Unit s in m_SelectedUnits)
-            {
-                s.RemoveHighlight();
-            }
-            m_SelectedUnits.Clear();
+        }
+
+        public void StateUpdate()
+        {
+            HandleInput();
 
             // Take the selection box and highlight all the objects inside
             foreach (Unit s in FindObjectsOfType<Unit>())
@@ -211,14 +210,14 @@ public class CameraController : MonoBehaviour, Observable {
                 if (IsWithinSelectionBounds(s))
                 {
                     s.Highlight();
-                    m_SelectedUnits.Add(s);
+                    m_CameraController.m_SelectedUnits.Add(s);
+                }
+                else
+                {
+                    s.RemoveHighlight();
+                    m_CameraController.m_SelectedUnits.Remove(s);
                 }
             }
-            m_CameraController.NotifyAll<List<Unit>>(GameObserver.UNITS_SELECTED, m_SelectedUnits);
-        }
-
-        public void StateUpdate()
-        {
         }
 
         // Checks to see if a given object is within the area being selected

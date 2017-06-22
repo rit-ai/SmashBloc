@@ -45,7 +45,7 @@ public class City : MonoBehaviour, Observable {
     {
         // Handle private fields
         m_Observers = new List<Observer>();
-        m_Observers.Add(new MenuObserver());
+        m_Observers.Add(new UIObserver());
 
         incomeLevel = DEFAULT_INCOME_LEVEL;
         cityName = DEFAULT_NAME;
@@ -73,7 +73,7 @@ public class City : MonoBehaviour, Observable {
     private void OnMouseDown()
     {
         Highlight();
-        NotifyAll<VoidObject>(MenuObserver.INVOKE_CITY_DATA);
+        NotifyAll<VoidObject>(UIObserver.INVOKE_CITY_DATA);
     }
 
     /// <summary>
