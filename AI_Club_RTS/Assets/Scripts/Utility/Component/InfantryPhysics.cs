@@ -13,8 +13,9 @@ public class InfantryPhysics : Component {
     // constructor and ComponentUpdate().
 
     // Private constants
-    private const float MIN_FLOAT_DISTANCE = 15f;
-    private const float MAX_VECTOR_FORCE = 100f;
+    private const float MIN_FLOAT_DISTANCE = 30f;
+    private const float DECELERATE_DISTANCE = 100f;
+    private readonly float MAX_VECTOR_FORCE;
 
     // Private fields
     private Infantry m_Parent;
@@ -25,6 +26,10 @@ public class InfantryPhysics : Component {
     {
         Debug.Assert(parent is Infantry);
         m_Parent = parent;
+
+        // Private constants
+        MAX_VECTOR_FORCE = parent.m_Speed;
+        // Private fields
         m_Hoverball = parent.m_Hoverball;
         m_BottomWeight = parent.m_BottomWeight;
     }
@@ -40,9 +45,11 @@ public class InfantryPhysics : Component {
     /// <summary>
     /// Infantry Units hover above the ground, based on their current distance 
     /// from the floor. They will attempt to hover toward the parent's 
-    /// destination. The Hoverball provides upward force. The BottomWeight
-    /// provides stability (so that the Infantry doesn't constantly flip and
-    /// spin around).
+    /// destination and decelerate as they approach it.
+    /// 
+    /// The Hoverball provides upward force. The BottomWeight provides 
+    /// stability (so that the Infantry doesn't constantly flip and spin 
+    /// around).
     /// </summary>
     private void Hover()
     {
@@ -55,11 +62,14 @@ public class InfantryPhysics : Component {
             // Get a generic UP vector
             Vector3 hoverForce = Vector3.up * Mathf.Abs(Physics.gravity.y) * m_Hoverball.mass;
             // The further the distance from the floor, the less force is applied
-            hoverForce = hoverForce / hit.distance;
+            hoverForce /= hit.distance;
             // Get the vector in the direction of the destination
             Vector3 distanceToDest = (m_Parent.Destination - m_Parent.transform.position);
             // Get rid of the Y factor so that the hover stays the same
-            distanceToDest.y = 0;
+            distanceToDest.y = 0f;
+            // Decelerate the XZ factors if necessary (strictly decrease force)
+            float scaleFactor = Mathf.Max(Mathf.Max(distanceToDest.magnitude, 1f) / DECELERATE_DISTANCE, 1f);
+            distanceToDest /= scaleFactor;
             // Adjust by that vector
             hoverForce += distanceToDest;
             // Cap the amount of force (to prevent strange launches)

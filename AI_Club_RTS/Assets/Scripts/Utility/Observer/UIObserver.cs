@@ -8,11 +8,12 @@ using UnityEngine;
  * This class listens to other classes to determine which menus should be
  * displayed.
  * **/
-public class MenuObserver : Observer {
+public class UIObserver : Observer {
 
     // Constants that refer to different possible operations of MenuObserver
     public const string INVOKE_UNIT_DATA = "INVOKE_UNIT_DATA";
     public const string INVOKE_CITY_DATA = "INVOKE_CITY_DATA";
+    public const string INVOKE_TARGET_RING = "INVOKE_TARGET_RING";
     public const string CLOSE_ALL = "CLOSE_ALL";
 
     // Private constant fields
@@ -39,6 +40,10 @@ public class MenuObserver : Observer {
             case INVOKE_CITY_DATA:
                 Debug.Assert(entity is City); // don't pass bad objects
                 m_UI_Manager.DisplayCityInfo((City)entity);
+                break;
+            case INVOKE_TARGET_RING:
+                Debug.Assert(entity is RTS_Terrain);
+                m_UI_Manager.DisplayTargetRing((RTS_Terrain)entity);
                 break;
             // Hides all menus and selection elements
             case CLOSE_ALL:

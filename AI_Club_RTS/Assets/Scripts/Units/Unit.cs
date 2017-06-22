@@ -51,7 +51,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     protected void Init()
     {
         observers = new List<Observer>();
-        observers.Add(new MenuObserver());
+        observers.Add(new UIObserver());
 
         // Sets default destination to be the location the unit spawns
         SetDestination(transform.position);
@@ -76,7 +76,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     private void OnMouseDown()
     {
         Highlight();
-        NotifyAll<VoidObject>(MenuObserver.INVOKE_UNIT_DATA);
+        NotifyAll<VoidObject>(UIObserver.INVOKE_UNIT_DATA);
     }
 
     /// <summary>

@@ -22,12 +22,8 @@ public class GameObserver : Observer {
     public const string DESTINATION_SET = "DESTINATION_SET";
 
     // Private fields
-    private List<Unit> selectedUnits;
-
-    public GameObserver()
-    {
-        selectedUnits = new List<Unit>();
-    }
+    // static because there are multiple GameObservers
+    private static HashSet<Unit> selectedUnits; 
 
     /// <summary>
     /// Determines the type of action to perform, based on the invocation.
@@ -42,33 +38,39 @@ public class GameObserver : Observer {
             // Store units that are selected
             case UNITS_SELECTED:
                 Debug.Assert(data != null);
-                Debug.Assert(data[0] is List<Unit>);
-                selectedUnits = data[0] as List<Unit>;
+                Debug.Assert(data[0] is HashSet<Unit>);
+                selectedUnits = data[0] as HashSet<Unit>;
+                Debug.Assert(selectedUnits != null);
                 break;
             // Clear stored units
             case UNITS_DESELECTED:
                 selectedUnits.Clear();
                 break;
+            // Set new destination based on mouse position over terrain
+            case DESTINATION_SET:
+                Debug.Assert(entity is RTS_Terrain);
+                SetNewDestination((RTS_Terrain)entity);
+                break;
             // Invocation not found? Must be for someone else. Ignore.
         }
     }
 
-    /// <summary>
-    /// Overloaded because Unity doesn't currently support <<dynamic>>.
-    /// </summary>
-    public void OnNotify(Object entity, string invocation, Vector3 data)
+    private void SetNewDestination(RTS_Terrain terrain)
     {
-        switch (invocation)
+        if (selectedUnits == null) { return; }
+        Camera camera = Camera.main;
+        RaycastHit hit;
+        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, terrain.IgnoreAllButTerrain))
         {
-            // Set the destination of all selected units
-            case DESTINATION_SET:
-                foreach (Unit u in selectedUnits)
-                {
-                    u.SetDestination(data);
-                }
-                break;
-            // Invocation not found? Must be for someone else. Ignore.
+            // Set the destination of all the units
+            foreach (Unit u in selectedUnits)
+            {
+                u.SetDestination(hit.point);
+            }
         }
+
+
     }
 
 }

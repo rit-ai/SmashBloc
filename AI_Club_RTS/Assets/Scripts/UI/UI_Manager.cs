@@ -34,6 +34,8 @@ public class UI_Manager : MonoBehaviour {
     public InputField m_CityMenuNameInput;
     public Slider m_CityMenuIncomeSlider;
     public Button m_CityMenuSpawnButton;
+    // MISC UI
+    public GameObject m_TargetRing;
 
     // Private fields
     private Player m_Player;
@@ -58,9 +60,11 @@ public class UI_Manager : MonoBehaviour {
     // Initialize whenever this object loads
     void Start ()
     {
+        // Instantiate misc UI
+        m_TargetRing = Instantiate(m_TargetRing);
+
         // Handle private fields
-        m_Player = GameObject.FindObjectOfType<Player>();
-        m_UnitMenuCanvas.enabled = false;
+        m_Player = FindObjectOfType<Player>();
         menuSpawnPos = m_UnitMenuCanvas.transform.position;
 
         // Initialization
@@ -201,12 +205,34 @@ public class UI_Manager : MonoBehaviour {
     }
 
     /// <summary>
+    /// Displays the target ring at the current mouse position.
+    /// </summary>
+    /// <param name="terrain"></param>
+    public void DisplayTargetRing(RTS_Terrain terrain)
+    {
+        RaycastHit hit;
+        Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out hit, terrain.IgnoreAllButTerrain))
+        {
+            m_TargetRing.transform.position = hit.point;
+            m_TargetRing.GetComponent<Renderer>().enabled = true;
+            foreach (Renderer r in m_TargetRing.GetComponentsInChildren<Renderer>())
+            {
+                r.enabled = true;
+            }
+        }
+    }
+
+    /// <summary>
     /// Hides all currently displayed menus.
     /// </summary>
     public void CloseAll()
     {
-        m_CityMenuCanvas.transform.position = new Vector3();
-        m_UnitMenuCanvas.transform.position = new Vector3();
+        m_TargetRing.GetComponent<Renderer>().enabled = false;
+        foreach (Renderer r in m_TargetRing.GetComponentsInChildren<Renderer>())
+        {
+            r.enabled = false;
+        }
         m_UnitMenuCanvas.enabled = false;
         m_CityMenuCanvas.enabled = false;
     }

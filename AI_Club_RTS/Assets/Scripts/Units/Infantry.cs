@@ -11,6 +11,7 @@ public class Infantry : Unit {
     public const string IDENTITY = "Infantry";
 
     // Public fields
+    public float m_Speed;
     public Rigidbody m_Hoverball;
     public Rigidbody m_BottomWeight;
 
