@@ -23,9 +23,9 @@ public class CameraController : MonoBehaviour, Observable {
     // Private constants
     private static Color BOX_INTERIOR_COLOR = new Color(0.74f, 0.71f, 0.27f, 0.5f);
     private static Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
-    private static float MAX_SCROLL_HEIGHT = 100;
-    private static float MIN_SCROLL_HEIGHT = 60;
-    private static float SCROLLSPEED = 5;
+    private static float MAX_CAMERA_SIZE = 150;
+    private static float MIN_CAMERA_SIZE = 50;
+    private static float SCROLLSPEED = 20;
     private static float BORDER_SIZE = 20f;
     private static float SPEED = 1f;
 
@@ -53,6 +53,9 @@ public class CameraController : MonoBehaviour, Observable {
         m_CurrentState = new SelectedState(this);
     }
 
+    /// <summary>
+    /// Essential function for drawing the selection box.
+    /// </summary>
     void OnGUI()
     {
         Rect rect = Utils.GetScreenRect(m_MousePos, Input.mousePosition);
@@ -79,12 +82,12 @@ public class CameraController : MonoBehaviour, Observable {
     /// </summary>
     private void Scroll() { 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
-		    if(scroll< 0 && transform.position.y< MAX_SCROLL_HEIGHT)
-        {
-			    transform.Translate(0, scroll* SCROLLSPEED, scroll * SCROLLSPEED);
-		    } else if (scroll > 0 && transform.position.y > MIN_SCROLL_HEIGHT) {
-			    transform.Translate(0, scroll* SCROLLSPEED, scroll * SCROLLSPEED);
-		    }
+        float size = m_Camera.orthographicSize;
+        size -= scroll * SCROLLSPEED;
+        size = Mathf.Max(size, MIN_CAMERA_SIZE);
+        size = Mathf.Min(size, MAX_CAMERA_SIZE);
+        m_Camera.orthographicSize = size;
+
     }
 
     /// <summary>
@@ -188,6 +191,10 @@ public class CameraController : MonoBehaviour, Observable {
             //m_SelectedUnits = controller.m_SelectedUnits;
         }
 
+        /// <summary>
+        /// Determines if the state needs to be switched (when the user stops 
+        /// dragging the pointer).
+        /// </summary>
         public void HandleInput()
         {
             // When mouse button is up, switch back to drawing state.
@@ -200,6 +207,10 @@ public class CameraController : MonoBehaviour, Observable {
 
         }
 
+        /// <summary>
+        /// Updates the units and the selected units list based on whether or 
+        /// not they're in the selection box.
+        /// </summary>
         public void StateUpdate()
         {
             HandleInput();

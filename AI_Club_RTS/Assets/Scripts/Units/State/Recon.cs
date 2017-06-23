@@ -39,7 +39,7 @@ public class Recon : Unit {
     /// <param name="newDest"></param>
     public override void SetDestination(Vector3 newDest)
     {
-        ai.SetDestChanged();
+        ai.OnDestChanged();
     }
 
     /// <summary>

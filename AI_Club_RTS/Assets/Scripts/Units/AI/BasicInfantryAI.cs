@@ -12,14 +12,21 @@ using UnityEngine;
  *      2) If a unit is close enough to a unit from another team, it should 
  *      attempt to move to its location and attack.
  * **/
-public class InfantryAI : UnitAI {
+public class BasicInfantryAI : UnitAI {
 
-    public InfantryAI(Infantry parent)
+    public BasicInfantryAI(Infantry parent)
     {
         m_Parent = parent;
+
+        currentState = new IdleState();
     }
 
     public override void ComponentUpdate()
+    {
+        currentState.StateUpdate();
+    }
+
+    public override void OnDestChanged()
     {
 
     }

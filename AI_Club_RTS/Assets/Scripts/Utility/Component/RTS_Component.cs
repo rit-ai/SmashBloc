@@ -8,7 +8,7 @@ using UnityEngine;
  * Class designed to decouple the different domains of a single class, e.g.
  * decouple a Unit's Physics from its AI behavior.
  * **/
-public interface Component {
+public interface RTS_Component {
 
     /// <summary>
     /// Handle the behavior, and update the state, of this component.

@@ -2,31 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Artillery : Unit {
+public class Bazooka : Unit {
     // Author: Ben Fairlamb
-    // Author: Paul Galatic
-    // Purpose: Artillery unit
+    // Purpose: Bazooka unit
 
     // NAME -- for external reference purposes
-    public const string IDENTITY = "ARTILLERY";
+    public const string IDENTITY = "BAZOOKA";
 
     // CONSTANTS -- intimately related to unit design
-    private static ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
-    private static DamageType DMG_TYPE = DamageType.EXPLOSIVE;
+    private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
+    private const DamageType DMG_TYPE = DamageType.EXPLOSIVE;
 
     // Default values
-    private const float MAXHEALTH = 50f;
-    private const float DAMAGE = 100f;
-    private const float RANGE = 200f;
-    private const int COST = 400;
+    private const int MAXHEALTH = 100;
+    private const int DAMAGE = 100;
+    private const int RANGE = 100;
+    private const int COST = 300;
 
 	// Methods
 	// Use this for initialization
 	public override void Start () {
         base.Start();
-        // Handle components
-        // physics = new ArtilleryPhysics();
-        // ai = new ArtilleryAI();
         // Handle constants
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
@@ -35,7 +31,7 @@ public class Artillery : Unit {
         dmg = DAMAGE;
         range = RANGE;
         cost = COST;
-	}
+    }
 
     /// <summary>
     /// Sets a new destination, which the unit will attempt to navigate toward.
@@ -43,7 +39,7 @@ public class Artillery : Unit {
     /// <param name="newDest"></param>
     public override void SetDestination(Vector3 newDest)
     {
-        ai.SetDestChanged();
+        ai.OnDestChanged();
     }
 
     /// <summary>

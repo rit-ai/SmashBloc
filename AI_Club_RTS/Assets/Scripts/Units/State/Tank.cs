@@ -1,23 +1,24 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bazooka : Unit {
+public class Tank : Unit {
     // Author: Ben Fairlamb
-    // Purpose: Bazooka unit
+    // Purpose: Tank unit
 
-    // NAME -- for external reference purposes
-    public const string IDENTITY = "BAZOOKA";
+    public const string IDENTITY = "Tank";
 
     // CONSTANTS -- intimately related to unit design
-    private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
+    private const ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
     private const DamageType DMG_TYPE = DamageType.EXPLOSIVE;
 
     // Default values
-    private const int MAXHEALTH = 100;
+    private const string NAME = "Tank";
+    private const int MAXHEALTH = 200;
     private const int DAMAGE = 100;
     private const int RANGE = 100;
-    private const int COST = 300;
+    private const int COST = 500;
 
 	// Methods
 	// Use this for initialization
@@ -27,10 +28,13 @@ public class Bazooka : Unit {
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
         // Handle default values
+        unitName = NAME;
         maxHealth = MAXHEALTH;
         dmg = DAMAGE;
         range = RANGE;
         cost = COST;
+        // Handle fields
+        health = MAXHEALTH;
     }
 
     /// <summary>
@@ -39,7 +43,7 @@ public class Bazooka : Unit {
     /// <param name="newDest"></param>
     public override void SetDestination(Vector3 newDest)
     {
-        ai.SetDestChanged();
+        ai.OnDestChanged();
     }
 
     /// <summary>

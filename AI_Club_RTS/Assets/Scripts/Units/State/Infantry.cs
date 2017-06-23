@@ -28,7 +28,7 @@ public class Infantry : Unit {
     public override void Start () {
         // Handle components
         physics = new InfantryPhysics(this);
-        ai = new InfantryAI(this);
+        ai = new BasicInfantryAI(this);
         // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
@@ -62,7 +62,7 @@ public class Infantry : Unit {
     public override void SetDestination(Vector3 newDest)
     {
         destination = newDest;
-        ai.SetDestChanged();
+        ai.OnDestChanged();
     }
 
     /// <summary>

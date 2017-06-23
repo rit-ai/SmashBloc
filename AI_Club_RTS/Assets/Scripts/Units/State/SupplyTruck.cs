@@ -48,7 +48,7 @@ public class SupplyTruck : Unit {
     /// <param name="newDest"></param>
     public override void SetDestination(Vector3 newDest)
     {
-        ai.SetDestChanged();
+        ai.OnDestChanged();
     }
 
     /// <summary>
