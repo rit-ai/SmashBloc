@@ -24,12 +24,13 @@ public class Player : MonoBehaviour {
     public SupplyTruck SUPPLY_TRUCK;
     public Tank TANK;
 
-    public City defaultCity; // REMOVEME
+    public City ownedCity;
 
     // Private fields
     private List<City> m_Cities;
     private List<Unit> m_Units;
     private Unit toSpawn;
+    private string team;
     private int currentGoldAmount;
     private int currentNumUnits;
 
@@ -43,12 +44,13 @@ public class Player : MonoBehaviour {
         m_Units = new List<Unit>();
         currentGoldAmount = 0;
         currentNumUnits = 0;
+        team = "DEFAULT";
 
         // Handle function setup
         InvokeRepeating("UpdateGold", 0.0f, GOLD_INCREMENT_RATE);
 
         // Debug
-        m_Cities.Add(defaultCity);
+        m_Cities.Add(ownedCity);
 	}
 	
 	// Update is called once per frame
@@ -105,6 +107,7 @@ public class Player : MonoBehaviour {
             Unit newUnit = Utils.UnitToPrefab(toSpawn);
             Transform spawnPoint = city.SpawnPoint;
             newUnit = Instantiate(newUnit, spawnPoint.transform.position, Quaternion.identity);
+            newUnit.ownedByPlayer = true;
             newUnit.setUnitName(newUnit.UnitName + currentNumUnits.ToString());
             m_Units.Add(newUnit);
 
@@ -119,6 +122,14 @@ public class Player : MonoBehaviour {
     public void RemoveUnit(Unit unit)
     {
         m_Units.Remove(unit);
+    }
+
+    /// <summary>
+    /// Returns this player's team.
+    /// </summary>
+    public string Team
+    {
+        get { return team; }
     }
 
     /// <summary>
@@ -149,7 +160,6 @@ public class Player : MonoBehaviour {
     /// <summary>
     /// Updates the current gold amount, reflecting passive gold gain.
     /// </summary>
-    /// 
     private void UpdateGold()
     {
         foreach (City c in m_Cities)

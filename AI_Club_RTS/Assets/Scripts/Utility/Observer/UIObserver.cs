@@ -19,6 +19,7 @@ public class UIObserver : Observer {
     // Private constant fields
     // We keep a reference to the UI Manager to tell it what we want it to show
     private static UI_Manager m_UI_Manager = Object.FindObjectOfType<UI_Manager>();
+    private static string PLAYER_TEAM_NAME = Utils.PlayerTeamName;
 
     /// <summary>
     /// Determines which type of menu to raise, depending on the entity 
@@ -29,17 +30,20 @@ public class UIObserver : Observer {
     /// <param name="data">Optional misc data.</param>
     public void OnNotify<T>(Object entity, string invocation, params T[] data)
     {
+        bool enabled = false;
         switch (invocation)
         {
             // Display unit info
             case INVOKE_UNIT_DATA:
                 Debug.Assert(entity is Unit); // don't pass bad objects
-                m_UI_Manager.DisplayUnitInfo((Unit)entity);
+                enabled = (((Unit)entity).Team == PLAYER_TEAM_NAME);
+                m_UI_Manager.DisplayUnitInfo((Unit)entity, enabled);
                 break;
             // Display city info
             case INVOKE_CITY_DATA:
                 Debug.Assert(entity is City); // don't pass bad objects
-                m_UI_Manager.DisplayCityInfo((City)entity);
+                enabled = (((City)entity).Team == PLAYER_TEAM_NAME);
+                m_UI_Manager.DisplayCityInfo((City)entity, enabled);
                 break;
             case INVOKE_TARGET_RING:
                 Debug.Assert(entity is RTS_Terrain);

@@ -56,7 +56,8 @@ public class GameObserver : Observer {
     }
 
     /// <summary>
-    /// Sets the new destination for the unit.
+    /// Sets the new destination for the unit, if the unit is of the player's
+    /// team.
     /// </summary>
     /// <param name="terrain">The terrain, which was right clicked such to 
     /// invoke this method.</param>
@@ -66,12 +67,14 @@ public class GameObserver : Observer {
         Camera camera = Camera.main;
         RaycastHit hit;
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        string playerTeam = Utils.PlayerTeamName;
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
             // Set the destination of all the units
             foreach (Unit u in selectedUnits)
             {
-                u.SetDestination(hit.point);
+                if (u.Team == playerTeam)
+                    u.SetDestination(hit.point);
             }
         }
 

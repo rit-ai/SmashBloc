@@ -21,6 +21,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     public MeshRenderer m_HighlightInner;
     public MeshRenderer m_HighlightOuter;
     public LayerMask ignoreAllButUnits;
+    public bool ownedByPlayer;
     public int cost;
 
     // protected fields related to unit management
@@ -50,6 +51,7 @@ public abstract class Unit : MonoBehaviour, Observable {
 
     // Private fields
     private EnvironmentInfo info;
+    private MeshRenderer m_Surface;
 
     /// <summary>
     /// Sets up Observers and other state common between Units.
@@ -59,6 +61,17 @@ public abstract class Unit : MonoBehaviour, Observable {
         observers = new List<Observer>();
         observers.Add(new UIObserver());
         info = new EnvironmentInfo();
+        m_Surface = GetComponent<MeshRenderer>();
+        if (ownedByPlayer)
+        {
+            m_Surface.material.color = Color.blue;
+            team = Utils.PlayerTeamName;
+        }
+        else
+        {
+            m_Surface.material.color = Color.red;
+            team = "AI_TEAM"; //FIXME
+        }
 
         // Set the AI component to update its state every second
         InvokeRepeating("passInfoToAI", 1f, 1f);

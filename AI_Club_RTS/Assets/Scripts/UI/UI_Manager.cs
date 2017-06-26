@@ -112,10 +112,11 @@ public class UI_Manager : MonoBehaviour {
 
     /// <summary>
     /// Brings up the unit menu and displays unit's info. Handles any display
-    /// info that won't require dynamic updating.
+    /// info that won't require dynamic updating. Buttons will be disabled or
+    /// enabled depending on whether or not the player owns that unit.
     /// </summary>
     /// <param name="unit">The unit whose info is to be displayed.</param>
-    public void DisplayUnitInfo(Unit unit)
+    public void DisplayUnitInfo(Unit unit, bool enableCommand)
     {
         unitCurrentlyDisplayed = unit;
         //float damage = unitCurrentlyDisplayed.Damage;
@@ -126,6 +127,7 @@ public class UI_Manager : MonoBehaviour {
         m_UnitMenuCanvas.transform.position = menuSpawnPos;
 
         // Handle unit name input field
+        m_UnitMenuNameInput.enabled = enabled;
         m_UnitMenuNameInput.placeholder.GetComponent<Text>().text = unit.UnitName;
 
         // Handle health slider
@@ -138,10 +140,12 @@ public class UI_Manager : MonoBehaviour {
     }
 
     /// <summary>
-    /// Displays the city menu.
+    /// Displays the city menu. Handles any display info that won't require 
+    /// dynamic updating. Buttons will be disabled or enabled depending on 
+    /// whether or not the player owns that unit. 
     /// </summary>
     /// <param name="city">The city to display.</param>
-    public void DisplayCityInfo(City city)
+    public void DisplayCityInfo(City city, bool enabled)
     {
         cityCurrentlyDisplayed = city;
 
@@ -149,7 +153,11 @@ public class UI_Manager : MonoBehaviour {
         m_CityMenuCanvas.transform.position = menuSpawnPos;
 
         // Handle city name input field
+        m_CityMenuNameInput.enabled = enabled;
         m_CityMenuNameInput.placeholder.GetComponent<Text>().text = city.CityName;
+
+        // Handle spawn button
+        m_CityMenuSpawnButton.enabled = enabled;
 
         // Handle income slider
         m_CityMenuIncomeSlider.maxValue = City.MAX_INCOME_LEVEL;
@@ -238,11 +246,12 @@ public class UI_Manager : MonoBehaviour {
     }
 
     /// <summary>
-    /// Moves a menu when the player drags it.
+    /// Moves a menu, and brings it to the front, when the player drags it.
     /// </summary>
     /// <param name="menu">The menu to move.</param>
     public void MoveMenuOnDrag(Canvas menu)
     {
+        menu.transform.SetAsLastSibling();
         Vector3 newMousePos = Input.mousePosition;
         Vector3 relativePos = newMousePos - oldMousePos;
         menu.transform.position += relativePos;

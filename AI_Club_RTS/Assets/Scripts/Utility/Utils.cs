@@ -112,6 +112,14 @@ public class Utils : MonoBehaviour {
     }
 
     /// <summary>
+    /// Returns the name of the player's team. FIXME
+    /// </summary>
+    public static string PlayerTeamName
+    {
+        get { return "DEFAULT"; }
+    }
+
+    /// <summary>
     /// Returns the prefab associated with a particular type of Unit.
     /// </summary>
     public static Unit UnitToPrefab(Unit unit)
