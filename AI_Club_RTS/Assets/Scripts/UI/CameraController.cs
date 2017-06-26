@@ -25,8 +25,8 @@ public class CameraController : MonoBehaviour, Observable {
     private static Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
     private static float MAX_CAMERA_SIZE = 150;
     private static float MIN_CAMERA_SIZE = 50;
-    private static float SCROLLSPEED = 20;
-    private static float BORDER_SIZE = 20f;
+    private static float SCROLLSPEED = 30;
+    private static float BORDER_SIZE = 10f;
     private static float SPEED = 1f;
 
     // Private fields
@@ -128,7 +128,7 @@ public class CameraController : MonoBehaviour, Observable {
     /// Handles all state involved with selected units after drawing the 
     /// selection rectangle is completed.
     /// </summary>
-    class SelectedState : State
+    private class SelectedState : State
     {
         private CameraController m_CameraController;
 
@@ -177,7 +177,7 @@ public class CameraController : MonoBehaviour, Observable {
     /// State that handles all behavior involving drawing a box, but NOT with
     /// selecting units.
     /// </summary>
-    class DrawingState : State
+    private class DrawingState : State
     {
         private CameraController m_CameraController;
         private Camera m_Camera;

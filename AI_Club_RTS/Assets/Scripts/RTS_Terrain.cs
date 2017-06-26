@@ -14,7 +14,7 @@ public class RTS_Terrain : MonoBehaviour, Observable
 {
 
     // Public fields
-    public LayerMask IgnoreAllButTerrain;
+    public LayerMask ignoreAllButTerrain;
 
     // Private fields
     private List<Observer> m_Observers;

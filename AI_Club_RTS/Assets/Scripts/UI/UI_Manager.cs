@@ -212,7 +212,7 @@ public class UI_Manager : MonoBehaviour {
     {
         RaycastHit hit;
         Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit, terrain.IgnoreAllButTerrain))
+        if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
             m_TargetRing.transform.position = hit.point;
             m_TargetRing.GetComponent<Renderer>().enabled = true;

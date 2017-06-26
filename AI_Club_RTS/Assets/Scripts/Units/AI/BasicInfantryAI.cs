@@ -14,10 +14,8 @@ using UnityEngine;
  * **/
 public class BasicInfantryAI : UnitAI {
 
-    public BasicInfantryAI(Infantry parent)
+    public BasicInfantryAI()
     {
-        m_Parent = parent;
-
         currentState = new IdleState();
     }
 
@@ -26,7 +24,7 @@ public class BasicInfantryAI : UnitAI {
         currentState.StateUpdate();
     }
 
-    public override void OnDestChanged()
+    public override void UpdateState(EnvironmentInfo info)
     {
 
     }

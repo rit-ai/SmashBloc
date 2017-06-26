@@ -15,7 +15,6 @@ public class BaseUnitAI : UnitAI
 
     public BaseUnitAI(Infantry parent)
     {
-        m_Parent = parent;
 
         currentState = new IdleState();
     }
@@ -25,10 +24,11 @@ public class BaseUnitAI : UnitAI
         currentState.StateUpdate();
     }
 
-    public override void OnDestChanged()
+    public override void UpdateState(EnvironmentInfo info)
     {
-        throw new NotImplementedException();
+
     }
+
 
     public class IdleState : State
     {

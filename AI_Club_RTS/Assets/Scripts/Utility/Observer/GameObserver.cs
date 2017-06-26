@@ -55,13 +55,18 @@ public class GameObserver : Observer {
         }
     }
 
+    /// <summary>
+    /// Sets the new destination for the unit.
+    /// </summary>
+    /// <param name="terrain">The terrain, which was right clicked such to 
+    /// invoke this method.</param>
     private void SetNewDestination(RTS_Terrain terrain)
     {
         if (selectedUnits == null) { return; }
         Camera camera = Camera.main;
         RaycastHit hit;
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit, terrain.IgnoreAllButTerrain))
+        if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
             // Set the destination of all the units
             foreach (Unit u in selectedUnits)

@@ -28,14 +28,14 @@ public class Infantry : Unit {
     public override void Start () {
         // Handle components
         physics = new InfantryPhysics(this);
-        ai = new BasicInfantryAI(this);
+        ai = new BasicInfantryAI();
         // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
         // team = "NULL";
         maxHealth = MAXHEALTH;
-        dmg = DAMAGE;
-        range = RANGE;
+        damage = DAMAGE;
+        attackRange = RANGE;
         // Handle fields
         health = Random.Range(10f, 90f); //FIXME
         base.Start();
@@ -62,7 +62,7 @@ public class Infantry : Unit {
     public override void SetDestination(Vector3 newDest)
     {
         destination = newDest;
-        ai.OnDestChanged();
+
     }
 
     /// <summary>

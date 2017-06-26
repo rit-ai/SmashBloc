@@ -28,8 +28,8 @@ public class Bazooka : Unit {
         dmgType = DMG_TYPE;
         // Handle default values
         maxHealth = MAXHEALTH;
-        dmg = DAMAGE;
-        range = RANGE;
+        damage = DAMAGE;
+        attackRange = RANGE;
         cost = COST;
     }
 
@@ -39,7 +39,7 @@ public class Bazooka : Unit {
     /// <param name="newDest"></param>
     public override void SetDestination(Vector3 newDest)
     {
-        ai.OnDestChanged();
+
     }
 
     /// <summary>

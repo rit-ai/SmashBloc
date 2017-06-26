@@ -20,6 +20,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     // public fields
     public MeshRenderer m_HighlightInner;
     public MeshRenderer m_HighlightOuter;
+    public LayerMask ignoreAllButUnits;
     public int cost;
 
     // protected fields related to unit management
@@ -31,8 +32,9 @@ public abstract class Unit : MonoBehaviour, Observable {
     protected string customName; // user-assigned names
     protected float maxHealth;
     protected float health;
-    protected float dmg;
-    protected float range;
+    protected float damage;
+    protected float sightRange;
+    protected float attackRange;
 
     // protected fields related to fundamentals of unit type
     protected ArmorType armorType;
@@ -46,6 +48,9 @@ public abstract class Unit : MonoBehaviour, Observable {
     // protected fields related to behavior
     protected Vector3 destination;
 
+    // Private fields
+    private EnvironmentInfo info;
+
     /// <summary>
     /// Sets up Observers and other state common between Units.
     /// </summary>
@@ -53,6 +58,10 @@ public abstract class Unit : MonoBehaviour, Observable {
     {
         observers = new List<Observer>();
         observers.Add(new UIObserver());
+        info = new EnvironmentInfo();
+
+        // Set the AI component to update its state every second
+        InvokeRepeating("passInfoToAI", 1f, 1f);
 
         // Sets default destination to be the location the unit spawns
         SetDestination(transform.position);
@@ -68,6 +77,48 @@ public abstract class Unit : MonoBehaviour, Observable {
         foreach (Observer o in observers){
             o.OnNotify<T>(this, invocation);
         }
+    }
+
+    /// <summary>
+    /// Grabs all relevant information and builds it into an EnvironmentInfo 
+    /// struct to pass into the unit's AI component.
+    /// </summary>
+    protected void passInfoToAI()
+    {
+        // Add all units within line of sight to the unitsInSightRange list.
+        Unit current;
+        List<Unit> enemiesInSight = new List<Unit>();
+        List<Unit> alliesInSight = new List<Unit>();
+        List<Unit> enemiesInAttackRange = new List<Unit>();
+        List<Collider> collidersInSight;
+        collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButUnits));
+        foreach (Collider c in collidersInSight)
+        {
+            current = c.gameObject.GetComponent<Unit>();
+            // Only be aggressive to units on the other team.
+            if (current.team != team)
+            {
+                // If they're close enough to attack, add them to the second list.
+                if (c.transform.position.magnitude - transform.position.magnitude < attackRange)
+                    enemiesInAttackRange.Add(current);
+                enemiesInSight.Add(current);
+            }
+            else
+            {
+                alliesInSight.Add(current);
+            }
+        }
+
+        // Build the info struct.
+        info.team = team;
+        info.healthPercentage = health / maxHealth;
+        info.damage = damage;
+
+        info.enemiesInSight = enemiesInSight;
+        info.alliesInSight = alliesInSight;
+        info.enemiesInAttackRange = enemiesInAttackRange;
+
+        ai.UpdateState(info);
     }
 
     /// <summary>
@@ -203,7 +254,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     public float Damage
     {
-        get { return dmg; }
+        get { return damage; }
     }
 
     /// <summary>
@@ -211,7 +262,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     public float Range
     {
-        get { return range; }
+        get { return attackRange; }
     }
 
     /// <summary>
