@@ -14,7 +14,9 @@ public class Utils : MonoBehaviour {
     private static Unit InfantryPrefab = (Unit)Resources.Load("Prefabs/Units/" + Infantry.IDENTITY, typeof(Unit));
     private static Unit TankPrefab = (Unit)Resources.Load("Prefabs/Units/" + Tank.IDENTITY, typeof(Unit));
 
-	static Texture2D whiteTexture;
+    private static Player playerOne = null;
+
+    static Texture2D whiteTexture;
 	public static Texture2D WhiteTexture {
 		get {
 			if(whiteTexture == null) {
@@ -112,11 +114,22 @@ public class Utils : MonoBehaviour {
     }
 
     /// <summary>
-    /// Returns the name of the player's team. FIXME
+    /// Finds the Player controlled by the user and returns it, storing the 
+    /// result for later use.
     /// </summary>
-    public static string PlayerTeamName
+    public static Player PlayerOne
     {
-        get { return "DEFAULT"; }
+        get {
+            if (!(playerOne == null)) { return playerOne; }
+            foreach (Player p in FindObjectsOfType<Player>())
+            {
+                if (!(p is AI_Player)) {
+                    playerOne = p;
+                    return p;
+                }
+            }
+            return null;
+        }
     }
 
     /// <summary>

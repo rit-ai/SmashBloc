@@ -21,14 +21,12 @@ public abstract class Unit : MonoBehaviour, Observable {
     public MeshRenderer m_HighlightInner;
     public MeshRenderer m_HighlightOuter;
     public LayerMask ignoreAllButUnits;
-    public bool ownedByPlayer;
     public int cost;
 
     // protected fields related to unit management
     protected List<Observer> observers;
 
     // protected fields intended to be changed for balancing or by gameplay
-    protected string team;
     protected string unitName;
     protected string customName; // user-assigned names
     protected float maxHealth;
@@ -40,13 +38,15 @@ public abstract class Unit : MonoBehaviour, Observable {
     // protected fields related to fundamentals of unit type
     protected ArmorType armorType;
     protected DamageType dmgType;
-    protected UnitAI ai;
+    protected BaseAI ai;
 
     // protected fields related to physics
     protected Rigidbody body;
     protected Collider collision;
 
     // protected fields related to behavior
+    protected bool ownedByPlayer;
+    protected Team team;
     protected Vector3 destination;
 
     // Private fields
@@ -61,23 +61,26 @@ public abstract class Unit : MonoBehaviour, Observable {
         observers = new List<Observer>();
         observers.Add(new UIObserver());
         info = new EnvironmentInfo();
-        m_Surface = GetComponent<MeshRenderer>();
-        if (ownedByPlayer)
-        {
-            m_Surface.material.color = Color.blue;
-            team = Utils.PlayerTeamName;
-        }
-        else
-        {
-            m_Surface.material.color = Color.red;
-            team = "AI_TEAM"; //FIXME
-        }
 
         // Set the AI component to update its state every second
         InvokeRepeating("passInfoToAI", 1f, 1f);
 
         // Sets default destination to be the location the unit spawns
         SetDestination(transform.position);
+    }
+
+    /// <summary>
+    /// Handles any processing that must occur only AFTER the Unit is 
+    /// instantiated. For example, a Unit can only be told what team it's on
+    /// after it's been created.
+    /// </summary>
+    public void Init(Team team)
+    {
+        m_Surface = GetComponent<MeshRenderer>();
+
+        this.team = team;
+        ownedByPlayer = (team == Utils.PlayerOne.Team);
+        m_Surface.material.color = team.color;
     }
 
     /// <summary>
@@ -183,7 +186,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// <summary>
     /// Gets the Team of the unit.
     /// </summary>
-    public string Team
+    public Team Team
     {
         get { return team; }
     }

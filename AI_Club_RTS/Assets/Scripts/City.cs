@@ -19,7 +19,6 @@ public class City : MonoBehaviour, Observable {
     public Transform m_SpawnPoint;
     public MeshRenderer m_HighlightInner;
     public MeshRenderer m_HighlightOuter;
-    public bool ownedByPlayer;
     
     // Private constants
     private const string DEFAULT_NAME = "Dylanto";
@@ -28,7 +27,7 @@ public class City : MonoBehaviour, Observable {
     // Private fields
     private MeshRenderer m_Surface;
     private List<Observer> m_Observers;
-    private string team;
+    private Team team;
     private string cityName;
     private string customName;
     private int incomeLevel;
@@ -37,32 +36,27 @@ public class City : MonoBehaviour, Observable {
     void Start()
     {
         // Handle private fields
-        m_Surface = GetComponent<MeshRenderer>();
         m_Observers = new List<Observer>();
         m_Observers.Add(new UIObserver());
 
         incomeLevel = DEFAULT_INCOME_LEVEL;
         cityName = DEFAULT_NAME;
-
-        // Handle public fields
-        if (ownedByPlayer)
-        {
-            m_Surface.material.color = Color.blue;
-            team = Utils.PlayerTeamName;
-        }
-        else
-        {
-            // FIXME
-            m_Surface.material.color = Color.red;
-            team = "AI_TEAM";
-        }
-
-
     }
 
-    // Update is called once per frame
-    void Update()
+    /// <summary>
+    /// Handles any data that needs to be passed after a city is instantiated.
+    /// 
+    /// TODO Until a player can spawn cities, this value is set by a public 
+    /// variable.
+    /// </summary>
+    /// <param name="team">The Team the city is on when it is created.</param>
+    public void Init(Team team)
     {
+        m_Surface = GetComponent<MeshRenderer>();
+
+        this.team = team;
+        Debug.Assert(m_Surface != null);
+        m_Surface.material.color = team.color;
     }
 
     /// <summary>
@@ -136,7 +130,7 @@ public class City : MonoBehaviour, Observable {
     /// <summary>
     /// Returns this city's team.
     /// </summary>
-    public string Team
+    public Team Team
     {
         get { return team; }
     }

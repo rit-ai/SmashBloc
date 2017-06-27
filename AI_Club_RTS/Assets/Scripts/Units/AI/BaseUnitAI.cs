@@ -10,21 +10,31 @@ using UnityEngine;
  * AI for units, rather than having to change an existing one (though the 
  * existing files may freely be used as examples).
  * **/
-public class BaseUnitAI : UnitAI
+public class BaseUnitAI : BaseAI
 {
+    // The absolute destination of the unit, separate from the local 
+    // destination (which this AI should freely change). This value is set by 
+    // either the player, or by a "parent AI" that controls all the units.
+    protected Vector3 absoluteDest;
 
-    public BaseUnitAI(Infantry parent)
+    // The current state of the AI. AIs can have any number of potential
+    // states, but only one state can be active at a time. A Unit's State 
+    // handles its frame-by-frame behavior—is it aggressively pursuing enemies,
+    // or is it running away? Is it regrouping, advancing, or retreating?
+    protected State currentState;
+
+    public BaseUnitAI()
     {
 
         currentState = new IdleState();
     }
 
-    public override void ComponentUpdate()
+    public void ComponentUpdate()
     {
         currentState.StateUpdate();
     }
 
-    public override void UpdateState(EnvironmentInfo info)
+    public void UpdateState(EnvironmentInfo info)
     {
 
     }

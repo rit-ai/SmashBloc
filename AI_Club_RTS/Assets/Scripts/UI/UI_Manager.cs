@@ -21,12 +21,14 @@ public class UI_Manager : MonoBehaviour {
 
     // Public fields
     // GENERAL
+    public Player m_Player;
     public Camera m_Camera;
-    public Text m_StartMessage;
     // HEADER
     public Dropdown m_UnitSelect;
     public Text m_CurrentGoldAmount;
     public Text m_CurrentUnitAmount;
+    // STARTING AND ENDING GAME
+    public Text m_StartMessage;
     // UNIT MENU
     public Canvas m_UnitMenu;
     public InputField m_UnitMenuNameInput;
@@ -40,7 +42,6 @@ public class UI_Manager : MonoBehaviour {
     public GameObject m_TargetRing;
 
     // Private fields
-    private Player m_Player;
     private Unit unitCurrentlyDisplayed;
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
@@ -70,7 +71,6 @@ public class UI_Manager : MonoBehaviour {
         m_TargetRing = Instantiate(m_TargetRing);
 
         // Handle private fields
-        m_Player = FindObjectOfType<Player>();
         menuSpawnPos = m_UnitMenu.transform.position;
 
         // Initialization
@@ -114,7 +114,8 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     public void SpawnUnit()
     {
-        m_Player.SpawnUnit(cityCurrentlyDisplayed);
+        m_Player.SetCityToSpawnAt(cityCurrentlyDisplayed);
+        m_Player.SpawnUnit();
     }
 
     /// <summary>

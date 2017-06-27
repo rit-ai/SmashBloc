@@ -11,53 +11,52 @@ using UnityEngine;
 public class Player : MonoBehaviour {
 
     // Private Constants
-    private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
+    private const float GOLD_INCREMENT_RATE = 0.3f; // higher is slower
 
     private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
 
     // Public fields
     // Types of units a Player can own
-    public Artillery ARTILLERY;
-    public Bazooka BAZOOKA;
     public Infantry INFANTRY;
-    public Recon RECON;
-    public SupplyTruck SUPPLY_TRUCK;
     public Tank TANK;
 
     public City ownedCity;
 
     // Private fields
-    private List<City> m_Cities;
-    private List<Unit> m_Units;
-    private Unit toSpawn;
-    private string team;
-    private int currentGoldAmount;
-    private int currentNumUnits;
+    protected List<City> m_Cities;
+    protected List<Unit> m_Units;
+    protected Unit toSpawn;
+    protected City toSpawnAt;
+    protected Team team;
+    protected int currentGoldAmount;
+    protected int currentNumUnits;
+
+    /// <summary>
+    /// Initializing the Team first because other functionality relies on it.
+    /// This is bad code practice and should be fixed. FIXME.
+    /// </summary>
+    protected virtual void Awake()
+    {
+        team = new Team(this, "Dylanteam", Color.cyan);
+    }
 
     // Use this for initialization
-    void Start () {
-        // Handle public constants
-
-
-        // Handle fields
+    protected virtual void Start () {
+        // Handle private fields
         m_Cities = new List<City>();
         m_Units = new List<Unit>();
         currentGoldAmount = 0;
         currentNumUnits = 0;
-        team = "DEFAULT";
-
+        
         // Handle function setup
         InvokeRepeating("UpdateGold", 0.0f, GOLD_INCREMENT_RATE);
 
-        // Debug
+        // Debug FIXME
+        ownedCity.Init(team);
         m_Cities.Add(ownedCity);
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-
     }
+
+
 
     /// <summary>
     /// Sets the unit to spawn. Throws an exception on an invalid name being 
@@ -65,24 +64,12 @@ public class Player : MonoBehaviour {
     /// </summary>
     /// <param name="unitIdentity">The name of the unit to spawn, based on 
     /// Unit.NAME.</param>
-    public void SetUnitToSpawn(string unitIdentity)
+    public virtual void SetUnitToSpawn(string unitIdentity)
     {
         switch (unitIdentity)
         {
-            case Artillery.IDENTITY:
-                toSpawn = ARTILLERY;
-                break;
-            case Bazooka.IDENTITY:
-                toSpawn = BAZOOKA;
-                break;
             case Infantry.IDENTITY:
                 toSpawn = INFANTRY;
-                break;
-            case Recon.IDENTITY:
-                toSpawn = RECON;
-                break;
-            case SupplyTruck.IDENTITY:
-                toSpawn = SUPPLY_TRUCK;
                 break;
             case Tank.IDENTITY:
                 toSpawn = TANK;
@@ -90,14 +77,21 @@ public class Player : MonoBehaviour {
             default:
                 throw new KeyNotFoundException("SetUnitToSpawn given invalid string");
         }
+    }
 
-        
+    /// <summary>
+    /// Sets the city at which the next unit will be spawned.
+    /// </summary>
+    /// <param name="city"></param>
+    public virtual void SetCityToSpawnAt(City city)
+    {
+        toSpawnAt = city;
     }
 
     /// <summary>
     /// Spawns a unit based on toSpawn, if the Player has enough gold.
     /// </summary>
-    public void SpawnUnit(City city)
+    public virtual void SpawnUnit()
     {
         if (currentGoldAmount > toSpawn.Cost)
         {
@@ -105,9 +99,9 @@ public class Player : MonoBehaviour {
             currentGoldAmount -= toSpawn.Cost;
 
             Unit newUnit = Utils.UnitToPrefab(toSpawn);
-            Transform spawnPoint = city.SpawnPoint;
+            Transform spawnPoint = toSpawnAt.SpawnPoint;
             newUnit = Instantiate(newUnit, spawnPoint.transform.position, Quaternion.identity);
-            newUnit.ownedByPlayer = true;
+            newUnit.Init(team);
             newUnit.setUnitName(newUnit.UnitName + currentNumUnits.ToString());
             m_Units.Add(newUnit);
 
@@ -127,7 +121,7 @@ public class Player : MonoBehaviour {
     /// <summary>
     /// Returns this player's team.
     /// </summary>
-    public string Team
+    public Team Team
     {
         get { return team; }
     }
@@ -160,7 +154,7 @@ public class Player : MonoBehaviour {
     /// <summary>
     /// Updates the current gold amount, reflecting passive gold gain.
     /// </summary>
-    private void UpdateGold()
+    protected void UpdateGold()
     {
         foreach (City c in m_Cities)
         {

@@ -12,7 +12,7 @@ using UnityEngine;
  * **/
 public struct EnvironmentInfo {
     // The team of the unit.
-    public string team;
+    public Team team;
     // The relative amount of health the unit currently possesses.
     public float healthPercentage;
     // The amount of damage the unit's weapon does.
@@ -23,7 +23,7 @@ public struct EnvironmentInfo {
     public List<Unit> alliesInSight;
     public List<Unit> enemiesInAttackRange;
 
-    public EnvironmentInfo(string team, float healthPercentage, float damage, List<Unit> enemiesInSight, List<Unit> alliesInSight, List<Unit> enemiesInAttackRange)
+    public EnvironmentInfo(Team team, float healthPercentage, float damage, List<Unit> enemiesInSight, List<Unit> alliesInSight, List<Unit> enemiesInAttackRange)
     {
         this.team = team;
         this.healthPercentage = healthPercentage;

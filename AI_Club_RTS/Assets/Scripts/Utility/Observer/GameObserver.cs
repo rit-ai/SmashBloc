@@ -31,7 +31,7 @@ public class GameObserver : Observer {
     /// <param name="entity">The entity performing the invocation.</param>
     /// <param name="invocation">The type of invocation.</param>
     /// <param name="data">Misc data.</param>
-    public void OnNotify<T>(Object entity, string invocation, params T[] data)
+    public void OnNotify<T>(object entity, string invocation, params T[] data)
     {
         switch (invocation)
         {
@@ -67,7 +67,7 @@ public class GameObserver : Observer {
         Camera camera = Camera.main;
         RaycastHit hit;
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-        string playerTeam = Utils.PlayerTeamName;
+        Team playerTeam = Utils.PlayerOne.Team;
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
             // Set the destination of all the units

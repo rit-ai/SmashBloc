@@ -12,19 +12,25 @@ using UnityEngine;
  *      2) If a unit is close enough to a unit from another team, it should 
  *      attempt to move to its location and attack.
  * **/
-public class BasicInfantryAI : UnitAI {
+public class BasicInfantryAI : BaseAI {
+
+    // The current state of the AI. AIs can have any number of potential
+    // states, but only one state can be active at a time. A AI's state handles
+    // its frame-by-frame behavior—is it aggressively pursuing enemies, or is 
+    // it running away? Is it regrouping, advancing, or retreating?
+    protected State currentState;
 
     public BasicInfantryAI()
     {
         currentState = new IdleState();
     }
 
-    public override void ComponentUpdate()
+    public void ComponentUpdate()
     {
         currentState.StateUpdate();
     }
 
-    public override void UpdateState(EnvironmentInfo info)
+    public void UpdateState(EnvironmentInfo info)
     {
 
     }
