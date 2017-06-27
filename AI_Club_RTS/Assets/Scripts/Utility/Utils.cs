@@ -14,7 +14,7 @@ public class Utils : MonoBehaviour {
     private static Unit InfantryPrefab = (Unit)Resources.Load("Prefabs/Units/" + Infantry.IDENTITY, typeof(Unit));
     private static Unit TankPrefab = (Unit)Resources.Load("Prefabs/Units/" + Tank.IDENTITY, typeof(Unit));
 
-    private static Player playerOne = null;
+    private static Player playerOne;
 
     static Texture2D whiteTexture;
 	public static Texture2D WhiteTexture {
@@ -114,16 +114,15 @@ public class Utils : MonoBehaviour {
     }
 
     /// <summary>
-    /// Finds the Player controlled by the user and returns it, storing the 
-    /// result for later use.
+    /// Finds the Player controlled by the user and returns it.
     /// </summary>
     public static Player PlayerOne
     {
         get {
-            if (!(playerOne == null)) { return playerOne; }
-            foreach (Player p in FindObjectsOfType<Player>())
+           if (playerOne != null) { return playerOne; }
+           foreach (Player p in FindObjectsOfType<Player>())
             {
-                if (!(p is AI_Player)) {
+                if (!(p.hasBrain)) {
                     playerOne = p;
                     return p;
                 }

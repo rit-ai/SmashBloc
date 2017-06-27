@@ -28,7 +28,8 @@ public class Infantry : Unit {
     public override void Start () {
         // Handle components
         physics = new InfantryPhysics(this);
-        ai = new BasicInfantryAI();
+        ai = gameObject.AddComponent<BasicInfantryAI>();
+        ai.Body = this;
         // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
@@ -39,11 +40,6 @@ public class Infantry : Unit {
         // Handle fields
         health = Random.Range(10f, 90f); //FIXME
         base.Start();
-    }
-
-    public void Update()
-    {
-        ai.ComponentUpdate();
     }
 
     /// <summary>

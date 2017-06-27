@@ -293,7 +293,7 @@ public class UI_Manager : MonoBehaviour {
     private IEnumerator AnimateStart(float waitTime)
     {
         const int FRAMES_TO_LINGER = 90;
-        const float MOVE_DISTANCE_LARGE = 11f;
+        const float MOVE_DISTANCE_LARGE = 15f;
         const float MOVE_DISTANCE_SMALL = 2f;
         const float MIN_DISTANCE_SQR = 36f;
         Color textColor = new Color(1f, 1f, 1f, 0f); // white, but invisible

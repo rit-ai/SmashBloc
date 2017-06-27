@@ -40,7 +40,7 @@ public class City : MonoBehaviour, Observable {
         m_Observers.Add(new UIObserver());
 
         incomeLevel = DEFAULT_INCOME_LEVEL;
-        cityName = DEFAULT_NAME;
+        cityName = team.name;
     }
 
     /// <summary>

@@ -29,7 +29,7 @@ public class CameraController : MonoBehaviour, Observable {
     private static float MIN_CAMERA_SIZE = 50f;
     private static float SCROLLSPEED = 50f;
     private static float BORDER_SIZE = 10f;
-    private static float SPEED = 1f;
+    private static float SPEED = 3f;
 
     // Private fields
     private List<Observer> m_Observers;

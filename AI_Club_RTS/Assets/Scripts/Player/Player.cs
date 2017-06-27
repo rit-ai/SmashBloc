@@ -7,41 +7,51 @@ using UnityEngine;
  * Class designed to handle all state encapsulated in a Player, such as name,
  * current number of units, current amount of gold, et cetera.
  */
-
 public class Player : MonoBehaviour {
 
     // Private Constants
     private const float GOLD_INCREMENT_RATE = 0.3f; // higher is slower
 
     private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
+    private const int MAX_UNITS = 20;
 
     // Public fields
     // Types of units a Player can own
     public Infantry INFANTRY;
     public Tank TANK;
 
+    // Debug
+    public bool hasBrain;
     public City ownedCity;
 
     // Private fields
-    protected List<City> m_Cities;
-    protected List<Unit> m_Units;
-    protected Unit toSpawn;
-    protected City toSpawnAt;
-    protected Team team;
-    protected int currentGoldAmount;
-    protected int currentNumUnits;
+    private PlayerAI brain;
+    private List<City> m_Cities;
+    private List<Unit> m_Units;
+    private Unit toSpawn;
+    private City toSpawnAt;
+    private Team team;
+    private int currentGoldAmount;
+    private int currentNumUnits;
 
     /// <summary>
     /// Initializing the Team first because other functionality relies on it.
     /// This is bad code practice and should be fixed. FIXME.
     /// </summary>
-    protected virtual void Awake()
+    public virtual void Awake()
     {
-        team = new Team(this, "Dylanteam", Color.cyan);
+        team = new Team(this, "Dylantea", Color.cyan);
+
+        if (hasBrain)
+        {
+            team = new Team(this, "AI_Team", Color.red);
+            brain = gameObject.AddComponent<PlayerAI_Basic>();
+            brain.Body = this;
+        }
     }
 
     // Use this for initialization
-    protected virtual void Start () {
+    public virtual void Start () {
         // Handle private fields
         m_Cities = new List<City>();
         m_Units = new List<Unit>();
@@ -93,6 +103,8 @@ public class Player : MonoBehaviour {
     /// </summary>
     public virtual void SpawnUnit()
     {
+        if (currentNumUnits >= MAX_UNITS) { return; }
+
         if (currentGoldAmount > toSpawn.Cost)
         {
             Debug.Assert(toSpawn.Cost > 0);
@@ -124,6 +136,15 @@ public class Player : MonoBehaviour {
     public Team Team
     {
         get { return team; }
+        set { team = value; }
+    }
+
+    /// <summary>
+    /// Returns all of the cities this Player owns.
+    /// </summary>
+    public List<City> Cities
+    {
+        get { return m_Cities; }
     }
 
     /// <summary>
@@ -154,7 +175,7 @@ public class Player : MonoBehaviour {
     /// <summary>
     /// Updates the current gold amount, reflecting passive gold gain.
     /// </summary>
-    protected void UpdateGold()
+    private void UpdateGold()
     {
         foreach (City c in m_Cities)
         {

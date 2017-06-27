@@ -38,7 +38,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     // protected fields related to fundamentals of unit type
     protected ArmorType armorType;
     protected DamageType dmgType;
-    protected BaseAI ai;
+    protected UnitAI ai;
 
     // protected fields related to physics
     protected Rigidbody body;
