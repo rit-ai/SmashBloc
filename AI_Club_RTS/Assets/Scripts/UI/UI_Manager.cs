@@ -17,22 +17,24 @@ public class UI_Manager : MonoBehaviour {
     private const string SPAWNUNITBUTTON_NAME = "SpawnUnitButton";
     private const string GOLDAMOUNTTEXT_NAME = "GoldAmountText";
     private const string PLAYER_NAME = "Player";
+    private const float WAIT_TIME = 1f;
 
     // Public fields
     // GENERAL
     public Camera m_Camera;
+    public Text m_StartMessage;
     // HEADER
-    public Dropdown m_UnitSelectDropdown;
-    public Text m_CurrentGoldAmountText;
-    public Text m_CurrentUnitAmountText;
+    public Dropdown m_UnitSelect;
+    public Text m_CurrentGoldAmount;
+    public Text m_CurrentUnitAmount;
     // UNIT MENU
-    public Canvas m_UnitMenuCanvas;
+    public Canvas m_UnitMenu;
     public InputField m_UnitMenuNameInput;
-    public Slider m_UnitMenuHealthSlider;
+    public Slider m_UnitMenuHealth;
     // CITY MENU
-    public Canvas m_CityMenuCanvas;
+    public Canvas m_CityMenu;
     public InputField m_CityMenuNameInput;
-    public Slider m_CityMenuIncomeSlider;
+    public Slider m_CityMenuIncome;
     public Button m_CityMenuSpawnButton;
     // MISC UI
     public GameObject m_TargetRing;
@@ -43,18 +45,22 @@ public class UI_Manager : MonoBehaviour {
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
     private Vector3 menuSpawnPos;
+    private IEnumerator coroutine;
 
     // Initialize only once
     private void Awake()
     {
         // Set UI handlers
         // Handlers for changing a dropdown value
-        m_UnitSelectDropdown.onValueChanged.AddListener(delegate { SetUnitToSpawn(); });
+        m_UnitSelect.onValueChanged.AddListener(delegate { SetUnitToSpawn(); });
         // Handlers for finishing changing a name field
         m_UnitMenuNameInput.onEndEdit.AddListener(delegate { UpdateUnitName(); });
         m_UnitMenuNameInput.onEndEdit.AddListener(delegate { UpdateCityName(); });
         // Handlers for pressing a button on a menu
         m_CityMenuSpawnButton.onClick.AddListener(delegate { SpawnUnit(); });
+
+        // Set IEnumerators
+        coroutine = AnimateStart(WAIT_TIME);
     }
 
     // Initialize whenever this object loads
@@ -65,9 +71,10 @@ public class UI_Manager : MonoBehaviour {
 
         // Handle private fields
         m_Player = FindObjectOfType<Player>();
-        menuSpawnPos = m_UnitMenuCanvas.transform.position;
+        menuSpawnPos = m_UnitMenu.transform.position;
 
         // Initialization
+        StartCoroutine(coroutine);
         SetUnitToSpawn();
 	}
 
@@ -90,7 +97,7 @@ public class UI_Manager : MonoBehaviour {
     public void SetUnitToSpawn()
     {
         string toSpawn;
-        switch (m_UnitSelectDropdown.value)
+        switch (m_UnitSelect.value)
         {
             case 0:
                 toSpawn = Infantry.IDENTITY;
@@ -124,19 +131,19 @@ public class UI_Manager : MonoBehaviour {
         //int cost = unitCurrentlyDisplayed.Cost;
 
         // Set position to wherever menus are supposed to appear
-        m_UnitMenuCanvas.transform.position = menuSpawnPos;
+        m_UnitMenu.transform.position = menuSpawnPos;
 
         // Handle unit name input field
         m_UnitMenuNameInput.enabled = enabled;
         m_UnitMenuNameInput.placeholder.GetComponent<Text>().text = unit.UnitName;
 
         // Handle health slider
-        m_UnitMenuHealthSlider.maxValue = unit.MaxHealth;
-        m_UnitMenuHealthSlider.value = unit.Health;
+        m_UnitMenuHealth.maxValue = unit.MaxHealth;
+        m_UnitMenuHealth.value = unit.Health;
 
         // Once processing is finished, bring to front and enable display
-        m_UnitMenuCanvas.transform.SetAsLastSibling();
-        m_UnitMenuCanvas.enabled = true;
+        m_UnitMenu.transform.SetAsLastSibling();
+        m_UnitMenu.enabled = true;
     }
 
     /// <summary>
@@ -150,7 +157,7 @@ public class UI_Manager : MonoBehaviour {
         cityCurrentlyDisplayed = city;
 
         // Set position to wherever menus are supposed to appear
-        m_CityMenuCanvas.transform.position = menuSpawnPos;
+        m_CityMenu.transform.position = menuSpawnPos;
 
         // Handle city name input field
         m_CityMenuNameInput.enabled = enabled;
@@ -160,12 +167,12 @@ public class UI_Manager : MonoBehaviour {
         m_CityMenuSpawnButton.enabled = enabled;
 
         // Handle income slider
-        m_CityMenuIncomeSlider.maxValue = City.MAX_INCOME_LEVEL;
-        m_CityMenuIncomeSlider.value = city.IncomeLevel;
+        m_CityMenuIncome.maxValue = City.MAX_INCOME_LEVEL;
+        m_CityMenuIncome.value = city.IncomeLevel;
 
         // Once processing is finished, bring to front and enable display
-        m_CityMenuCanvas.transform.SetAsLastSibling();
-        m_CityMenuCanvas.enabled = true;
+        m_CityMenu.transform.SetAsLastSibling();
+        m_CityMenu.enabled = true;
     }
 
     /// <summary>
@@ -174,12 +181,12 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     public void UpdateUnitMenu()
     {
-        if (!m_UnitMenuCanvas.enabled) { return; }
+        if (!m_UnitMenu.enabled) { return; }
 
         float health = unitCurrentlyDisplayed.Health;
 
         // Handle health slider
-        m_UnitMenuHealthSlider.value = health;
+        m_UnitMenuHealth.value = health;
     }
 
     /// <summary>
@@ -188,12 +195,12 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     private void UpdateCityInfo()
     {
-        if (!m_CityMenuCanvas.enabled) { return; }
+        if (!m_CityMenu.enabled) { return; }
 
         int incomeLevel = cityCurrentlyDisplayed.IncomeLevel;
 
         // Handle income slider
-        m_CityMenuIncomeSlider.value = incomeLevel;
+        m_CityMenuIncome.value = incomeLevel;
     }
 
     /// <summary>
@@ -241,8 +248,8 @@ public class UI_Manager : MonoBehaviour {
         {
             r.enabled = false;
         }
-        m_UnitMenuCanvas.enabled = false;
-        m_CityMenuCanvas.enabled = false;
+        m_UnitMenu.enabled = false;
+        m_CityMenu.enabled = false;
     }
 
     /// <summary>
@@ -264,7 +271,7 @@ public class UI_Manager : MonoBehaviour {
     {
         int gold = m_Player.Gold;
         string goldText = gold.ToString();
-        m_CurrentGoldAmountText.text = goldText;
+        m_CurrentGoldAmount.text = goldText;
     }
 
     /// <summary>
@@ -274,7 +281,63 @@ public class UI_Manager : MonoBehaviour {
     {
         int units = m_Player.NumUnits;
         string unitText = units.ToString();
-        m_CurrentUnitAmountText.text = unitText;
+        m_CurrentUnitAmount.text = unitText;
+    }
+
+    /// <summary>
+    /// Animates the "start round" text of a game.
+    /// </summary>
+    /// <param name="waitTime">The amount of time to wait before playing the
+    /// animation, in seconds.</param>
+    private IEnumerator AnimateStart(float waitTime)
+    {
+        const int FRAMES_TO_LINGER = 90;
+        const float MOVE_DISTANCE_LARGE = 11f;
+        const float MOVE_DISTANCE_SMALL = 2f;
+        const float MIN_DISTANCE_SQR = 36f;
+        Color textColor = new Color(1f, 1f, 1f, 0f); // white, but invisible
+        Vector3 textPosition = m_StartMessage.transform.position;
+        textPosition.x = 0;
+        Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2);
+
+        yield return new WaitForSeconds(waitTime);
+
+        m_StartMessage.enabled = true;
+        //m_StartMessage.color = textColor;
+        m_StartMessage.transform.position = textPosition;
+
+        // Until the text is near the center of the screen, move it to the 
+        // right and raise the alpha
+        while ((m_StartMessage.transform.position - screenCenter).sqrMagnitude > MIN_DISTANCE_SQR)
+        {
+            textColor.a += 0.04f;
+            textPosition.x += MOVE_DISTANCE_LARGE;
+            m_StartMessage.color = textColor;
+            m_StartMessage.transform.position = textPosition;
+            yield return 0f;
+        }
+
+        // Let it linger for FRAMES_TO_LINGER frames
+        for (int x = 0; x < FRAMES_TO_LINGER; x++)
+        {
+            textPosition.x += MOVE_DISTANCE_SMALL;
+            m_StartMessage.transform.position = textPosition;
+            yield return 0f;
+        }
+
+        // Until text is offscreen, move to the right and fade out
+        while (m_StartMessage.transform.position.x < Screen.width * 1.5)
+        {
+            textColor.a -= 0.03f;
+            textPosition.x += MOVE_DISTANCE_LARGE;
+            m_StartMessage.color = textColor;
+            m_StartMessage.transform.position = textPosition;
+            yield return 0f;
+        }
+
+        m_StartMessage.enabled = false;
+
+        yield return null;
     }
 
 
