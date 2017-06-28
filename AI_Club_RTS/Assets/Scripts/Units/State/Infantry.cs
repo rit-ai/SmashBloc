@@ -28,7 +28,7 @@ public class Infantry : Unit {
     public override void Start () {
         // Handle components
         physics = new InfantryPhysics(this);
-        ai = gameObject.AddComponent<BasicInfantryAI>();
+        ai = gameObject.AddComponent<UnitAI_Template>();
         ai.Body = this;
         // Handle default values
         armorType = ARMOR_TYPE;

@@ -14,19 +14,16 @@ using UnityEngine;
  * to regularly receive limited information from its Unit, rather than having
  * access to the entire scope of the battlefield at once.
  * **/
-public class UnitAI_Template : BaseAI
+public sealed class UnitAI_Template : UnitAI
 {
-    // The absolute destination of the unit, separate from the local 
-    // destination (which this AI should freely change). This value is set by 
-    // either the player, or by a "parent AI" that controls all the units.
-    protected Vector3 absoluteDest;
 
-    public UnitAI_Template()
+    protected override void Start()
     {
+        base.Start();
         currentState = new IdleState();
     }
 
-    public override void UpdateState(object info)
+    public override void UpdateState(UnitInfo info)
     {
 
     }

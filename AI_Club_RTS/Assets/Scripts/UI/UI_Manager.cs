@@ -46,7 +46,7 @@ public class UI_Manager : MonoBehaviour {
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
     private Vector3 menuSpawnPos;
-    private IEnumerator coroutine;
+    private IEnumerator animateStart;
 
     // Initialize only once
     private void Awake()
@@ -59,9 +59,6 @@ public class UI_Manager : MonoBehaviour {
         m_UnitMenuNameInput.onEndEdit.AddListener(delegate { UpdateCityName(); });
         // Handlers for pressing a button on a menu
         m_CityMenuSpawnButton.onClick.AddListener(delegate { SpawnUnit(); });
-
-        // Set IEnumerators
-        coroutine = AnimateStart(WAIT_TIME);
     }
 
     // Initialize whenever this object loads
@@ -74,7 +71,8 @@ public class UI_Manager : MonoBehaviour {
         menuSpawnPos = m_UnitMenu.transform.position;
 
         // Initialization
-        StartCoroutine(coroutine);
+        animateStart = AnimateStart(WAIT_TIME);
+        StartCoroutine(animateStart);
         SetUnitToSpawn();
 	}
 

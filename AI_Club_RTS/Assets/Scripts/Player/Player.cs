@@ -10,8 +10,8 @@ using UnityEngine;
 public class Player : MonoBehaviour {
 
     // Private Constants
-    private const float GOLD_INCREMENT_RATE = 0.3f; // higher is slower
-
+    private const float PASS_INFO_RATE = 1f;
+    private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
     private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
     private const int MAX_UNITS = 20;
 
@@ -25,12 +25,14 @@ public class Player : MonoBehaviour {
     public City ownedCity;
 
     // Private fields
+    private IEnumerator passInfo;
+    private IEnumerator incrementGold;
     private PlayerAI brain;
+    private Team team;
     private List<City> m_Cities;
     private List<Unit> m_Units;
     private Unit toSpawn;
     private City toSpawnAt;
-    private Team team;
     private int currentGoldAmount;
     private int currentNumUnits;
 
@@ -40,7 +42,7 @@ public class Player : MonoBehaviour {
     /// </summary>
     public virtual void Awake()
     {
-        team = new Team(this, "Dylantea", Color.cyan);
+        team = new Team(this, "Dylante", Color.cyan);
 
         if (hasBrain)
         {
@@ -57,16 +59,20 @@ public class Player : MonoBehaviour {
         m_Units = new List<Unit>();
         currentGoldAmount = 0;
         currentNumUnits = 0;
-        
-        // Handle function setup
-        InvokeRepeating("UpdateGold", 0.0f, GOLD_INCREMENT_RATE);
 
         // Debug FIXME
         ownedCity.Init(team);
         m_Cities.Add(ownedCity);
+
+        // Handle IEnumerators
+        incrementGold = IncrementGold();
+        StartCoroutine(incrementGold);
+
+        if (hasBrain)
+        {
+            StartCoroutine(PassInfo());
+        }
     }
-
-
 
     /// <summary>
     /// Sets the unit to spawn. Throws an exception on an invalid name being 
@@ -173,17 +179,33 @@ public class Player : MonoBehaviour {
     }
 
     /// <summary>
+    /// Passes PlayerInfo to this Player's brain.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator PassInfo()
+    {
+        PlayerInfo info = new PlayerInfo();
+        info.cities = m_Cities;
+        brain.UpdateState(info);
+        yield return PASS_INFO_RATE;
+    }
+
+    /// <summary>
     /// Updates the current gold amount, reflecting passive gold gain.
     /// </summary>
-    private void UpdateGold()
+    private IEnumerator IncrementGold()
     {
-        foreach (City c in m_Cities)
+        while (true)
         {
-            currentGoldAmount += c.IncomeLevel;
-        }
-        if (currentGoldAmount > MAX_GOLD_AMOUNT)
-        {
-            currentGoldAmount = MAX_GOLD_AMOUNT;
+            foreach (City c in m_Cities)
+            {
+                currentGoldAmount += c.IncomeLevel;
+            }
+            if (currentGoldAmount > MAX_GOLD_AMOUNT)
+            {
+                currentGoldAmount = MAX_GOLD_AMOUNT;
+            }
+            yield return new WaitForSeconds(GOLD_INCREMENT_RATE);
         }
     }
 

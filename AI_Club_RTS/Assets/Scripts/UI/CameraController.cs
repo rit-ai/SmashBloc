@@ -10,6 +10,9 @@ using UnityEngine;
  * interaction with the world space (NOT menus).
  * 
  * If a menu is opened, CameraController defers to its observer, UIManager.
+ * 
+ * The two-state behavior is necessary due to the fact that the controller must
+ * be able to identify when the user is clicking, clicking and dragging, etc.
  * **/
 public class CameraController : MonoBehaviour, Observable {
 

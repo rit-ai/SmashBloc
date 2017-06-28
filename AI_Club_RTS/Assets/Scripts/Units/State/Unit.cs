@@ -45,12 +45,13 @@ public abstract class Unit : MonoBehaviour, Observable {
     protected Collider collision;
 
     // protected fields related to behavior
-    protected bool ownedByPlayer;
     protected Team team;
     protected Vector3 destination;
 
+    // Private constants
+    private const float PASS_INFO_RATE = 1f;
+
     // Private fields
-    private EnvironmentInfo info;
     private MeshRenderer m_Surface;
 
     /// <summary>
@@ -60,10 +61,9 @@ public abstract class Unit : MonoBehaviour, Observable {
     {
         observers = new List<Observer>();
         observers.Add(new UIObserver());
-        info = new EnvironmentInfo();
 
-        // Set the AI component to update its state every second
-        InvokeRepeating("passInfoToAI", 1f, 1f);
+        // Pass info to the AI component every second
+        StartCoroutine(PassInfo());
 
         // Sets default destination to be the location the unit spawns
         SetDestination(transform.position);
@@ -79,7 +79,6 @@ public abstract class Unit : MonoBehaviour, Observable {
         m_Surface = GetComponent<MeshRenderer>();
 
         this.team = team;
-        ownedByPlayer = (team == Utils.PlayerOne.Team);
         m_Surface.material.color = team.color;
     }
 
@@ -99,8 +98,9 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// Grabs all relevant information and builds it into an EnvironmentInfo 
     /// struct to pass into the unit's AI component.
     /// </summary>
-    protected void passInfoToAI()
+    protected IEnumerator PassInfo()
     {
+        UnitInfo info = new UnitInfo();
         // Add all units within line of sight to the unitsInSightRange list.
         Unit current;
         List<Unit> enemiesInSight = new List<Unit>();
@@ -135,6 +135,7 @@ public abstract class Unit : MonoBehaviour, Observable {
         info.enemiesInAttackRange = enemiesInAttackRange;
 
         ai.UpdateState(info);
+        yield return PASS_INFO_RATE;
     }
 
     /// <summary>
