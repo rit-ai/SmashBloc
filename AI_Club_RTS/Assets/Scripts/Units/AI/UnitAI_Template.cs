@@ -10,9 +10,9 @@ using UnityEngine;
  * AI for units, rather than having to change an existing one (though the 
  * existing files may freely be used as examples).
  * 
- * One difference this class has from the Player AI is that it can expect
- * to regularly receive limited information from its Unit, rather than having
- * access to the entire scope of the battlefield at once.
+ * A Unit will regularly receive information from its body. When this happens,
+ * Decide() is called. At that point, it is the responsibility of the AI to 
+ * construct Commands and use AddCommand() to relay said commands to the body.
  * **/
 public sealed class UnitAI_Template : UnitAI
 {
@@ -23,7 +23,7 @@ public sealed class UnitAI_Template : UnitAI
         currentState = new IdleState();
     }
 
-    public override void UpdateState(UnitInfo info)
+    protected override void Decide()
     {
 
     }

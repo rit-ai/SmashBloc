@@ -186,7 +186,7 @@ public class Player : MonoBehaviour {
     {
         PlayerInfo info = new PlayerInfo();
         info.cities = m_Cities;
-        brain.UpdateState(info);
+        brain.UpdateInfo(info);
         yield return PASS_INFO_RATE;
     }
 

@@ -134,8 +134,8 @@ public abstract class Unit : MonoBehaviour, Observable {
         info.alliesInSight = alliesInSight;
         info.enemiesInAttackRange = enemiesInAttackRange;
 
-        ai.UpdateState(info);
-        yield return PASS_INFO_RATE;
+        ai.UpdateInfo(info);
+        yield return new WaitForSeconds(PASS_INFO_RATE);
     }
 
     /// <summary>

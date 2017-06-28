@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SpawnUnitCommand : PlayerCommand {
 
+    public static string IDENTITY = "SpawnUnitCommand";
+
     string toSpawnName;
     City toSpawnAt;
 
@@ -15,7 +17,6 @@ public class SpawnUnitCommand : PlayerCommand {
 
     public override void Execute()
     {
-        Debug.Log("Yes");
         body.SetUnitToSpawn(toSpawnName);
         body.SetCityToSpawnAt(toSpawnAt);
         body.SpawnUnit();

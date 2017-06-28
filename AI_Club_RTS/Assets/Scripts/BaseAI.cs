@@ -42,16 +42,17 @@ public abstract class BaseAI : MonoBehaviour {
     protected UnityEngine.Object body;
 
     /// <summary>
-    /// Uses provided info to update the current state.
+    /// Allows the body to provide updated info to the brain.
     /// </summary>
-    /// At regular intervals, the AI must make a decision to update its current
-    /// state. This is protected because child classes must specify a type of
-    /// info that they will handle (see PlayerAI.cs for an example).
+    /// At regular intervals, the body of the AI will call this function in 
+    /// order to provide information. This is protected because child classes 
+    /// must specify a type of info that they will handle (see PlayerAI.cs for 
+    /// an example).
     /// <param name="info">Any information that may be relevant to the unit in 
     /// order for it to make a more effective decision, stored inside an info 
     /// struct. It is the responsibility of the implementer to make sure that 
     /// the struct is of the right type. </param>
-    protected abstract void UpdateState(object info);
+    public abstract void UpdateInfo(object info);
 
     /// <summary>
     /// Adds a command to the command queue.

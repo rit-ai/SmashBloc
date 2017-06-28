@@ -7,7 +7,18 @@ using UnityEngine;
  * @author Paul Galatic
  * 
  * Class representing the most basic form of Player AI and providing details on
- * how to implement a custom one.
+ * how to implement a custom one. The basic dataflow of a Player AI is as 
+ * follows:
+ * 
+ * 1. Receive Info from Body
+ * 2. Process Info and form Commands
+ * 3. Enqueue Commands
+ * 4. Wait for more Info
+ * 
+ * Step one is called by the body in UpdateInfo(). Step two is Decide(). Step
+ * three is AddCommand(). Children classes only have to worry about 
+ * implementing Decide(), building Commands, and calling AddCommand(). 
+ * Everything else is handled externally.
  * **/
 public abstract class PlayerAI : BaseAI {
 
@@ -16,21 +27,30 @@ public abstract class PlayerAI : BaseAI {
     new private Player body;
     // Player AIs command Players with PlayerCommands.
     new private Queue<PlayerCommand> commandQueue;
+    // This is the most recent information the AI has from its body.
+    protected PlayerInfo info;
 
     public Player Body { get; set; }
 
-    // Update the state using information specific to the Player
-    public abstract void UpdateState(PlayerInfo info);
+    /// <summary>
+    /// Decide how to handle new information. Will be called after every update
+    /// to info.
+    /// </summary>
+    protected abstract void Decide();
 
-    // Sealed and protected, to handle the requirements of BaseAI
-    // Command queue is cleared every time new information is presented
-    protected sealed override void UpdateState(object info)
+    /// <summary>
+    /// Allows the body to send updated information to the brain.
+    /// </summary>
+    /// <param name="info">Updated information about the Player's status, 
+    /// contained in a PlayerInfo class.</param>
+    public sealed override void UpdateInfo(object info)
     {
         if (!(info is PlayerInfo))
         {
             throw new ArgumentException("Attempted to call UpdateState with wrong Info type.", "info");
         }
-        UpdateState(info as PlayerInfo);
+        this.info = (info as PlayerInfo);
+        Decide();
     }
 
     // Protected and sealed to satisfy the base class
@@ -54,23 +74,20 @@ public abstract class PlayerAI : BaseAI {
     }
 
     /// <summary>
-    /// Processes the next command in the queue, if one is present.
-    /// 
-    /// //TODO Why are commands enqueued so rapidly?
+    /// Executes the next command in the queue, if one is present.
     /// </summary>
     protected sealed override IEnumerator ProcessNext()
     {
         while (true)
         {
-            Debug.Log(commandQueue.Count);
-            while (commandQueue.Count == 0) { yield return COMMAND_PROCESS_RATE; }
+            while (commandQueue.Count == 0) { yield return new WaitForSeconds(COMMAND_PROCESS_RATE); }
             Command command = commandQueue.Dequeue();
             if (!(command is PlayerCommand))
             {
                 throw new ArgumentException("Attempted to call AddCommand with wrong Command type.", "command");
             }
             command.Execute();
-            yield return COMMAND_PROCESS_RATE;
+            yield return new WaitForSeconds(COMMAND_PROCESS_RATE);
         }
     }
 

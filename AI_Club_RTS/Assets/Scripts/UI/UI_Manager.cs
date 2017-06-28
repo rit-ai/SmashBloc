@@ -302,7 +302,7 @@ public class UI_Manager : MonoBehaviour {
         yield return new WaitForSeconds(waitTime);
 
         m_StartMessage.enabled = true;
-        //m_StartMessage.color = textColor;
+        m_StartMessage.color = textColor;
         m_StartMessage.transform.position = textPosition;
 
         // Until the text is near the center of the screen, move it to the 
@@ -311,9 +311,8 @@ public class UI_Manager : MonoBehaviour {
         {
             textColor.a += 0.04f;
             textPosition.x += MOVE_DISTANCE_LARGE;
-            m_StartMessage.color = textColor;
             m_StartMessage.transform.position = textPosition;
-            yield return 0f;
+            yield return new WaitForEndOfFrame();
         }
 
         // Let it linger for FRAMES_TO_LINGER frames
@@ -321,7 +320,7 @@ public class UI_Manager : MonoBehaviour {
         {
             textPosition.x += MOVE_DISTANCE_SMALL;
             m_StartMessage.transform.position = textPosition;
-            yield return 0f;
+            yield return new WaitForEndOfFrame();
         }
 
         // Until text is offscreen, move to the right and fade out
@@ -329,9 +328,8 @@ public class UI_Manager : MonoBehaviour {
         {
             textColor.a -= 0.03f;
             textPosition.x += MOVE_DISTANCE_LARGE;
-            m_StartMessage.color = textColor;
             m_StartMessage.transform.position = textPosition;
-            yield return 0f;
+            yield return new WaitForEndOfFrame();
         }
 
         m_StartMessage.enabled = false;

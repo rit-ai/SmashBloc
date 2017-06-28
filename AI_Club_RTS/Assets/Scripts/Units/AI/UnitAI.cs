@@ -6,35 +6,51 @@ using UnityEngine;
 /*
  * @author Paul Galatic
  * 
- * Class created to represent state common across all AIs that control Units.
+ * Class created to represent state common across all Unit AIs and providing 
+ * details on how to implement a custom one. The basic dataflow of a Unit AI is
+ * as follows:
+ * 
+ * 1. Receive Info from Body
+ * 2. Process Info and form Commands
+ * 3. Enqueue Commands
+ * 4. Wait for more Info
+ * 
+ * Step one is called by the body in UpdateInfo(). Step two is Decide(). Step
+ * three is AddCommand(). Children classes only have to worry about 
+ * implementing Decide(), building Commands, and calling AddCommand(). 
+ * Everything else is handled externally.
  * **/
 public abstract class UnitAI : BaseAI
-{ 
+{
+    // Unit AIs control Units. However, the AIs aren't allowed to reference
+    // their Units themselves—they can only do so through Commands.
+    new private Unit body;
     // Unit AIs command Players with UnitCommands.
     new protected Queue<UnitCommand> commandQueue;
-
+    // This is the most updated information the AI has from its body.
+    protected UnitInfo info;
     // The absolute destination of the unit, separate from the local 
     // destination (which this AI should freely change). This value is set by 
     // either the player, or by a "parent AI" that controls all the units.
     protected Vector3 absoluteDest;
 
-    // Unit AIs control Units. However, the AIs aren't allowed to reference
-    // their Units themselves—they can only do so through Commands.
-    new private Unit body;
-
     public Unit Body { set { body = value; } }
 
-    // From interface -- accept information and update state if necessary
-    public abstract void UpdateState(UnitInfo info);
+    /// <summary>
+    /// Decide how to handle new information. Will be called after every update
+    /// to info.
+    /// </summary>
+    protected abstract void Decide();
 
     // Sealed and protected, to handle the requirements of BaseAI
-    protected sealed override void UpdateState(object info)
+    public sealed override void UpdateInfo(object info)
     {
         if (!(info is UnitInfo))
         {
             throw new ArgumentException("Attempted to call UpdateState with wrong Info type.", "info");
         }
-        UpdateState(info as UnitInfo);
+        this.info = (info as UnitInfo);
+        Decide();
     }
 
     // Sealed and protected, to handle the requirements of BaseAI
@@ -63,14 +79,14 @@ public abstract class UnitAI : BaseAI
     {
         while (true)
         {
-            while (commandQueue.Count == 0) { yield return COMMAND_PROCESS_RATE; }
+            while (commandQueue.Count == 0) { yield return new WaitForSeconds(COMMAND_PROCESS_RATE); }
             Command command = commandQueue.Dequeue();
             if (!(command is UnitCommand))
             {
                 throw new ArgumentException("Attempted to call AddCommand with wrong Command type.", "command");
             }
             command.Execute();
-            yield return COMMAND_PROCESS_RATE;
+            yield return new WaitForSeconds(COMMAND_PROCESS_RATE);
         }
     }
 

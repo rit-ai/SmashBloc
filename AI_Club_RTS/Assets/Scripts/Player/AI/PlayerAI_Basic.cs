@@ -6,17 +6,12 @@ using UnityEngine;
 /*
  * The simplest form of master AI, this one only spawns Infantry units, only 
  * spawns them at its first city, and never moves its units. Naturally, this
- * is pretty boring—but it's a good example of behavior that should be 
- * implemented and extended in a better AI Player.
+ * is pretty boring,.
  * **/
 public sealed class PlayerAI_Basic : PlayerAI {
 
     // Try to spawn a unit every SPAWN_UNIT_RATE seconds
     private const float SPAWN_UNIT_RATE = 5f;
-
-    
-
-    private PlayerInfo workingInfo;
 
     protected override void Start () {
         base.Start();
@@ -24,9 +19,9 @@ public sealed class PlayerAI_Basic : PlayerAI {
         currentState = new IdleState(this);
 	}
 
-    public override void UpdateState(PlayerInfo info)
+    protected override void Decide()
     {
-        workingInfo = info;
+        
     }
 
 
@@ -49,9 +44,9 @@ public sealed class PlayerAI_Basic : PlayerAI {
         {
             while (true)
             {
-                while (brain.workingInfo == null) { yield return SPAWN_UNIT_RATE; }
-                brain.AddCommand(new SpawnUnitCommand(brain.Body, Infantry.IDENTITY, brain.workingInfo.cities[0]));
-                yield return SPAWN_UNIT_RATE;
+                while (brain.info == null) { yield return new WaitForSeconds(SPAWN_UNIT_RATE); }
+                brain.AddCommand(new SpawnUnitCommand(brain.Body, Infantry.IDENTITY, brain.info.cities[0]));
+                yield return new WaitForSeconds(SPAWN_UNIT_RATE);
             }
         }
     }
