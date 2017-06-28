@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * @author Paul Galatic
+ * 
+ * This command tells a Player to attempt to spawn a specific type of unit at
+ * a specific city.
+ * **/
 public class SpawnUnitCommand : PlayerCommand {
 
     public static string IDENTITY = "SpawnUnitCommand";
@@ -9,7 +15,7 @@ public class SpawnUnitCommand : PlayerCommand {
     string toSpawnName;
     City toSpawnAt;
 
-    public SpawnUnitCommand(Player body, string toSpawnName, City toSpawnAt) : base(body)
+    public SpawnUnitCommand(string toSpawnName, City toSpawnAt)
     {
         this.toSpawnName = toSpawnName;
         this.toSpawnAt = toSpawnAt;

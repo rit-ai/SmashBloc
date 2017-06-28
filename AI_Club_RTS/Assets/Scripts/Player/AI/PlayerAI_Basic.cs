@@ -45,7 +45,7 @@ public sealed class PlayerAI_Basic : PlayerAI {
             while (true)
             {
                 while (brain.info == null) { yield return new WaitForSeconds(SPAWN_UNIT_RATE); }
-                brain.AddCommand(new SpawnUnitCommand(brain.Body, Infantry.IDENTITY, brain.info.cities[0]));
+                brain.AddCommand(new SpawnUnitCommand(Infantry.IDENTITY, brain.info.cities[0]));
                 yield return new WaitForSeconds(SPAWN_UNIT_RATE);
             }
         }

@@ -70,6 +70,7 @@ public abstract class UnitAI : BaseAI
     protected void AddCommand(UnitCommand command)
     {
         while (commandQueue.Count >= MAX_NUM_COMMANDS) { return; }
+        command.Body = body;
         commandQueue.Enqueue(command);
     }
 

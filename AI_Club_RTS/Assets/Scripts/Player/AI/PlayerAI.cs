@@ -30,7 +30,7 @@ public abstract class PlayerAI : BaseAI {
     // This is the most recent information the AI has from its body.
     protected PlayerInfo info;
 
-    public Player Body { get; set; }
+    public Player Body { set { body = value; } }
 
     /// <summary>
     /// Decide how to handle new information. Will be called after every update
@@ -70,6 +70,7 @@ public abstract class PlayerAI : BaseAI {
     protected void AddCommand(PlayerCommand command)
     {
         if (commandQueue.Count >= MAX_NUM_COMMANDS) { return; }
+        command.Body = body;
         commandQueue.Enqueue(command);
     }
 
