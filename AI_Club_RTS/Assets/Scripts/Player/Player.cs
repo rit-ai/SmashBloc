@@ -25,16 +25,14 @@ public class Player : MonoBehaviour {
     public City ownedCity;
 
     // Private fields
-    private IEnumerator passInfo;
-    private IEnumerator incrementGold;
     private PlayerAI brain;
+    private PlayerInfo info;
     private Team team;
     private List<City> m_Cities;
     private List<Unit> m_Units;
     private Unit toSpawn;
     private City toSpawnAt;
-    private int currentGoldAmount;
-    private int currentNumUnits;
+    private int goldAmount;
 
     /// <summary>
     /// Initializing the Team first because other functionality relies on it.
@@ -57,19 +55,18 @@ public class Player : MonoBehaviour {
         // Handle private fields
         m_Cities = new List<City>();
         m_Units = new List<Unit>();
-        currentGoldAmount = 0;
-        currentNumUnits = 0;
+        goldAmount = 0;
 
         // Debug FIXME
         ownedCity.Init(team);
         m_Cities.Add(ownedCity);
 
         // Handle IEnumerators
-        incrementGold = IncrementGold();
-        StartCoroutine(incrementGold);
+        StartCoroutine(IncrementGold());
 
         if (hasBrain)
         {
+            info = new PlayerInfo();
             StartCoroutine(PassInfo());
         }
     }
@@ -109,21 +106,19 @@ public class Player : MonoBehaviour {
     /// </summary>
     public virtual void SpawnUnit()
     {
-        if (currentNumUnits >= MAX_UNITS) { return; }
+        if (m_Units.Count >= MAX_UNITS) { return; }
 
-        if (currentGoldAmount > toSpawn.Cost)
+        if (goldAmount > toSpawn.Cost)
         {
             Debug.Assert(toSpawn.Cost > 0);
-            currentGoldAmount -= toSpawn.Cost;
+            goldAmount -= toSpawn.Cost;
 
             Unit newUnit = Utils.UnitToPrefab(toSpawn);
             Transform spawnPoint = toSpawnAt.SpawnPoint;
             newUnit = Instantiate(newUnit, spawnPoint.transform.position, Quaternion.identity);
             newUnit.Init(team);
-            newUnit.setUnitName(newUnit.UnitName + currentNumUnits.ToString());
+            newUnit.setUnitName(newUnit.UnitName + m_Units.Count.ToString());
             m_Units.Add(newUnit);
-
-            currentNumUnits++;
         }
     }
 
@@ -154,12 +149,20 @@ public class Player : MonoBehaviour {
     }
 
     /// <summary>
+    /// Returns the player's current amount of gold.
+    /// </summary>
+    public List<Unit> Units
+    {
+        get { return m_Units; }
+    }
+
+    /// <summary>
     /// Modifies the current amount of gold.
     /// </summary>
     /// <param name="amount">The amount to modify by.</param>
     public void UpdateGold(int amount)
     {
-        currentGoldAmount += amount;
+        goldAmount += amount;
     }
 
     /// <summary>
@@ -167,15 +170,7 @@ public class Player : MonoBehaviour {
     /// </summary>
     public int Gold
     {
-        get { return currentGoldAmount; }
-    }
-
-    /// <summary>
-    /// Returns the player's current amount of gold.
-    /// </summary>
-    public int NumUnits
-    {
-        get { return currentNumUnits; }
+        get { return goldAmount; }
     }
 
     /// <summary>
@@ -184,10 +179,12 @@ public class Player : MonoBehaviour {
     /// <returns></returns>
     private IEnumerator PassInfo()
     {
-        PlayerInfo info = new PlayerInfo();
+        info.team = team;
+        info.goldAmount = goldAmount;
         info.cities = m_Cities;
+        info.units = m_Units;
         brain.UpdateInfo(info);
-        yield return PASS_INFO_RATE;
+        yield return new WaitForSeconds(PASS_INFO_RATE);
     }
 
     /// <summary>
@@ -199,11 +196,11 @@ public class Player : MonoBehaviour {
         {
             foreach (City c in m_Cities)
             {
-                currentGoldAmount += c.IncomeLevel;
+                goldAmount += c.IncomeLevel;
             }
-            if (currentGoldAmount > MAX_GOLD_AMOUNT)
+            if (goldAmount > MAX_GOLD_AMOUNT)
             {
-                currentGoldAmount = MAX_GOLD_AMOUNT;
+                goldAmount = MAX_GOLD_AMOUNT;
             }
             yield return new WaitForSeconds(GOLD_INCREMENT_RATE);
         }

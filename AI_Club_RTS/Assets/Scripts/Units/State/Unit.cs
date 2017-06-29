@@ -53,6 +53,7 @@ public abstract class Unit : MonoBehaviour, Observable {
 
     // Private fields
     private MeshRenderer m_Surface;
+    private UnitInfo info;
 
     /// <summary>
     /// Sets up Observers and other state common between Units.
@@ -61,6 +62,8 @@ public abstract class Unit : MonoBehaviour, Observable {
     {
         observers = new List<Observer>();
         observers.Add(new UIObserver());
+
+        info = new UnitInfo();
 
         // Pass info to the AI component every second
         StartCoroutine(PassInfo());
@@ -100,7 +103,6 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     protected IEnumerator PassInfo()
     {
-        UnitInfo info = new UnitInfo();
         // Add all units within line of sight to the unitsInSightRange list.
         Unit current;
         List<Unit> enemiesInSight = new List<Unit>();
