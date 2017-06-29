@@ -9,26 +9,25 @@ using UnityEngine;
  * perform. To be used as a "starter file" for those that wish to develop new
  * AI for units, rather than having to change an existing one (though the 
  * existing files may freely be used as examples).
+ * 
+ * A Unit will regularly receive information from its body. When this happens,
+ * Decide() is called. At that point, it is the responsibility of the AI to 
+ * construct Commands and use AddCommand() to relay said commands to the body.
  * **/
-public class BaseUnitAI : UnitAI
+public sealed class UnitAI_Template : UnitAI
 {
 
-    public BaseUnitAI(Infantry parent)
+    protected override void Start()
     {
-        m_Parent = parent;
-
+        base.Start();
         currentState = new IdleState();
     }
 
-    public override void ComponentUpdate()
+    protected override void Decide()
     {
-        currentState.StateUpdate();
+
     }
 
-    public override void OnDestChanged()
-    {
-        throw new NotImplementedException();
-    }
 
     public class IdleState : State
     {

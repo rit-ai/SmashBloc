@@ -14,7 +14,9 @@ public class Utils : MonoBehaviour {
     private static Unit InfantryPrefab = (Unit)Resources.Load("Prefabs/Units/" + Infantry.IDENTITY, typeof(Unit));
     private static Unit TankPrefab = (Unit)Resources.Load("Prefabs/Units/" + Tank.IDENTITY, typeof(Unit));
 
-	static Texture2D whiteTexture;
+    private static Player playerOne;
+
+    static Texture2D whiteTexture;
 	public static Texture2D WhiteTexture {
 		get {
 			if(whiteTexture == null) {
@@ -109,6 +111,24 @@ public class Utils : MonoBehaviour {
     public static List<City> AllCities()
     {
         return new List<City>(FindObjectsOfType<City>());
+    }
+
+    /// <summary>
+    /// Finds the Player controlled by the user and returns it.
+    /// </summary>
+    public static Player PlayerOne
+    {
+        get {
+           if (playerOne != null) { return playerOne; }
+           foreach (Player p in FindObjectsOfType<Player>())
+            {
+                if (!(p.hasBrain)) {
+                    playerOne = p;
+                    return p;
+                }
+            }
+            return null;
+        }
     }
 
     /// <summary>

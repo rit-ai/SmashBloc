@@ -19,26 +19,18 @@ public class City : MonoBehaviour, Observable {
     public Transform m_SpawnPoint;
     public MeshRenderer m_HighlightInner;
     public MeshRenderer m_HighlightOuter;
-
+    
     // Private constants
     private const string DEFAULT_NAME = "Dylanto";
     private const int DEFAULT_INCOME_LEVEL = 8;
 
     // Private fields
+    private MeshRenderer m_Surface;
     private List<Observer> m_Observers;
-    // private string team;
+    private Team team;
     private string cityName;
     private string customName;
     private int incomeLevel;
-
-    // Properties
-    /// <summary>
-    /// Gets the Team that currently owns the city.
-    /// </summary>
-    /// <value>The Team that owns the city.</value>
-    //public string Team {
-    //get { return team; }
-    //}
 
     // Use this for initialization
     void Start()
@@ -48,12 +40,23 @@ public class City : MonoBehaviour, Observable {
         m_Observers.Add(new UIObserver());
 
         incomeLevel = DEFAULT_INCOME_LEVEL;
-        cityName = DEFAULT_NAME;
+        cityName = team.name;
     }
 
-    // Update is called once per frame
-    void Update()
+    /// <summary>
+    /// Handles any data that needs to be passed after a city is instantiated.
+    /// 
+    /// TODO Until a player can spawn cities, this value is set by a public 
+    /// variable.
+    /// </summary>
+    /// <param name="team">The Team the city is on when it is created.</param>
+    public void Init(Team team)
     {
+        m_Surface = GetComponent<MeshRenderer>();
+
+        this.team = team;
+        Debug.Assert(m_Surface != null);
+        m_Surface.material.color = team.color;
     }
 
     /// <summary>
@@ -122,6 +125,14 @@ public class City : MonoBehaviour, Observable {
             }
             return customName;
         }
+    }
+
+    /// <summary>
+    /// Returns this city's team.
+    /// </summary>
+    public Team Team
+    {
+        get { return team; }
     }
 
     /// <summary>

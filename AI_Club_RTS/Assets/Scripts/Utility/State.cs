@@ -5,10 +5,9 @@ using UnityEngine;
 public interface State {
 
     /// <summary>
-    /// Handles Update() delegation from implementer.
-    /// 
-    /// This is the function that will be called instead of Update() when a 
-    /// class implementing this pattern needs to update.
+    /// Handles any work that the implementer must do while in a particular 
+    /// State. It should execute every EXECUTION_RATE seconds. Lower is faster,
+    /// but increases CPU load.
     /// </summary>
     void StateUpdate();
 }

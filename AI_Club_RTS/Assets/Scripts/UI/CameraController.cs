@@ -10,6 +10,9 @@ using UnityEngine;
  * interaction with the world space (NOT menus).
  * 
  * If a menu is opened, CameraController defers to its observer, UIManager.
+ * 
+ * The two-state behavior is necessary due to the fact that the controller must
+ * be able to identify when the user is clicking, clicking and dragging, etc.
  * **/
 public class CameraController : MonoBehaviour, Observable {
 
@@ -21,13 +24,15 @@ public class CameraController : MonoBehaviour, Observable {
     public LayerMask Terrain_mask;
 
     // Private constants
+    // Sic: Don't ask me how this works.
+    private static Vector3 SCREEN_CENTER = new Vector3(Screen.width, Screen.height);
     private static Color BOX_INTERIOR_COLOR = new Color(0.74f, 0.71f, 0.27f, 0.5f);
     private static Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
-    private static float MAX_CAMERA_SIZE = 150;
-    private static float MIN_CAMERA_SIZE = 50;
-    private static float SCROLLSPEED = 20;
-    private static float BORDER_SIZE = 20f;
-    private static float SPEED = 1f;
+    private static float MAX_CAMERA_SIZE = 200f;
+    private static float MIN_CAMERA_SIZE = 50f;
+    private static float SCROLLSPEED = 50f;
+    private static float BORDER_SIZE = 10f;
+    private static float SPEED = 3f;
 
     // Private fields
     private List<Observer> m_Observers;
@@ -98,10 +103,12 @@ public class CameraController : MonoBehaviour, Observable {
         // Is the mouse at the edge of the screen?
         if (!m_ScreenBorderInverse.Contains(m_MousePos))
         {
-            Vector2 v = new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2);
-            v.Normalize();
-            v *= SPEED;
-            transform.Translate(v.x, 0, v.y, Space.World);
+            Quaternion rotation = m_Camera.transform.rotation;
+            //Vector2 direction = new Vector2(Input.mousePosition.x + Screen.width / 2, Input.mousePosition.y + Screen.height / 2);
+            Vector3 direction = SCREEN_CENTER - m_MousePos;
+            direction.Normalize();
+            direction *= SPEED;
+            transform.Translate(direction.x, 0, direction.y, Space.World);
         }
     }
 
@@ -128,7 +135,7 @@ public class CameraController : MonoBehaviour, Observable {
     /// Handles all state involved with selected units after drawing the 
     /// selection rectangle is completed.
     /// </summary>
-    class SelectedState : State
+    private class SelectedState : State
     {
         private CameraController m_CameraController;
 
@@ -177,7 +184,7 @@ public class CameraController : MonoBehaviour, Observable {
     /// State that handles all behavior involving drawing a box, but NOT with
     /// selecting units.
     /// </summary>
-    class DrawingState : State
+    private class DrawingState : State
     {
         private CameraController m_CameraController;
         private Camera m_Camera;

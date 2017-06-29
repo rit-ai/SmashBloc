@@ -31,7 +31,7 @@ public class GameObserver : Observer {
     /// <param name="entity">The entity performing the invocation.</param>
     /// <param name="invocation">The type of invocation.</param>
     /// <param name="data">Misc data.</param>
-    public void OnNotify<T>(Object entity, string invocation, params T[] data)
+    public void OnNotify<T>(object entity, string invocation, params T[] data)
     {
         switch (invocation)
         {
@@ -55,18 +55,26 @@ public class GameObserver : Observer {
         }
     }
 
+    /// <summary>
+    /// Sets the new destination for the unit, if the unit is of the player's
+    /// team.
+    /// </summary>
+    /// <param name="terrain">The terrain, which was right clicked such to 
+    /// invoke this method.</param>
     private void SetNewDestination(RTS_Terrain terrain)
     {
         if (selectedUnits == null) { return; }
         Camera camera = Camera.main;
         RaycastHit hit;
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit, terrain.IgnoreAllButTerrain))
+        Team playerTeam = Utils.PlayerOne.Team;
+        if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
             // Set the destination of all the units
             foreach (Unit u in selectedUnits)
             {
-                u.SetDestination(hit.point);
+                if (u.Team == playerTeam)
+                    u.SetDestination(hit.point);
             }
         }
 

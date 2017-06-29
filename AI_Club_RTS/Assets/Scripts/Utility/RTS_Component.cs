@@ -13,6 +13,7 @@ public interface RTS_Component {
     /// <summary>
     /// Handle the behavior, and update the state, of this component.
     /// </summary>
+    /// <param name="data">Any additional useful data, if any. Optional.</param>
     void ComponentUpdate();
 
 }

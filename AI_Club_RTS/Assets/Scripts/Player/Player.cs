@@ -7,54 +7,71 @@ using UnityEngine;
  * Class designed to handle all state encapsulated in a Player, such as name,
  * current number of units, current amount of gold, et cetera.
  */
-
 public class Player : MonoBehaviour {
 
     // Private Constants
+    private const float PASS_INFO_RATE = 1f;
     private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
-
     private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
+    private const int MAX_UNITS = 20;
 
     // Public fields
     // Types of units a Player can own
-    public Artillery ARTILLERY;
-    public Bazooka BAZOOKA;
     public Infantry INFANTRY;
-    public Recon RECON;
-    public SupplyTruck SUPPLY_TRUCK;
     public Tank TANK;
 
-    public City defaultCity; // REMOVEME
+    // Debug
+    public bool hasBrain;
+    public City ownedCity;
 
     // Private fields
+    private IEnumerator passInfo;
+    private IEnumerator incrementGold;
+    private PlayerAI brain;
+    private Team team;
     private List<City> m_Cities;
     private List<Unit> m_Units;
     private Unit toSpawn;
+    private City toSpawnAt;
     private int currentGoldAmount;
     private int currentNumUnits;
 
+    /// <summary>
+    /// Initializing the Team first because other functionality relies on it.
+    /// This is bad code practice and should be fixed. FIXME.
+    /// </summary>
+    public virtual void Awake()
+    {
+        team = new Team(this, "Dylante", Color.cyan);
+
+        if (hasBrain)
+        {
+            team = new Team(this, "AI_Team", Color.red);
+            brain = gameObject.AddComponent<PlayerAI_Basic>();
+            brain.Body = this;
+        }
+    }
+
     // Use this for initialization
-    void Start () {
-        // Handle public constants
-
-
-        // Handle fields
+    public virtual void Start () {
+        // Handle private fields
         m_Cities = new List<City>();
         m_Units = new List<Unit>();
         currentGoldAmount = 0;
         currentNumUnits = 0;
 
-        // Handle function setup
-        InvokeRepeating("UpdateGold", 0.0f, GOLD_INCREMENT_RATE);
+        // Debug FIXME
+        ownedCity.Init(team);
+        m_Cities.Add(ownedCity);
 
-        // Debug
-        m_Cities.Add(defaultCity);
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
+        // Handle IEnumerators
+        incrementGold = IncrementGold();
+        StartCoroutine(incrementGold);
 
+        if (hasBrain)
+        {
+            StartCoroutine(PassInfo());
+        }
     }
 
     /// <summary>
@@ -63,24 +80,12 @@ public class Player : MonoBehaviour {
     /// </summary>
     /// <param name="unitIdentity">The name of the unit to spawn, based on 
     /// Unit.NAME.</param>
-    public void SetUnitToSpawn(string unitIdentity)
+    public virtual void SetUnitToSpawn(string unitIdentity)
     {
         switch (unitIdentity)
         {
-            case Artillery.IDENTITY:
-                toSpawn = ARTILLERY;
-                break;
-            case Bazooka.IDENTITY:
-                toSpawn = BAZOOKA;
-                break;
             case Infantry.IDENTITY:
                 toSpawn = INFANTRY;
-                break;
-            case Recon.IDENTITY:
-                toSpawn = RECON;
-                break;
-            case SupplyTruck.IDENTITY:
-                toSpawn = SUPPLY_TRUCK;
                 break;
             case Tank.IDENTITY:
                 toSpawn = TANK;
@@ -88,23 +93,33 @@ public class Player : MonoBehaviour {
             default:
                 throw new KeyNotFoundException("SetUnitToSpawn given invalid string");
         }
+    }
 
-        
+    /// <summary>
+    /// Sets the city at which the next unit will be spawned.
+    /// </summary>
+    /// <param name="city"></param>
+    public virtual void SetCityToSpawnAt(City city)
+    {
+        toSpawnAt = city;
     }
 
     /// <summary>
     /// Spawns a unit based on toSpawn, if the Player has enough gold.
     /// </summary>
-    public void SpawnUnit(City city)
+    public virtual void SpawnUnit()
     {
+        if (currentNumUnits >= MAX_UNITS) { return; }
+
         if (currentGoldAmount > toSpawn.Cost)
         {
             Debug.Assert(toSpawn.Cost > 0);
             currentGoldAmount -= toSpawn.Cost;
 
             Unit newUnit = Utils.UnitToPrefab(toSpawn);
-            Transform spawnPoint = city.SpawnPoint;
+            Transform spawnPoint = toSpawnAt.SpawnPoint;
             newUnit = Instantiate(newUnit, spawnPoint.transform.position, Quaternion.identity);
+            newUnit.Init(team);
             newUnit.setUnitName(newUnit.UnitName + currentNumUnits.ToString());
             m_Units.Add(newUnit);
 
@@ -119,6 +134,23 @@ public class Player : MonoBehaviour {
     public void RemoveUnit(Unit unit)
     {
         m_Units.Remove(unit);
+    }
+
+    /// <summary>
+    /// Returns this player's team.
+    /// </summary>
+    public Team Team
+    {
+        get { return team; }
+        set { team = value; }
+    }
+
+    /// <summary>
+    /// Returns all of the cities this Player owns.
+    /// </summary>
+    public List<City> Cities
+    {
+        get { return m_Cities; }
     }
 
     /// <summary>
@@ -147,18 +179,33 @@ public class Player : MonoBehaviour {
     }
 
     /// <summary>
+    /// Passes PlayerInfo to this Player's brain.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator PassInfo()
+    {
+        PlayerInfo info = new PlayerInfo();
+        info.cities = m_Cities;
+        brain.UpdateInfo(info);
+        yield return PASS_INFO_RATE;
+    }
+
+    /// <summary>
     /// Updates the current gold amount, reflecting passive gold gain.
     /// </summary>
-    /// 
-    private void UpdateGold()
+    private IEnumerator IncrementGold()
     {
-        foreach (City c in m_Cities)
+        while (true)
         {
-            currentGoldAmount += c.IncomeLevel;
-        }
-        if (currentGoldAmount > MAX_GOLD_AMOUNT)
-        {
-            currentGoldAmount = MAX_GOLD_AMOUNT;
+            foreach (City c in m_Cities)
+            {
+                currentGoldAmount += c.IncomeLevel;
+            }
+            if (currentGoldAmount > MAX_GOLD_AMOUNT)
+            {
+                currentGoldAmount = MAX_GOLD_AMOUNT;
+            }
+            yield return new WaitForSeconds(GOLD_INCREMENT_RATE);
         }
     }
 

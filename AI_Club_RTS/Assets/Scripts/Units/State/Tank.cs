@@ -30,8 +30,8 @@ public class Tank : Unit {
         // Handle default values
         unitName = NAME;
         maxHealth = MAXHEALTH;
-        dmg = DAMAGE;
-        range = RANGE;
+        damage = DAMAGE;
+        attackRange = RANGE;
         cost = COST;
         // Handle fields
         health = MAXHEALTH;
@@ -43,7 +43,7 @@ public class Tank : Unit {
     /// <param name="newDest"></param>
     public override void SetDestination(Vector3 newDest)
     {
-        ai.OnDestChanged();
+
     }
 
     /// <summary>
