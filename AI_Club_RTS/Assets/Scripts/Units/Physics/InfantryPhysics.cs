@@ -5,7 +5,10 @@ using UnityEngine;
 /*
  * @author Paul Galatic
  * 
- * Class designed to handle the physics of the Infantry Unit.
+ * Class designed to handle the physics of the Infantry Unit. The functions in 
+ * this file are designed in such a way to reasonably accomodate being called
+ * many times a second. Being that this design precludes the use of conditional
+ * branches, it may be a bit confusing to read.
  * **/
 public class InfantryPhysics : RTS_Component {
 
@@ -50,6 +53,7 @@ public class InfantryPhysics : RTS_Component {
         Hover();
         Guide();
     }
+
 
     /// <summary>
     /// Infantry Units hover above the ground, based on their current distance 

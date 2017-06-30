@@ -12,6 +12,7 @@ using UnityEngine;
 public class City : MonoBehaviour, Observable {
 
     // Public constants
+    public const float MAX_HEALTH = 500f;
     public const int MAX_INCOME_LEVEL = 8;
     public const int MIN_INCOME_LEVEL = 1;
 
@@ -30,6 +31,7 @@ public class City : MonoBehaviour, Observable {
     private Team team;
     private string cityName;
     private string customName;
+    private float health;
     private int incomeLevel;
 
     // Use this for initialization
@@ -39,6 +41,8 @@ public class City : MonoBehaviour, Observable {
         m_Observers = new List<Observer>();
         m_Observers.Add(new UIObserver());
 
+        // Default values
+        health = MAX_HEALTH;
         incomeLevel = DEFAULT_INCOME_LEVEL;
         cityName = team.name;
     }
@@ -68,6 +72,30 @@ public class City : MonoBehaviour, Observable {
         foreach (Observer o in m_Observers){
             o.OnNotify(this, invocation, data);
         }
+    }
+
+    /// <summary>
+    /// What to do when the unit collides with another unit that's not on the 
+    /// same team.
+    /// </summary>
+    /// <param name="collision"></param>
+    private void OnCollisionEnter(Collision collision)
+    {
+        Unit unit = collision.gameObject.GetComponent<Unit>();
+        if (unit != null && !(unit.Team.Equals(team)))
+        {
+            TakeDamage(UnityEngine.Random.Range(10f, 20f));
+        }
+        City city = collision.gameObject.GetComponent<City>();
+        if (city != null && !(city.Team.Equals(team)))
+        {
+            TakeDamage(UnityEngine.Random.Range(10f, 20f));
+        }
+    }
+
+    private void TakeDamage(float damage)
+    {
+        health -= damage;
     }
 
     /// <summary>
@@ -126,6 +154,8 @@ public class City : MonoBehaviour, Observable {
             return customName;
         }
     }
+
+    public float Health { get { return health; } }
 
     /// <summary>
     /// Returns this city's team.

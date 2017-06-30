@@ -6,7 +6,7 @@ using UnityEngine;
  * @author Paul Galatic
  * 
  * Class designed to represent all the state that should be passed to a 
- * Unit_AI in order for it to evaluate its current situation and make a 
+ * UnitAI in order for it to evaluate its current situation and make a 
  * decision. This struct should NOT contain anything particular to a specific
  * type of unit, as different AIs will be implemented for different Unit types.
  * 
