@@ -36,6 +36,7 @@ public class UI_Manager : MonoBehaviour {
     // CITY MENU
     public Canvas m_CityMenu;
     public InputField m_CityMenuNameInput;
+    public Slider m_CityMenuHealth;
     public Slider m_CityMenuIncome;
     public Button m_CityMenuSpawnButton;
     // MISC UI
@@ -83,6 +84,7 @@ public class UI_Manager : MonoBehaviour {
         UpdateGoldAmountText();
         UpdateUnitAmountText();
         UpdateUnitMenu();
+        UpdateCityMenu();
 
         oldMousePos = Input.mousePosition;
 	}
@@ -164,7 +166,9 @@ public class UI_Manager : MonoBehaviour {
         // Handle spawn button
         m_CityMenuSpawnButton.enabled = enabled;
 
-        // Handle income slider
+        // Handle sliders
+        m_CityMenuHealth.maxValue = City.MAX_HEALTH;
+        m_CityMenuHealth.value = city.Health;
         m_CityMenuIncome.maxValue = City.MAX_INCOME_LEVEL;
         m_CityMenuIncome.value = city.IncomeLevel;
 
@@ -181,24 +185,21 @@ public class UI_Manager : MonoBehaviour {
     {
         if (!m_UnitMenu.enabled) { return; }
 
-        float health = unitCurrentlyDisplayed.Health;
-
         // Handle health slider
-        m_UnitMenuHealth.value = health;
+        m_UnitMenuHealth.value = unitCurrentlyDisplayed.Health;
     }
 
     /// <summary>
     /// Updates the city menu based on the dynamic status of the city, if a
     /// city is being displayed.
     /// </summary>
-    private void UpdateCityInfo()
+    private void UpdateCityMenu()
     {
         if (!m_CityMenu.enabled) { return; }
 
-        int incomeLevel = cityCurrentlyDisplayed.IncomeLevel;
-
-        // Handle income slider
-        m_CityMenuIncome.value = incomeLevel;
+        // Handle sliders
+        m_CityMenuHealth.value = cityCurrentlyDisplayed.Health;
+        m_CityMenuIncome.value = cityCurrentlyDisplayed.IncomeLevel;
     }
 
     /// <summary>
@@ -206,7 +207,7 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     public void UpdateUnitName()
     {
-        unitCurrentlyDisplayed.setCustomName(m_UnitMenuNameInput.text);
+        unitCurrentlyDisplayed.SetCustomName(m_UnitMenuNameInput.text);
     }
 
     /// <summary>

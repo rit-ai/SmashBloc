@@ -45,10 +45,12 @@ public abstract class Unit : MonoBehaviour, Observable {
     // protected fields related to physics
     protected Rigidbody body;
     protected Collider collision;
+    protected Vector3 newPos;
 
     // protected fields related to behavior
     protected Team team;
     protected Vector3 destination;
+    protected bool alive;
 
     // Private constants
     private const float PASS_INFO_RATE = 1f;
@@ -60,18 +62,16 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// <summary>
     /// Sets up Observers and other state common between Units.
     /// </summary>
-    public virtual void Start()
+    protected virtual void Start()
     {
         observers = new List<Observer>();
         observers.Add(new UIObserver());
 
         info = new UnitInfo();
+        alive = true;
 
         // Pass info to the AI component every second
         StartCoroutine(PassInfo());
-
-        // Sets default destination to be the location the unit spawns
-        SetDestination(transform.position);
     }
 
     /// <summary>
@@ -84,6 +84,7 @@ public abstract class Unit : MonoBehaviour, Observable {
         m_Surface = GetComponent<MeshRenderer>();
 
         this.team = team;
+        tag = team.name;
         m_Surface.material.color = team.color;
     }
 
@@ -193,7 +194,11 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// <summary>
     /// Kill this instance.
     /// </summary>
-    public abstract void Kill();
+    public void Kill()
+    {
+        alive = false;
+        StartCoroutine(DeathAnimation());
+    }
 
     // Properties
     /// <summary>
@@ -222,7 +227,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// Sets the default unit name.
     /// </summary>
     /// <param name="newName"></param>
-    public void setUnitName(string newName)
+    public void SetName(string newName)
     {
         unitName = newName;
     }
@@ -230,7 +235,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// <summary>
     /// Sets a permanent custom name for this unit.
     /// </summary>
-    public void setCustomName(string newName)
+    public void SetCustomName(string newName)
     {
         customName = newName;
     }
@@ -240,10 +245,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     public Vector3 Destination
     {
-        get
-        {
-            return destination;
-        }
+        get; set;
     }
 
     /// <summary>
@@ -303,16 +305,24 @@ public abstract class Unit : MonoBehaviour, Observable {
     }
 
     /// <summary>
-    /// Sets a new destination, which the unit will attempt to navigate toward.
-    /// </summary>
-    /// <param name="newDest"></param>
-    public abstract void SetDestination(Vector3 newDest);
-
-    /// <summary>
     /// Returns the "identity" of the unit, a unique identifier for the purpose
     /// of disambiguation.
     /// </summary>
     public abstract string Identity();
+
+    /// <summary>
+    /// All units must have code for what they do when another object collides 
+    /// with them, but this behavior may vary from unit to unit, or be 
+    /// otherwise type-specific.
+    /// </summary>
+    protected abstract void OnCollisionEnter(Collision collision);
+
+    /// <summary>
+    /// "Animates" the death of the unit, which can be handled as the 
+    /// implementer sees fit. Infantry units, for example, ascend for a while
+    /// before fading out of existence.
+    /// </summary>
+    protected abstract IEnumerator DeathAnimation();
 
 }
 

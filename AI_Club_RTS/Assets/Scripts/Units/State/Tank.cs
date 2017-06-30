@@ -20,9 +20,9 @@ public class Tank : Unit {
     private const int RANGE = 100;
     private const int COST = 500;
 
-	// Methods
-	// Use this for initialization
-	public override void Start () {
+    // Methods
+    // Use this for initialization
+    protected override void Start () {
         base.Start();
         // Handle constants
         armorType = ARMOR_TYPE;
@@ -38,15 +38,6 @@ public class Tank : Unit {
     }
 
     /// <summary>
-    /// Sets a new destination, which the unit will attempt to navigate toward.
-    /// </summary>
-    /// <param name="newDest"></param>
-    public override void SetDestination(Vector3 newDest)
-    {
-
-    }
-
-    /// <summary>
     /// Returns identity of the unit, for disambiguation purposes.
     /// </summary>
     public override string Identity()
@@ -54,10 +45,13 @@ public class Tank : Unit {
         return IDENTITY;
     }
 
-	/// <summary>
-	/// Kill this instance.
-	/// </summary>
-	public override void Kill()
-	{
-	}
+    protected override void OnCollisionEnter(Collision collision)
+    {
+
+    }
+
+    protected override IEnumerator DeathAnimation()
+    {
+        yield return null;
+    }
 }

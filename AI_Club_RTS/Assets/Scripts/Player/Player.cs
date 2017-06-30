@@ -9,6 +9,10 @@ using UnityEngine;
  */
 public class Player : MonoBehaviour {
 
+    // Public constants
+    public static string TEAM_1 = "Dylante";
+    public static string TEAM_2 = "AI_Team";
+
     // Private Constants
     private const float PASS_INFO_RATE = 1f;
     private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
@@ -40,11 +44,11 @@ public class Player : MonoBehaviour {
     /// </summary>
     public virtual void Awake()
     {
-        team = new Team(this, "Dylante", Color.cyan);
+        team = new Team(this, TEAM_1, Color.cyan);
 
         if (hasBrain)
         {
-            team = new Team(this, "AI_Team", Color.red);
+            team = new Team(this, TEAM_2, Color.red);
             brain = gameObject.AddComponent<PlayerAI_Basic>();
             brain.Body = this;
         }
@@ -116,8 +120,10 @@ public class Player : MonoBehaviour {
             Unit newUnit = Utils.UnitToPrefab(toSpawn);
             Transform spawnPoint = toSpawnAt.SpawnPoint;
             newUnit = Instantiate(newUnit, spawnPoint.transform.position, Quaternion.identity);
+            // Sets default destination to be the location the unit spawns
+            newUnit.Destination = transform.position;
             newUnit.Init(team);
-            newUnit.setUnitName(newUnit.UnitName + m_Units.Count.ToString());
+            newUnit.SetName(newUnit.UnitName + m_Units.Count.ToString());
             m_Units.Add(newUnit);
         }
     }
