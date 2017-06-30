@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 /*
@@ -13,7 +14,8 @@ using UnityEngine;
  *  * Decision making (AI) / Behavior Execution
  *  * Physics
  *  * Effects (particles, highlighting)
- * Any other UI elements should be handled by Observers.
+ *  * Lite UI (health bar)
+ * Any other UI elements (e.g. menus) should be handled by Observers.
  * **/
 public abstract class Unit : MonoBehaviour, Observable {
 
@@ -43,30 +45,33 @@ public abstract class Unit : MonoBehaviour, Observable {
     // protected fields related to physics
     protected Rigidbody body;
     protected Collider collision;
+    protected Vector3 newPos;
 
     // protected fields related to behavior
     protected Team team;
     protected Vector3 destination;
+    protected bool alive;
 
     // Private constants
     private const float PASS_INFO_RATE = 1f;
 
     // Private fields
     private MeshRenderer m_Surface;
+    private UnitInfo info;
 
     /// <summary>
     /// Sets up Observers and other state common between Units.
     /// </summary>
-    public virtual void Start()
+    protected virtual void Start()
     {
         observers = new List<Observer>();
         observers.Add(new UIObserver());
 
+        info = new UnitInfo();
+        alive = true;
+
         // Pass info to the AI component every second
         StartCoroutine(PassInfo());
-
-        // Sets default destination to be the location the unit spawns
-        SetDestination(transform.position);
     }
 
     /// <summary>
@@ -79,6 +84,7 @@ public abstract class Unit : MonoBehaviour, Observable {
         m_Surface = GetComponent<MeshRenderer>();
 
         this.team = team;
+        tag = team.name;
         m_Surface.material.color = team.color;
     }
 
@@ -100,7 +106,6 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     protected IEnumerator PassInfo()
     {
-        UnitInfo info = new UnitInfo();
         // Add all units within line of sight to the unitsInSightRange list.
         Unit current;
         List<Unit> enemiesInSight = new List<Unit>();
@@ -170,18 +175,30 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// Attack the specified target.
     /// </summary>
     /// <param name="target">Target to attack.</param>
-    public abstract void Attack(Unit target);
+    public virtual void Attack(Unit target)
+    {
+
+    }
 
     /// <summary>
-    /// Take specified damage.
+    /// Take specified damage, and Kill() if applicable.
     /// </summary>
-    /// <param name="dmg">Damage to Take.</param>
-    public abstract void TakeDmg(int dmg);
+    /// <param name="damage">Damage to Take.</param>
+    public virtual void TakeDamage(float damage)
+    {
+        health -= damage;
+        m_Surface.material.color = Color.Lerp(Team.color, Color.black, health / MaxHealth);
+        if (health <= 0f) { health = 0f; Kill(); }
+    }
 
     /// <summary>
     /// Kill this instance.
     /// </summary>
-    public abstract void Kill();
+    public void Kill()
+    {
+        alive = false;
+        StartCoroutine(DeathAnimation());
+    }
 
     // Properties
     /// <summary>
@@ -210,7 +227,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// Sets the default unit name.
     /// </summary>
     /// <param name="newName"></param>
-    public void setUnitName(string newName)
+    public void SetName(string newName)
     {
         unitName = newName;
     }
@@ -218,7 +235,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// <summary>
     /// Sets a permanent custom name for this unit.
     /// </summary>
-    public void setCustomName(string newName)
+    public void SetCustomName(string newName)
     {
         customName = newName;
     }
@@ -228,10 +245,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     public Vector3 Destination
     {
-        get
-        {
-            return destination;
-        }
+        get; set;
     }
 
     /// <summary>
@@ -291,16 +305,24 @@ public abstract class Unit : MonoBehaviour, Observable {
     }
 
     /// <summary>
-    /// Sets a new destination, which the unit will attempt to navigate toward.
-    /// </summary>
-    /// <param name="newDest"></param>
-    public abstract void SetDestination(Vector3 newDest);
-
-    /// <summary>
     /// Returns the "identity" of the unit, a unique identifier for the purpose
     /// of disambiguation.
     /// </summary>
     public abstract string Identity();
+
+    /// <summary>
+    /// All units must have code for what they do when another object collides 
+    /// with them, but this behavior may vary from unit to unit, or be 
+    /// otherwise type-specific.
+    /// </summary>
+    protected abstract void OnCollisionEnter(Collision collision);
+
+    /// <summary>
+    /// "Animates" the death of the unit, which can be handled as the 
+    /// implementer sees fit. Infantry units, for example, ascend for a while
+    /// before fading out of existence.
+    /// </summary>
+    protected abstract IEnumerator DeathAnimation();
 
 }
 

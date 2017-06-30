@@ -36,6 +36,7 @@ public class UI_Manager : MonoBehaviour {
     // CITY MENU
     public Canvas m_CityMenu;
     public InputField m_CityMenuNameInput;
+    public Slider m_CityMenuHealth;
     public Slider m_CityMenuIncome;
     public Button m_CityMenuSpawnButton;
     // MISC UI
@@ -46,7 +47,6 @@ public class UI_Manager : MonoBehaviour {
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
     private Vector3 menuSpawnPos;
-    private IEnumerator animateStart;
 
     // Initialize only once
     private void Awake()
@@ -71,8 +71,8 @@ public class UI_Manager : MonoBehaviour {
         menuSpawnPos = m_UnitMenu.transform.position;
 
         // Initialization
-        animateStart = AnimateStart(WAIT_TIME);
-        StartCoroutine(animateStart);
+
+        StartCoroutine(AnimateStart(WAIT_TIME));
         SetUnitToSpawn();
 	}
 
@@ -84,6 +84,7 @@ public class UI_Manager : MonoBehaviour {
         UpdateGoldAmountText();
         UpdateUnitAmountText();
         UpdateUnitMenu();
+        UpdateCityMenu();
 
         oldMousePos = Input.mousePosition;
 	}
@@ -165,7 +166,9 @@ public class UI_Manager : MonoBehaviour {
         // Handle spawn button
         m_CityMenuSpawnButton.enabled = enabled;
 
-        // Handle income slider
+        // Handle sliders
+        m_CityMenuHealth.maxValue = City.MAX_HEALTH;
+        m_CityMenuHealth.value = city.Health;
         m_CityMenuIncome.maxValue = City.MAX_INCOME_LEVEL;
         m_CityMenuIncome.value = city.IncomeLevel;
 
@@ -182,24 +185,21 @@ public class UI_Manager : MonoBehaviour {
     {
         if (!m_UnitMenu.enabled) { return; }
 
-        float health = unitCurrentlyDisplayed.Health;
-
         // Handle health slider
-        m_UnitMenuHealth.value = health;
+        m_UnitMenuHealth.value = unitCurrentlyDisplayed.Health;
     }
 
     /// <summary>
     /// Updates the city menu based on the dynamic status of the city, if a
     /// city is being displayed.
     /// </summary>
-    private void UpdateCityInfo()
+    private void UpdateCityMenu()
     {
         if (!m_CityMenu.enabled) { return; }
 
-        int incomeLevel = cityCurrentlyDisplayed.IncomeLevel;
-
-        // Handle income slider
-        m_CityMenuIncome.value = incomeLevel;
+        // Handle sliders
+        m_CityMenuHealth.value = cityCurrentlyDisplayed.Health;
+        m_CityMenuIncome.value = cityCurrentlyDisplayed.IncomeLevel;
     }
 
     /// <summary>
@@ -207,7 +207,7 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     public void UpdateUnitName()
     {
-        unitCurrentlyDisplayed.setCustomName(m_UnitMenuNameInput.text);
+        unitCurrentlyDisplayed.SetCustomName(m_UnitMenuNameInput.text);
     }
 
     /// <summary>
@@ -278,7 +278,7 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     private void UpdateUnitAmountText()
     {
-        int units = m_Player.NumUnits;
+        int units = m_Player.Units.Count;
         string unitText = units.ToString();
         m_CurrentUnitAmount.text = unitText;
     }
@@ -290,10 +290,10 @@ public class UI_Manager : MonoBehaviour {
     /// animation, in seconds.</param>
     private IEnumerator AnimateStart(float waitTime)
     {
-        const int FRAMES_TO_LINGER = 90;
+        const int FRAMES_TO_LINGER = 60;
         const float MOVE_DISTANCE_LARGE = 15f;
         const float MOVE_DISTANCE_SMALL = 2f;
-        const float MIN_DISTANCE_SQR = 36f;
+        const float MIN_DISTANCE_SQR = 30000f;
         Color textColor = new Color(1f, 1f, 1f, 0f); // white, but invisible
         Vector3 textPosition = m_StartMessage.transform.position;
         textPosition.x = 0;
@@ -309,10 +309,11 @@ public class UI_Manager : MonoBehaviour {
         // right and raise the alpha
         while ((m_StartMessage.transform.position - screenCenter).sqrMagnitude > MIN_DISTANCE_SQR)
         {
-            textColor.a += 0.04f;
+            textColor.a += 0.10f;
             textPosition.x += MOVE_DISTANCE_LARGE;
+            m_StartMessage.color = textColor;
             m_StartMessage.transform.position = textPosition;
-            yield return new WaitForEndOfFrame();
+            yield return 0f;
         }
 
         // Let it linger for FRAMES_TO_LINGER frames
@@ -320,19 +321,18 @@ public class UI_Manager : MonoBehaviour {
         {
             textPosition.x += MOVE_DISTANCE_SMALL;
             m_StartMessage.transform.position = textPosition;
-            yield return new WaitForEndOfFrame();
+            yield return 0f;
         }
 
         // Until text is offscreen, move to the right and fade out
         while (m_StartMessage.transform.position.x < Screen.width * 1.5)
         {
-            textColor.a -= 0.03f;
+            textColor.a -= 0.05f;
             textPosition.x += MOVE_DISTANCE_LARGE;
+            m_StartMessage.color = textColor;
             m_StartMessage.transform.position = textPosition;
-            yield return new WaitForEndOfFrame();
+            yield return 0f;
         }
-
-        m_StartMessage.enabled = false;
 
         yield return null;
     }

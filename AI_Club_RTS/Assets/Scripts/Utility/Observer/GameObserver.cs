@@ -74,7 +74,7 @@ public class GameObserver : Observer {
             foreach (Unit u in selectedUnits)
             {
                 if (u.Team == playerTeam)
-                    u.SetDestination(hit.point);
+                    u.Destination = hit.point;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ public class Infantry : Unit {
     private InfantryPhysics physics;
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
+    private const float ASCENSION_HEIGHT = 1000f;
     // Default values
     private const int MAXHEALTH = 100;
     private const int DAMAGE = 10;
@@ -25,7 +27,7 @@ public class Infantry : Unit {
 
     // Methods
     // Use this for initialization
-    public override void Start () {
+    protected override void Start () {
         // Handle components
         physics = new InfantryPhysics(this);
         ai = gameObject.AddComponent<UnitAI_Template>();
@@ -35,10 +37,11 @@ public class Infantry : Unit {
         dmgType = DMG_TYPE;
         // team = "NULL";
         maxHealth = MAXHEALTH;
+        health = MAXHEALTH;
         damage = DAMAGE;
         attackRange = RANGE;
         // Handle fields
-        health = Random.Range(10f, 90f); //FIXME
+        TakeDamage(UnityEngine.Random.Range(10f, 50f));
         base.Start();
     }
 
@@ -52,16 +55,6 @@ public class Infantry : Unit {
     }
 
     /// <summary>
-    /// Sets a new destination, which the unit will attempt to navigate toward.
-    /// </summary>
-    /// <param name="newDest"></param>
-    public override void SetDestination(Vector3 newDest)
-    {
-        destination = newDest;
-
-    }
-
-    /// <summary>
     /// Returns identity of the unit, for disambiguation purposes.
     /// </summary>
     public override string Identity()
@@ -70,26 +63,42 @@ public class Infantry : Unit {
     }
 
     /// <summary>
-    /// Attack the specified target.
+    /// What to do when the unit collides with another unit that's not on the 
+    /// same team.
     /// </summary>
-    /// <param name="target">Target to attack.</param>
-    public override void Attack(Unit target)
-	{
-	}
+    /// <param name="collision"></param>
+    protected override void OnCollisionEnter(Collision collision)
+    {
+        Unit unit = collision.gameObject.GetComponent<Unit>();
+        if (unit != null && !(unit.Team.Equals(team)))
+        {
+            TakeDamage(UnityEngine.Random.Range(10f, 20f));
+        }
+        City city = collision.gameObject.GetComponent<City>();
+        if (city != null && !(city.Team.Equals(team)))
+        {
+            TakeDamage(UnityEngine.Random.Range(10f, 20f));
+        }
+    }
 
-	/// <summary>
-	/// Take specified damage.
-	/// </summary>
-	/// <param name="dmg">Damage to Take.</param>
-	/// <param name="amount">Amount.</param>
-	public override void TakeDmg(int amount)
-	{
-	}
+    /// <summary>
+    /// In this animation, the Infantry unit sails into the air before being
+    /// destroyed. Particle effects are TODO.
+    /// </summary>
+    protected override IEnumerator DeathAnimation()
+    {
+        float y = transform.position.y;
+        float dest = transform.position.y + ASCENSION_HEIGHT;
+        for (float x = y; x < dest; x++)
+        {
+            newPos = transform.position;
+            newPos.y += 10;
+            transform.position = newPos;
+            yield return new WaitForFixedUpdate();
+        }
 
-	/// <summary>
-	/// Kill this instance.
-	/// </summary>
-	public override void Kill()
-	{
-	}
+        Destroy(gameObject);
+
+        yield return null;
+    }
 }
