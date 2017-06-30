@@ -54,23 +54,6 @@ public class Tank : Unit {
         return IDENTITY;
     }
 
-    /// <summary>
-    /// Attack the specified target.
-    /// </summary>
-    /// <param name="target">Target to attack.</param>
-    public override void Attack(Unit target)
-	{
-	}
-
-	/// <summary>
-	/// Take specified damage.
-	/// </summary>
-	/// <param name="dmg">Damage to Take.</param>
-	/// <param name="amount">Amount.</param>
-	public override void TakeDmg(int amount)
-	{
-	}
-
 	/// <summary>
 	/// Kill this instance.
 	/// </summary>

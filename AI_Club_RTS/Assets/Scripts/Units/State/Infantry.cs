@@ -35,10 +35,11 @@ public class Infantry : Unit {
         dmgType = DMG_TYPE;
         // team = "NULL";
         maxHealth = MAXHEALTH;
+        health = MAXHEALTH;
         damage = DAMAGE;
         attackRange = RANGE;
         // Handle fields
-        health = Random.Range(10f, 90f); //FIXME
+        TakeDamage(Random.Range(10f, 50f));
         base.Start();
     }
 
@@ -68,23 +69,6 @@ public class Infantry : Unit {
     {
         return IDENTITY;
     }
-
-    /// <summary>
-    /// Attack the specified target.
-    /// </summary>
-    /// <param name="target">Target to attack.</param>
-    public override void Attack(Unit target)
-	{
-	}
-
-	/// <summary>
-	/// Take specified damage.
-	/// </summary>
-	/// <param name="dmg">Damage to Take.</param>
-	/// <param name="amount">Amount.</param>
-	public override void TakeDmg(int amount)
-	{
-	}
 
 	/// <summary>
 	/// Kill this instance.

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 /*
@@ -13,7 +14,8 @@ using UnityEngine;
  *  * Decision making (AI) / Behavior Execution
  *  * Physics
  *  * Effects (particles, highlighting)
- * Any other UI elements should be handled by Observers.
+ *  * Lite UI (health bar)
+ * Any other UI elements (e.g. menus) should be handled by Observers.
  * **/
 public abstract class Unit : MonoBehaviour, Observable {
 
@@ -172,13 +174,21 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// Attack the specified target.
     /// </summary>
     /// <param name="target">Target to attack.</param>
-    public abstract void Attack(Unit target);
+    public virtual void Attack(Unit target)
+    {
+
+    }
 
     /// <summary>
-    /// Take specified damage.
+    /// Take specified damage, and Kill() if applicable.
     /// </summary>
-    /// <param name="dmg">Damage to Take.</param>
-    public abstract void TakeDmg(int dmg);
+    /// <param name="damage">Damage to Take.</param>
+    public virtual void TakeDamage(float damage)
+    {
+        health -= damage;
+        m_Surface.material.color = Color.Lerp(Team.color, Color.black, health / MaxHealth);
+        if (health <= 0f) { health = 0f; Kill(); }
+    }
 
     /// <summary>
     /// Kill this instance.
