@@ -14,12 +14,15 @@ using Microsoft;
  * than having Terrain communicate directly to each selected unit that its
  * destination has changed.
  * **/
-public class GameObserver : Observer {
+public class GameObserver : IObserver {
 
     // Public constant invocations
     public const string UNITS_SELECTED = "UNITS_SELECTED";
     public const string UNITS_DESELECTED = "UNITS_DESELECTED";
     public const string DESTINATION_SET = "DESTINATION_SET";
+    public const string CITY_CAPTURED = "CITY_CAPTURED";
+
+    
 
     // Private fields
     // static because there are multiple GameObservers
@@ -29,27 +32,33 @@ public class GameObserver : Observer {
     /// Determines the type of action to perform, based on the invocation.
     /// </summary>
     /// <param name="entity">The entity performing the invocation.</param>
-    /// <param name="invocation">The type of invocation.</param>
+    /// <param name="invoke">The type of invocation.</param>
     /// <param name="data">Misc data.</param>
-    public void OnNotify<T>(object entity, string invocation, params T[] data)
+    public void OnNotify(object entity, Invocation invoke, params object[] data)
     {
-        switch (invocation)
+        switch (invoke)
         {
             // Store units that are selected
-            case UNITS_SELECTED:
+            case Invocation.UNITS_SELECTED:
                 Debug.Assert(data != null);
                 Debug.Assert(data[0] is HashSet<Unit>);
                 selectedUnits = data[0] as HashSet<Unit>;
                 Debug.Assert(selectedUnits != null);
                 break;
             // Clear stored units
-            case UNITS_DESELECTED:
+            case Invocation.UNITS_DESELECTED:
                 selectedUnits.Clear();
                 break;
             // Set new destination based on mouse position over terrain
-            case DESTINATION_SET:
+            case Invocation.DESTINATION_SET:
                 Debug.Assert(entity is RTS_Terrain);
                 SetNewDestination((RTS_Terrain)entity);
+                break;
+            case Invocation.CITY_CAPTURED:
+                Debug.Assert(entity is City);
+                Debug.Assert(data != null);
+                Debug.Assert(data[0] is Team);
+                TransferCity(entity as City, data[0] as Team);
                 break;
             // Invocation not found? Must be for someone else. Ignore.
         }
@@ -77,8 +86,21 @@ public class GameObserver : Observer {
                     u.Destination = hit.point;
             }
         }
+    }
 
+    /// <summary>
+    /// Transfers a city from the control of one Team to another.
+    /// </summary>
+    /// <param name="city">The city to be transferred.</param>
+    /// <param name="newTeam">The team the city will be transferred to.</param>
+    private void TransferCity(City city, Team newTeam)
+    {
+        Debug.Log("Captured");
+        city.Team.cities.Remove(city);
+        newTeam.cities.Add(city);
 
+        // Don't chance the city's team until the end
+        city.Team = newTeam;
     }
 
 }

@@ -57,13 +57,12 @@ public class Player : MonoBehaviour {
     // Use this for initialization
     public virtual void Start () {
         // Handle private fields
-        m_Cities = new List<City>();
-        m_Units = new List<Unit>();
+        m_Cities = team.cities;
+        m_Units = team.units;
         goldAmount = 0;
 
         // Debug FIXME
         ownedCity.Init(team);
-        m_Cities.Add(ownedCity);
 
         // Handle IEnumerators
         StartCoroutine(IncrementGold());

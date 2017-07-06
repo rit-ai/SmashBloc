@@ -8,11 +8,14 @@ using UnityEngine;
  * A struct that contains all relevant information denoting to which team a
  * unit or city belongs.
  * **/
-public struct Team {
+public class Team {
 
     public readonly Player owner;
     public readonly string name;
     public readonly Color color;
+
+    public List<Unit> units;
+    public List<City> cities;
 
     /// <summary>
     /// Constructs a new Team.
@@ -25,6 +28,17 @@ public struct Team {
         this.owner = owner;
         this.name = name;
         this.color = color;
+        units = new List<Unit>();
+        cities = new List<City>();
+    }
+
+    public Team(Player owner, string name, Color color, List<Unit> units, List<City> cities)
+    {
+        this.owner = owner;
+        this.name = name;
+        this.color = color;
+        this.units = units;
+        this.cities = cities;
     }
 
     public static bool operator ==(Team t1, Team t2)

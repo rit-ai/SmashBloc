@@ -10,25 +10,27 @@ using UnityEngine;
  * Naturally, any behavior outside the domain of terrain will be forwarded by
  * Observers and processed externally.
  * **/
-public class RTS_Terrain : MonoBehaviour, Observable
+public class RTS_Terrain : MonoBehaviour, IObservable
 {
 
     // Public fields
     public LayerMask ignoreAllButTerrain;
 
     // Private fields
-    private List<Observer> m_Observers;
+    private List<IObserver> m_Observers;
 
     public void Start()
     {
-        m_Observers = new List<Observer>();
-        m_Observers.Add(new UIObserver());
-        m_Observers.Add(new GameObserver());
+        m_Observers = new List<IObserver>
+        {
+            new UIObserver(),
+            new GameObserver()
+        };
     }
 
-    public void NotifyAll<T>(string invocation, params T[] data)
+    public void NotifyAll(Invocation invocation, params object[] data)
     {
-        foreach (Observer o in m_Observers)
+        foreach (IObserver o in m_Observers)
         {
             o.OnNotify(this, invocation, data);
         }
@@ -40,7 +42,7 @@ public class RTS_Terrain : MonoBehaviour, Observable
     public void OnMouseDown()
     {
         if (Utils.MouseIsOverUI()) { return; }
-        NotifyAll<VoidObject>(UIObserver.CLOSE_ALL);
+        NotifyAll(Invocation.CLOSE_ALL);
     }
 
     /// <summary>
@@ -49,7 +51,7 @@ public class RTS_Terrain : MonoBehaviour, Observable
     /// </summary>
     public void OnRightMouseDown()
     {
-        NotifyAll<VoidObject>(UIObserver.INVOKE_TARGET_RING);
-        NotifyAll<VoidObject>(GameObserver.DESTINATION_SET);
+        NotifyAll(Invocation.TARGET_RING);
+        NotifyAll(Invocation.DESTINATION_SET);
     }
 }

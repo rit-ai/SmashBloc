@@ -62,24 +62,6 @@ public class Infantry : Unit {
         return IDENTITY;
     }
 
-    /// <summary>
-    /// What to do when the unit collides with another unit that's not on the 
-    /// same team.
-    /// </summary>
-    /// <param name="collision"></param>
-    protected override void OnCollisionEnter(Collision collision)
-    {
-        Unit unit = collision.gameObject.GetComponent<Unit>();
-        if (unit != null && !(unit.Team.Equals(team)))
-        {
-            TakeDamage(UnityEngine.Random.Range(10f, 20f));
-        }
-        City city = collision.gameObject.GetComponent<City>();
-        if (city != null && !(city.Team.Equals(team)))
-        {
-            TakeDamage(UnityEngine.Random.Range(10f, 20f));
-        }
-    }
 
     /// <summary>
     /// In this animation, the Infantry unit sails into the air before being
@@ -94,7 +76,7 @@ public class Infantry : Unit {
             newPos = transform.position;
             newPos.y += 10;
             transform.position = newPos;
-            yield return new WaitForFixedUpdate();
+            yield return 0f;
         }
 
         Destroy(gameObject);

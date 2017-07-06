@@ -14,7 +14,7 @@ using UnityEngine;
  * The two-state behavior is necessary due to the fact that the controller must
  * be able to identify when the user is clicking, clicking and dragging, etc.
  * **/
-public class CameraController : MonoBehaviour, Observable {
+public class CameraController : MonoBehaviour, IObservable {
 
     // Public constants
     public static KeyCode DESELECT_KEY;
@@ -35,7 +35,7 @@ public class CameraController : MonoBehaviour, Observable {
     private static float SPEED = 3f;
 
     // Private fields
-    private List<Observer> m_Observers;
+    private List<IObserver> m_Observers;
     private HashSet<Unit> m_SelectedUnits;
     private State m_CurrentState;
     private Vector3 m_MousePos;
@@ -47,9 +47,11 @@ public class CameraController : MonoBehaviour, Observable {
         DESELECT_KEY = KeyCode.LeftShift; // TODO make custom binds
 
         // Handle private fields
-        m_Observers = new List<Observer>();
-        m_Observers.Add(new UIObserver());
-        m_Observers.Add(new GameObserver());
+        m_Observers = new List<IObserver>
+        {
+            new UIObserver(),
+            new GameObserver()
+        };
         m_SelectedUnits = new HashSet<Unit>();
 
         // Rectangle that contains everything EXCEPT the screen border
@@ -74,11 +76,11 @@ public class CameraController : MonoBehaviour, Observable {
         EdgePan();
     }
 
-    public void NotifyAll<T>(string invocation, params T[] data)
+    public void NotifyAll(Invocation invoke, params object[] data)
     {
-        foreach (Observer o in m_Observers)
+        foreach (IObserver o in m_Observers)
         {
-            o.OnNotify(this, invocation, data);
+            o.OnNotify(this, invoke, data);
         }
     }
 
@@ -127,8 +129,8 @@ public class CameraController : MonoBehaviour, Observable {
     private void DeselectAll()
     {
         // If there's a menu up displaying unit info, close it
-        NotifyAll<VoidObject>(UIObserver.CLOSE_ALL);
-        NotifyAll<VoidObject>(GameObserver.UNITS_DESELECTED);
+        NotifyAll(Invocation.CLOSE_ALL);
+        NotifyAll(Invocation.UNITS_DESELECTED);
     }
 
     /// <summary>
@@ -207,7 +209,7 @@ public class CameraController : MonoBehaviour, Observable {
             // When mouse button is up, switch back to drawing state.
             if (Input.GetMouseButtonUp(0))
             {
-                m_CameraController.NotifyAll(GameObserver.UNITS_SELECTED, m_CameraController.m_SelectedUnits);
+                m_CameraController.NotifyAll(Invocation.UNITS_SELECTED, m_CameraController.m_SelectedUnits);
                 m_CameraController.m_CurrentState = new SelectedState(m_CameraController);
                 return;
             }
