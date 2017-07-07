@@ -10,8 +10,7 @@ using UnityEngine;
  * **/
 public class Team {
 
-    public readonly Player owner;
-    public readonly string name;
+    public readonly string title;
     public readonly Color color;
 
     public List<Unit> units;
@@ -23,19 +22,17 @@ public class Team {
     /// <param name="owner">The owner of the team.</param>
     /// <param name="name">The name of the team.</param>
     /// <param name="color">The team's color.</param>
-    public Team (Player owner, string name = "NULL", Color color = default(Color))
+    public Team (string name = "NULL", Color color = default(Color))
     {
-        this.owner = owner;
-        this.name = name;
+        this.title = name;
         this.color = color;
         units = new List<Unit>();
         cities = new List<City>();
     }
 
-    public Team(Player owner, string name, Color color, List<Unit> units, List<City> cities)
+    public Team(string name, Color color, List<Unit> units, List<City> cities)
     {
-        this.owner = owner;
-        this.name = name;
+        this.title = name;
         this.color = color;
         this.units = units;
         this.cities = cities;
@@ -54,7 +51,7 @@ public class Team {
     public override bool Equals(object other) {
         if (!(other is Team)) { return false; }
         Team another = (Team)other;
-        return ((owner == another.owner) && (name == another.name) && (color == another.color));
+        return (title == another.title) && (color == another.color);
     }
 
     public override int GetHashCode()

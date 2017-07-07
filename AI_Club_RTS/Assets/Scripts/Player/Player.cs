@@ -15,28 +15,39 @@ public class Player : MonoBehaviour {
 
     // Private Constants
     private const float PASS_INFO_RATE = 1f;
-    private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
-    private const int MAX_GOLD_AMOUNT = 999; // richness ceiling
     private const int MAX_UNITS = 20;
 
-    // Public fields
-    // Types of units a Player can own
-    public Infantry INFANTRY;
-    public Tank TANK;
-
-    // Debug
-    public bool hasBrain;
-    public City ownedCity;
-
     // Private fields
+    // Types of units a Player can own
+    private Infantry m_Infantry = null;
+    private Tank m_Tank = null;
+    // The AI that controls this Player, if any
     private PlayerAI brain;
+    // Misc state
     private PlayerInfo info;
     private Team team;
-    private List<City> m_Cities;
-    private List<Unit> m_Units;
     private Unit toSpawn;
     private City toSpawnAt;
+    private int toSpawnCost;
     private int goldAmount;
+
+    /// <summary>
+    /// Creates and returns a Player instance.
+    /// </summary>
+    /// <param name="hasBrain">Whether or not this Player has a brain.</param>
+    /// <returns>A Player instance.</returns>
+    public static Player MakePlayer(bool hasBrain, Team team)
+    {
+        GameObject obj = new GameObject("Player Instance");
+        Player player = obj.AddComponent<Player>();
+        if (hasBrain)
+        {
+            player.Brain = obj.AddComponent<PlayerAI_Basic>();
+            player.Brain.Body = player;
+        }
+        player.Team = team;
+        return player;
+    }
 
     /// <summary>
     /// Initializing the Team first because other functionality relies on it.
@@ -44,34 +55,13 @@ public class Player : MonoBehaviour {
     /// </summary>
     public virtual void Awake()
     {
-        team = new Team(this, TEAM_1, Color.cyan);
-
-        if (hasBrain)
-        {
-            team = new Team(this, TEAM_2, Color.red);
-            brain = gameObject.AddComponent<PlayerAI_Basic>();
-            brain.Body = this;
-        }
     }
 
     // Use this for initialization
     public virtual void Start () {
         // Handle private fields
-        m_Cities = team.cities;
-        m_Units = team.units;
+        info = new PlayerInfo();
         goldAmount = 0;
-
-        // Debug FIXME
-        ownedCity.Init(team);
-
-        // Handle IEnumerators
-        StartCoroutine(IncrementGold());
-
-        if (hasBrain)
-        {
-            info = new PlayerInfo();
-            StartCoroutine(PassInfo());
-        }
     }
 
     /// <summary>
@@ -80,15 +70,17 @@ public class Player : MonoBehaviour {
     /// </summary>
     /// <param name="unitIdentity">The name of the unit to spawn, based on 
     /// Unit.NAME.</param>
-    public virtual void SetUnitToSpawn(string unitIdentity)
+    public void SetUnitToSpawn(string unitIdentity)
     {
         switch (unitIdentity)
         {
             case Infantry.IDENTITY:
-                toSpawn = INFANTRY;
+                toSpawn = m_Infantry;
+                toSpawnCost = Infantry.COST;
                 break;
             case Tank.IDENTITY:
-                toSpawn = TANK;
+                toSpawn = m_Tank;
+                toSpawnCost = Tank.COST;
                 break;
             default:
                 throw new KeyNotFoundException("SetUnitToSpawn given invalid string");
@@ -99,7 +91,7 @@ public class Player : MonoBehaviour {
     /// Sets the city at which the next unit will be spawned.
     /// </summary>
     /// <param name="city"></param>
-    public virtual void SetCityToSpawnAt(City city)
+    public void SetCityToSpawnAt(City city)
     {
         toSpawnAt = city;
     }
@@ -107,14 +99,14 @@ public class Player : MonoBehaviour {
     /// <summary>
     /// Spawns a unit based on toSpawn, if the Player has enough gold.
     /// </summary>
-    public virtual void SpawnUnit()
+    public void SpawnUnit()
     {
-        if (m_Units.Count >= MAX_UNITS) { return; }
+        if (team.units.Count >= MAX_UNITS) { return; }
 
-        if (goldAmount > toSpawn.Cost)
+        if (goldAmount > toSpawnCost)
         {
-            Debug.Assert(toSpawn.Cost > 0);
-            goldAmount -= toSpawn.Cost;
+            Debug.Assert(toSpawnCost > 0);
+            goldAmount -= toSpawnCost;
 
             Unit newUnit = Utils.UnitToPrefab(toSpawn);
             Transform spawnPoint = toSpawnAt.SpawnPoint;
@@ -122,8 +114,8 @@ public class Player : MonoBehaviour {
             // Sets default destination to be the location the unit spawns
             newUnit.Destination = transform.position;
             newUnit.Init(team);
-            newUnit.SetName(newUnit.UnitName + m_Units.Count.ToString());
-            m_Units.Add(newUnit);
+            newUnit.SetName(newUnit.UnitName + team.units.Count.ToString());
+            team.units.Add(newUnit);
         }
     }
 
@@ -133,7 +125,7 @@ public class Player : MonoBehaviour {
     /// <param name="unit">The unit to remove.</param>
     public void RemoveUnit(Unit unit)
     {
-        m_Units.Remove(unit);
+        team.units.Remove(unit);
     }
 
     /// <summary>
@@ -146,19 +138,11 @@ public class Player : MonoBehaviour {
     }
 
     /// <summary>
-    /// Returns all of the cities this Player owns.
+    /// Returns the AI of this player, or null if it has no brain.
     /// </summary>
-    public List<City> Cities
+    public PlayerAI Brain
     {
-        get { return m_Cities; }
-    }
-
-    /// <summary>
-    /// Returns the player's current amount of gold.
-    /// </summary>
-    public List<Unit> Units
-    {
-        get { return m_Units; }
+        get; set;
     }
 
     /// <summary>
@@ -175,7 +159,7 @@ public class Player : MonoBehaviour {
     /// </summary>
     public int Gold
     {
-        get { return goldAmount; }
+        get; set;
     }
 
     /// <summary>
@@ -186,29 +170,10 @@ public class Player : MonoBehaviour {
     {
         info.team = team;
         info.goldAmount = goldAmount;
-        info.cities = m_Cities;
-        info.units = m_Units;
+        info.cities = team.cities;
+        info.units = team.units;
         brain.UpdateInfo(info);
         yield return new WaitForSeconds(PASS_INFO_RATE);
-    }
-
-    /// <summary>
-    /// Updates the current gold amount, reflecting passive gold gain.
-    /// </summary>
-    private IEnumerator IncrementGold()
-    {
-        while (true)
-        {
-            foreach (City c in m_Cities)
-            {
-                goldAmount += c.IncomeLevel;
-            }
-            if (goldAmount > MAX_GOLD_AMOUNT)
-            {
-                goldAmount = MAX_GOLD_AMOUNT;
-            }
-            yield return new WaitForSeconds(GOLD_INCREMENT_RATE);
-        }
     }
 
 }

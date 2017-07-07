@@ -10,6 +10,7 @@ public class Infantry : Unit {
 
     // Public constants
     public const string IDENTITY = "Infantry";
+    public const int COST = 50;
 
     // Public fields
     public Rigidbody m_Hoverball;
@@ -62,6 +63,13 @@ public class Infantry : Unit {
         return IDENTITY;
     }
 
+    /// <summary>
+    /// The cost of an Infantry unit, in gold.
+    /// </summary>
+    public override int Cost()
+    {
+        return COST;
+    }
 
     /// <summary>
     /// In this animation, the Infantry unit sails into the air before being

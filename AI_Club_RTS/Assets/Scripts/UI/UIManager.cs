@@ -10,7 +10,7 @@ using UnityEngine.UI;
  * main overlay. Should **avoid** logic on what to display or what to pass
  * along if possible.
  */
-public class UI_Manager : MonoBehaviour {
+public class UIManager : MonoBehaviour {
 
     // Private constants
     private const string CAMERA_NAME = "Main Camera";
@@ -21,7 +21,6 @@ public class UI_Manager : MonoBehaviour {
 
     // Public fields
     // GENERAL
-    public Player m_Player;
     public Camera m_Camera;
     // HEADER
     public Dropdown m_UnitSelect;
@@ -43,6 +42,7 @@ public class UI_Manager : MonoBehaviour {
     public GameObject m_TargetRing;
 
     // Private fields
+    private Player playerOne;
     private Unit unitCurrentlyDisplayed;
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
@@ -71,7 +71,7 @@ public class UI_Manager : MonoBehaviour {
         menuSpawnPos = m_UnitMenu.transform.position;
 
         // Initialization
-
+        playerOne = GameManager.PLAYER_ONE;
         StartCoroutine(AnimateStart(WAIT_TIME));
         SetUnitToSpawn();
 	}
@@ -105,7 +105,7 @@ public class UI_Manager : MonoBehaviour {
                 toSpawn = Tank.IDENTITY;
                 break;
         }
-        m_Player.SetUnitToSpawn(toSpawn);
+        playerOne.SetUnitToSpawn(toSpawn);
     }
 
     /// <summary>
@@ -113,8 +113,8 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     public void SpawnUnit()
     {
-        m_Player.SetCityToSpawnAt(cityCurrentlyDisplayed);
-        m_Player.SpawnUnit();
+        playerOne.SetCityToSpawnAt(cityCurrentlyDisplayed);
+        playerOne.SpawnUnit();
     }
 
     /// <summary>
@@ -268,7 +268,7 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     private void UpdateGoldAmountText()
     {
-        int gold = m_Player.Gold;
+        int gold = playerOne.Gold;
         string goldText = gold.ToString();
         m_CurrentGoldAmount.text = goldText;
     }
@@ -278,7 +278,7 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     private void UpdateUnitAmountText()
     {
-        int units = m_Player.Units.Count;
+        int units = playerOne.Team.units.Count;
         string unitText = units.ToString();
         m_CurrentUnitAmount.text = unitText;
     }

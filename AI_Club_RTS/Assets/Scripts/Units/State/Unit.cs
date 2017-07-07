@@ -23,7 +23,6 @@ public abstract class Unit : MonoBehaviour, IObservable {
     public MeshRenderer m_HighlightInner;
     public MeshRenderer m_HighlightOuter;
     public LayerMask ignoreAllButUnits;
-    public int cost;
 
     // protected fields related to unit management
     protected List<IObserver> observers;
@@ -57,7 +56,6 @@ public abstract class Unit : MonoBehaviour, IObservable {
 
     // Private fields
     private MeshRenderer m_Surface;
-    private Rigidbody m_Rigidbody;
     private UnitInfo info;
 
     /// <summary>
@@ -65,9 +63,10 @@ public abstract class Unit : MonoBehaviour, IObservable {
     /// </summary>
     protected virtual void Start()
     {
+
         observers = new List<IObserver>
         {
-            new UIObserver()
+            gameObject.AddComponent<GameObserver>()
         };
 
         info = new UnitInfo();
@@ -84,11 +83,10 @@ public abstract class Unit : MonoBehaviour, IObservable {
     /// </summary>
     public void Init(Team team)
     {
-        m_Rigidbody = GetComponent<Rigidbody>();
         m_Surface = GetComponent<MeshRenderer>();
 
         this.team = team;
-        tag = team.name;
+        tag = team.title;
         m_Surface.material.color = team.color;
     }
 
@@ -301,15 +299,6 @@ public abstract class Unit : MonoBehaviour, IObservable {
     }
 
     /// <summary>
-    /// Gets the Cost of the unit.
-    /// </summary>
-    public int Cost
-    {
-        get { return cost; }
-    }
-
-
-    /// <summary>
     /// All units must have code for what they do when another object collides 
     /// with them, but this behavior may vary from unit to unit, or be 
     /// otherwise type-specific.
@@ -355,6 +344,11 @@ public abstract class Unit : MonoBehaviour, IObservable {
     /// of disambiguation.
     /// </summary>
     public abstract string Identity();
+
+    /// <summary>
+    /// Returns this unit's cost, in gold.
+    /// </summary>
+    public abstract int Cost();
 
 }
 

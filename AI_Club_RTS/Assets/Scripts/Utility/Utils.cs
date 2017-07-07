@@ -113,23 +113,7 @@ public class Utils : MonoBehaviour {
         return new List<City>(FindObjectsOfType<City>());
     }
 
-    /// <summary>
-    /// Finds the Player controlled by the user and returns it.
-    /// </summary>
-    public static Player PlayerOne
-    {
-        get {
-           if (playerOne != null) { return playerOne; }
-           foreach (Player p in FindObjectsOfType<Player>())
-            {
-                if (!(p.hasBrain)) {
-                    playerOne = p;
-                    return p;
-                }
-            }
-            return null;
-        }
-    }
+
 
     /// <summary>
     /// Returns the prefab associated with a particular type of Unit.

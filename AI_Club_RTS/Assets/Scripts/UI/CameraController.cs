@@ -49,8 +49,8 @@ public class CameraController : MonoBehaviour, IObservable {
         // Handle private fields
         m_Observers = new List<IObserver>
         {
-            new UIObserver(),
-            new GameObserver()
+            gameObject.AddComponent<UIObserver>(),
+            gameObject.AddComponent<GameObserver>()
         };
         m_SelectedUnits = new HashSet<Unit>();
 

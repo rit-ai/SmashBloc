@@ -41,8 +41,8 @@ public class City : MonoBehaviour, IObservable {
         // Handle private fields
         m_Observers = new List<IObserver>
         {
-            new UIObserver(),
-            new GameObserver()
+            gameObject.AddComponent<UIObserver>(),
+            gameObject.AddComponent<GameObserver>()
         };
 
         // Default values
@@ -64,7 +64,7 @@ public class City : MonoBehaviour, IObservable {
 
         Team = team;
         m_Surface.material.color = Team.color;
-        cityName = Team.name;
+        cityName = Team.title;
         Team.cities.Add(this);
     }
 
@@ -117,7 +117,7 @@ public class City : MonoBehaviour, IObservable {
         {
             health = CAPTURED_HEALTH;
             m_Surface.material.color = source.color;
-            cityName = source.name;
+            cityName = source.title;
             NotifyAll(Invocation.CITY_CAPTURED, source);
         }
     }
@@ -175,7 +175,10 @@ public class City : MonoBehaviour, IObservable {
     /// <summary>
     /// This city's team.
     /// </summary>
-    public Team Team { get; set;  }
+    public Team Team {
+        get { return team; }
+        set { team = value; }
+    }
 
     /// <summary>
     /// Sets the custom name of the city.

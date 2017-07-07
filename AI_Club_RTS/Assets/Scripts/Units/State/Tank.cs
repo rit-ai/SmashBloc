@@ -8,6 +8,7 @@ public class Tank : Unit {
     // Purpose: Tank unit
 
     public const string IDENTITY = "Tank";
+    public const int COST = 500;
 
     // CONSTANTS -- intimately related to unit design
     private const ArmorType ARMOR_TYPE = ArmorType.H_ARMOR;
@@ -18,7 +19,6 @@ public class Tank : Unit {
     private const int MAXHEALTH = 200;
     private const int DAMAGE = 100;
     private const int RANGE = 100;
-    private const int COST = 500;
 
     // Methods
     // Use this for initialization
@@ -32,7 +32,6 @@ public class Tank : Unit {
         maxHealth = MAXHEALTH;
         damage = DAMAGE;
         attackRange = RANGE;
-        cost = COST;
         // Handle fields
         health = MAXHEALTH;
     }
@@ -43,6 +42,15 @@ public class Tank : Unit {
     public override string Identity()
     {
         return IDENTITY;
+    }
+
+    /// <summary>
+    /// The cost of a Tank, in gold.
+    /// </summary>
+    /// <returns></returns>
+    public override int Cost()
+    {
+        return COST;
     }
 
     protected override void OnCollisionEnter(Collision collision)

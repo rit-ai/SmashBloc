@@ -30,7 +30,7 @@ public class InfantryPhysics : RTS_Component {
 
     // Private fields
     private Infantry m_Parent;
-    private Rigidbody m_Parent_Rigidbody;
+    private Rigidbody m_Rigidbody;
     private Rigidbody m_Hoverball;
     private Rigidbody m_BottomWeight;
 
@@ -40,7 +40,7 @@ public class InfantryPhysics : RTS_Component {
         m_Parent = parent;
 
         // Private fields
-        m_Parent_Rigidbody = parent.GetComponent<Rigidbody>();
+        m_Rigidbody = parent.GetComponent<Rigidbody>();
         m_Hoverball = parent.m_Hoverball;
         m_BottomWeight = parent.m_BottomWeight;
     }
@@ -75,7 +75,7 @@ public class InfantryPhysics : RTS_Component {
             // Get the destination height
             Vector3 destination = Vector3.up * MAX_FLOAT_THRESHOLD * Mathf.Abs(Physics.gravity.y);
             // Adjust UP by the masses of the hoverball and parent rigidbody
-            Vector3 desire = Vector3.up * (destination.y - m_Parent_Rigidbody.velocity.y * MAX_GUIDING_FORCE);
+            Vector3 desire = Vector3.up * (destination.y - m_Rigidbody.velocity.y * MAX_GUIDING_FORCE);
 
             // Cap the amount of force (to prevent strange launches)
             desire = Vector3.ClampMagnitude(desire, MAX_VECTOR_FORCE);
@@ -102,7 +102,7 @@ public class InfantryPhysics : RTS_Component {
         // Lower that speed depending on its distance from the destination
         desire *= Decelerate(desireMagnitude / DECELERATION_THRESHOLD_SQRD);
         // Steering = desired - velocity
-        desire -= m_Parent_Rigidbody.velocity;
+        desire -= m_Rigidbody.velocity;
         // Get rid of the Y factor so that the hover stays the same
         desire.y = 0;
         // Cap the amount of force (to prevent strange launches)
