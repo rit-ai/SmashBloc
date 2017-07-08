@@ -19,17 +19,12 @@ public class PlayerInfo {
 
     public int goldAmount;
 
-    public List<City> cities;
-    public List<Unit> units;
-
     public PlayerInfo() { }
 
-    public PlayerInfo(Team team, int goldAmount, List<City> cities, List<Unit> units)
+    public PlayerInfo(Team team, int goldAmount)
     {
         this.team = team;
         this.goldAmount = goldAmount;
-        this.cities = cities;
-        this.units = units;
     }
 
 }

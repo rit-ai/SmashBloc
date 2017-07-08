@@ -42,7 +42,6 @@ public class UIManager : MonoBehaviour {
     public GameObject m_TargetRing;
 
     // Private fields
-    private Player playerOne;
     private Unit unitCurrentlyDisplayed;
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
@@ -71,7 +70,6 @@ public class UIManager : MonoBehaviour {
         menuSpawnPos = m_UnitMenu.transform.position;
 
         // Initialization
-        playerOne = GameManager.PLAYER_ONE;
         StartCoroutine(AnimateStart(WAIT_TIME));
         SetUnitToSpawn();
 	}
@@ -105,7 +103,7 @@ public class UIManager : MonoBehaviour {
                 toSpawn = Tank.IDENTITY;
                 break;
         }
-        playerOne.SetUnitToSpawn(toSpawn);
+        GameManager.PLAYER.SetUnitToSpawn(toSpawn);
     }
 
     /// <summary>
@@ -113,8 +111,8 @@ public class UIManager : MonoBehaviour {
     /// </summary>
     public void SpawnUnit()
     {
-        playerOne.SetCityToSpawnAt(cityCurrentlyDisplayed);
-        playerOne.SpawnUnit();
+        GameManager.PLAYER.SetCityToSpawnAt(cityCurrentlyDisplayed);
+        GameManager.PLAYER.SpawnUnit();
     }
 
     /// <summary>
@@ -268,7 +266,7 @@ public class UIManager : MonoBehaviour {
     /// </summary>
     private void UpdateGoldAmountText()
     {
-        int gold = playerOne.Gold;
+        int gold = GameManager.PLAYER.Gold;
         string goldText = gold.ToString();
         m_CurrentGoldAmount.text = goldText;
     }
@@ -278,7 +276,7 @@ public class UIManager : MonoBehaviour {
     /// </summary>
     private void UpdateUnitAmountText()
     {
-        int units = playerOne.Team.units.Count;
+        int units = GameManager.PLAYER.Team.units.Count;
         string unitText = units.ToString();
         m_CurrentUnitAmount.text = unitText;
     }

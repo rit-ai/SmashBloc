@@ -118,9 +118,9 @@ public class Utils : MonoBehaviour {
     /// <summary>
     /// Returns the prefab associated with a particular type of Unit.
     /// </summary>
-    public static Unit UnitToPrefab(Unit unit)
+    public static Unit IdentityToPrefab(string identity)
     {
-        switch (unit.Identity())
+        switch (identity)
         {
             case Infantry.IDENTITY:
                 Debug.Assert(InfantryPrefab);

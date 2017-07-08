@@ -86,7 +86,6 @@ public abstract class Unit : MonoBehaviour, IObservable {
         m_Surface = GetComponent<MeshRenderer>();
 
         this.team = team;
-        tag = team.title;
         m_Surface.material.color = team.color;
     }
 
@@ -247,7 +246,8 @@ public abstract class Unit : MonoBehaviour, IObservable {
     /// </summary>
     public Vector3 Destination
     {
-        get; set;
+        get { return destination; }
+        set { destination = value; }
     }
 
     /// <summary>
@@ -279,7 +279,8 @@ public abstract class Unit : MonoBehaviour, IObservable {
     /// </summary>
     public float Health
     {
-        get; set;
+        get { return health; }
+        set { health = value; }
     }
 
     /// <summary>

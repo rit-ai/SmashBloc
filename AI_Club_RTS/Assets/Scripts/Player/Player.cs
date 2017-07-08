@@ -18,16 +18,14 @@ public class Player : MonoBehaviour {
     private const int MAX_UNITS = 20;
 
     // Private fields
-    // Types of units a Player can own
-    private Infantry m_Infantry = null;
-    private Tank m_Tank = null;
+
     // The AI that controls this Player, if any
     private PlayerAI brain;
     // Misc state
     private PlayerInfo info;
     private Team team;
-    private Unit toSpawn;
     private City toSpawnAt;
+    private string toSpawn;
     private int toSpawnCost;
     private int goldAmount;
 
@@ -62,6 +60,12 @@ public class Player : MonoBehaviour {
         // Handle private fields
         info = new PlayerInfo();
         goldAmount = 0;
+
+        // Handle Coroutines
+        if (brain != null)
+        {
+            StartCoroutine(PassInfo());
+        }
     }
 
     /// <summary>
@@ -72,14 +76,14 @@ public class Player : MonoBehaviour {
     /// Unit.NAME.</param>
     public void SetUnitToSpawn(string unitIdentity)
     {
+        toSpawn = unitIdentity;
+
         switch (unitIdentity)
         {
             case Infantry.IDENTITY:
-                toSpawn = m_Infantry;
                 toSpawnCost = Infantry.COST;
                 break;
             case Tank.IDENTITY:
-                toSpawn = m_Tank;
                 toSpawnCost = Tank.COST;
                 break;
             default:
@@ -108,7 +112,7 @@ public class Player : MonoBehaviour {
             Debug.Assert(toSpawnCost > 0);
             goldAmount -= toSpawnCost;
 
-            Unit newUnit = Utils.UnitToPrefab(toSpawn);
+            Unit newUnit = Utils.IdentityToPrefab(toSpawn);
             Transform spawnPoint = toSpawnAt.SpawnPoint;
             newUnit = Instantiate(newUnit, spawnPoint.transform.position, Quaternion.identity);
             // Sets default destination to be the location the unit spawns
@@ -142,16 +146,8 @@ public class Player : MonoBehaviour {
     /// </summary>
     public PlayerAI Brain
     {
-        get; set;
-    }
-
-    /// <summary>
-    /// Modifies the current amount of gold.
-    /// </summary>
-    /// <param name="amount">The amount to modify by.</param>
-    public void UpdateGold(int amount)
-    {
-        goldAmount += amount;
+        get { return brain; }
+        set { brain = value; }
     }
 
     /// <summary>
@@ -159,7 +155,8 @@ public class Player : MonoBehaviour {
     /// </summary>
     public int Gold
     {
-        get; set;
+        get { return goldAmount; }
+        set { goldAmount = value; }
     }
 
     /// <summary>
@@ -170,8 +167,6 @@ public class Player : MonoBehaviour {
     {
         info.team = team;
         info.goldAmount = goldAmount;
-        info.cities = team.cities;
-        info.units = team.units;
         brain.UpdateInfo(info);
         yield return new WaitForSeconds(PASS_INFO_RATE);
     }

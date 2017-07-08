@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour {
 
     // Public constants
     // The first created player, which will always be the main player.
-    public static Player PLAYER_ONE;
+    public static Player PLAYER;
 
     // Public fields
     public City cityPrefab;
@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour {
         Camera camera = Camera.main;
         RaycastHit hit;
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-        Team playerTeam = PLAYER_ONE.Team;
+        Team playerTeam = PLAYER.Team;
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
             // Set the destination of all the units
@@ -66,11 +66,6 @@ public class GameManager : MonoBehaviour {
 
     private void Awake()
     {
-
-    }
-
-    private void Start()
-    {
         citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
         City curr;
 
@@ -86,8 +81,6 @@ public class GameManager : MonoBehaviour {
             Player.MakePlayer(true, teams[1])
         };
 
-        PLAYER_ONE = players[0];
-
         // Every player should have at least one city, and we need places to 
         // put them.
         Debug.Assert(citySpawnPoints.Length >= NUM_AI_PLAYERS + 1);
@@ -101,6 +94,11 @@ public class GameManager : MonoBehaviour {
             curr.Init(teams[x]);
         }
 
+        PLAYER = players[0];
+    }
+
+    private void Start()
+    {
         StartCoroutine(GameLoop());
 
     }
@@ -140,6 +138,7 @@ public class GameManager : MonoBehaviour {
     {
         while (true)
         {
+
             foreach (Player p in players)
             {
                 foreach (City c in p.Team.cities)
@@ -151,7 +150,9 @@ public class GameManager : MonoBehaviour {
                     }
                 }
             }
+
             yield return new WaitForSeconds(GOLD_INCREMENT_RATE);
+
         }
     }
     

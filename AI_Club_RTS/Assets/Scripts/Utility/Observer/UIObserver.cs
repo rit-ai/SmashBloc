@@ -15,10 +15,11 @@ public class UIObserver : MonoBehaviour, IObserver {
     private static GameManager m_GameManager;
     private static Team PLAYER_TEAM;
 
+
     /// <summary>
     /// Find the UI Manager and store a reference to it.
     /// </summary>
-    private void Awake()
+    private void Start()
     {
         if (m_UIManager == null)
         {
@@ -33,7 +34,7 @@ public class UIObserver : MonoBehaviour, IObserver {
             m_GameManager = managers[0];
         }
 
-        PLAYER_TEAM = GameManager.PLAYER_ONE.Team;
+        PLAYER_TEAM = GameManager.PLAYER.Team;
     }
 
     /// <summary>

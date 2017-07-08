@@ -45,7 +45,7 @@ public sealed class PlayerAI_Basic : PlayerAI {
             while (true)
             {
                 while (brain.info == null) { yield return new WaitForSeconds(SPAWN_UNIT_RATE); }
-                foreach (City city in brain.info.cities)
+                foreach (City city in brain.info.team.cities)
                 {
                     brain.AddCommand(new SpawnUnitCommand(Infantry.IDENTITY, city));
                 }
