@@ -44,7 +44,15 @@ public class GameObserver : MonoBehaviour, IObserver {
     {
         switch (invoke)
         {
-            // Store units that are selected
+            case Invocation.TOGGLE_PAUSE:
+                manager.TogglePause();
+                break;
+            // Store selected units (just one)
+            case Invocation.ONE_SELECTED:
+                Debug.Assert(entity is Unit);
+                selectedUnits = new HashSet<Unit> { entity as Unit };
+                break;
+            // Store selected units (many)
             case Invocation.UNITS_SELECTED:
                 Debug.Assert(data != null);
                 Debug.Assert(data[0] is HashSet<Unit>);

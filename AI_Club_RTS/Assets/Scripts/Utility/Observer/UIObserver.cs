@@ -11,8 +11,7 @@ using UnityEngine;
 public class UIObserver : MonoBehaviour, IObserver {
     // Private constant fields
     // We keep a reference to the UI Manager to tell it what we want it to show
-    private static UIManager m_UIManager;
-    private static GameManager m_GameManager;
+    private static UIManager manager;
     private static Team PLAYER_TEAM;
 
 
@@ -21,17 +20,11 @@ public class UIObserver : MonoBehaviour, IObserver {
     /// </summary>
     private void Start()
     {
-        if (m_UIManager == null)
+        if (manager == null)
         {
             var managers = FindObjectsOfType<UIManager>();
             if (managers.Length != 1) { throw new UnityException("Incorrect number of UIManagers: " + managers.Length); }
-            m_UIManager = managers[0];
-        }
-        if (m_GameManager == null)
-        {
-            var managers = FindObjectsOfType<GameManager>();
-            if (managers.Length != 1) { throw new UnityException("Incorrect number of UIManagers: " + managers.Length); }
-            m_GameManager = managers[0];
+            manager = managers[0];
         }
 
         PLAYER_TEAM = GameManager.PLAYER.Team;
@@ -49,21 +42,24 @@ public class UIObserver : MonoBehaviour, IObserver {
         bool enabled = false;
         switch (invoke)
         {
+            case Invocation.TOGGLE_PAUSE:
+                manager.TogglePauseText();
+                break;
             // Display unit info
             case Invocation.UNIT_MENU:
                 Debug.Assert(entity is Unit); // don't pass bad objects
                 enabled = (((Unit)entity).Team == PLAYER_TEAM);
-                m_UIManager.DisplayUnitInfo((Unit)entity, enabled);
+                manager.DisplayUnitInfo((Unit)entity, enabled);
                 break;
             // Display city info
             case Invocation.CITY_MENU:
                 Debug.Assert(entity is City); // don't pass bad objects
                 enabled = (((City)entity).Team == PLAYER_TEAM);
-                m_UIManager.DisplayCityInfo((City)entity, enabled);
+                manager.DisplayCityInfo((City)entity, enabled);
                 break;
             case Invocation.TARGET_RING:
                 Debug.Assert(entity is RTS_Terrain);
-                m_UIManager.DisplayTargetRing((RTS_Terrain)entity);
+                manager.DisplayTargetRing((RTS_Terrain)entity);
                 break;
             // Hides all menus and selection elements
             case Invocation.CLOSE_ALL:
@@ -75,7 +71,7 @@ public class UIObserver : MonoBehaviour, IObserver {
                 {
                     c.RemoveHighlight();
                 }
-                m_UIManager.CloseAll();
+                manager.CloseAll();
                 break;
             // Invocation not found? Must be for someone else. Ignore.
 

@@ -66,7 +66,8 @@ public abstract class Unit : MonoBehaviour, IObservable {
 
         observers = new List<IObserver>
         {
-            gameObject.AddComponent<GameObserver>()
+            gameObject.AddComponent<GameObserver>(),
+            gameObject.AddComponent<UIObserver>()
         };
 
         info = new UnitInfo();
@@ -151,6 +152,7 @@ public abstract class Unit : MonoBehaviour, IObservable {
     private void OnMouseDown()
     {
         Highlight();
+        NotifyAll(Invocation.ONE_SELECTED);
         NotifyAll(Invocation.UNIT_MENU);
     }
 

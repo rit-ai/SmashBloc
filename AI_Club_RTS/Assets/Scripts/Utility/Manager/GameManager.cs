@@ -23,6 +23,15 @@ public class GameManager : MonoBehaviour {
     private bool oneTeamLeft = false;
 
     /// <summary>
+    /// Pauses or unpauses the game, depending on the current timescale.
+    /// </summary>
+    public void TogglePause()
+    {
+        // Set to 1 if 0, and 0 if 1.
+        Time.timeScale = (Time.timeScale == 0) ? 1 : 0;
+    }
+
+    /// <summary>
     /// Sets the new destination for the unit, if the unit is of the player's
     /// team.
     /// </summary>

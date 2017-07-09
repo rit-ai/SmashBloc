@@ -7,7 +7,14 @@ using UnityEngine;
  * @author Paul Galatic
  * 
  * Class used to condense often-called methods into smaller chunks / lines such
- * to reduce cluttering of other files.
+ * to reduce cluttering of other files. However, all of these methods are 
+ * effectively singletons, which is bad code practice. As core functionality is
+ * implemented, and new best practices are learned, this file should be shrunk
+ * down.
+ * 
+ * Some methods, like MouseIsOverUI(), are worthwhile in that they increase 
+ * overall code readability. However, functions like IdentityToPrefab() should 
+ * be phased out. TODO
  * **/
 public class Utils : MonoBehaviour {
 

@@ -22,6 +22,7 @@ public class UIManager : MonoBehaviour {
     // Public fields
     // GENERAL
     public Camera m_Camera;
+    public Canvas m_PauseText;
     // HEADER
     public Dropdown m_UnitSelect;
     public Text m_CurrentGoldAmount;
@@ -63,6 +64,11 @@ public class UIManager : MonoBehaviour {
     // Initialize whenever this object loads
     void Start ()
     {
+        // Hide menus
+        m_PauseText.enabled = false;
+        m_UnitMenu.enabled = false;
+        m_CityMenu.enabled = false;
+
         // Instantiate misc UI
         m_TargetRing = Instantiate(m_TargetRing);
 
@@ -86,6 +92,15 @@ public class UIManager : MonoBehaviour {
 
         oldMousePos = Input.mousePosition;
 	}
+
+    /// <summary>
+    /// Toggles whether or not the pause text is visible.
+    /// </summary>
+    public void TogglePauseText()
+    {
+        // Set to false if true, true if false
+        m_PauseText.enabled = (m_PauseText.enabled == true) ? false : true;
+    }
 
     /// <summary>
     /// Sets the unit to spawn based on the value of the dropdown menu,

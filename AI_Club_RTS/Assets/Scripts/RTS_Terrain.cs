@@ -12,6 +12,8 @@ using UnityEngine;
  * **/
 public class RTS_Terrain : MonoBehaviour, IObservable
 {
+    // Public constants
+    public static string TERRAIN_TAG = "RTS_Terrain";
 
     // Public fields
     public LayerMask ignoreAllButTerrain;
