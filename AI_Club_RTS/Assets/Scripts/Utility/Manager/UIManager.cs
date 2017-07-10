@@ -167,6 +167,9 @@ public class UIManager : MonoBehaviour {
     /// <param name="city">The city to display.</param>
     public void DisplayCityInfo(City city, bool enabled)
     {
+        if (cityCurrentlyDisplayed != null)
+            cityCurrentlyDisplayed.RemoveHighlight();
+
         cityCurrentlyDisplayed = city;
 
         // Set position to wherever menus are supposed to appear

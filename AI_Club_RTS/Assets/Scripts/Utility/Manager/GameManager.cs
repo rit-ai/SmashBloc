@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour {
     private static List<Team> teams;
     private static List<Player> players;
 
+    private Camera m_Camera;
+    private RTS_Terrain m_Terrain;
     private bool oneTeamLeft = false;
 
     /// <summary>
@@ -40,9 +42,8 @@ public class GameManager : MonoBehaviour {
     public void SetNewDestination(HashSet<Unit> selectedUnits, RTS_Terrain terrain)
     {
         if (selectedUnits == null) { return; }
-        Camera camera = Camera.main;
         RaycastHit hit;
-        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
         Team playerTeam = PLAYER.Team;
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
@@ -75,7 +76,14 @@ public class GameManager : MonoBehaviour {
 
     private void Awake()
     {
+        m_Camera = Camera.main;
+
+        m_Terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
         citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
+
+        Debug.Assert(m_Terrain != null);
+        Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
+
         City curr;
 
         teams = new List<Team>
@@ -96,14 +104,17 @@ public class GameManager : MonoBehaviour {
         // The number of cities to instantiate is capped both by the number of
         // places to spawn them as well as the total number of players in the 
         // game. 
-        for (int x = 0; (x < citySpawnPoints.Length) && (x < NUM_AI_PLAYERS + 1); x++)
+        for (int x = 0; ((x < citySpawnPoints.Length) && (x < NUM_AI_PLAYERS + 1)); x++)
         {
-            curr = Instantiate(cityPrefab, citySpawnPoints[x].transform.position, Quaternion.identity);
+            curr = City.MakeCity(teams[x], cityPrefab, citySpawnPoints[x].transform.position);
             teams[x].cities.Add(curr);
-            curr.Init(teams[x]);
+
         }
 
         PLAYER = players[0];
+
+        // Set main camera to be behind the player's first city
+        CenterCameraBehindPosition(teams[0].cities[0].transform.position);
     }
 
     private void Start()
@@ -163,6 +174,22 @@ public class GameManager : MonoBehaviour {
             yield return new WaitForSeconds(GOLD_INCREMENT_RATE);
 
         }
+    }
+
+    private void CenterCameraBehindPosition(Vector3 position)
+    {
+        // Move the camera over the position
+        Vector3 dest = position;
+        // Rotate the camera toward the center of the map
+        Vector3 towardCenter = dest - m_Terrain.transform.position;
+        Quaternion rotation = Quaternion.LookRotation(towardCenter);
+        rotation.x = 0; rotation.z = 0; // x and z aren't relevant
+        // Set values so that the orientation of the camera is unchanged
+        dest = rotation * dest;
+        dest.y = m_Camera.transform.position.y;
+        dest.z += 200; // offset to account for angle of camera
+        
+        m_Camera.transform.position = dest;
     }
     
 }

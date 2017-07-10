@@ -23,10 +23,10 @@ public class CameraController : MonoBehaviour, IObservable {
     public Camera m_Camera;
     public KeyCode m_PauseButton;
     // vv "Arrow Keys" vv
-    public KeyCode m_MoveCameraUp;
+    public KeyCode m_MoveCameraForward;
     public KeyCode m_MoveCameraLeft;
     public KeyCode m_MoveCameraRight;
-    public KeyCode m_MoveCameraDown;
+    public KeyCode m_MoveCameraBack;
 
     // Private constants
     private readonly Vector3 SCREEN_CENTER = new Vector3(Screen.width / 2, Screen.height / 2);
@@ -46,8 +46,6 @@ public class CameraController : MonoBehaviour, IObservable {
     private Rect m_ScreenBorderInverse;
 
     private Vector3 direction;
-    private bool pauseLatch = true;
-    private bool arrowMoveLatch = true;
     private bool arrowMoving = false;
 
 
@@ -117,7 +115,7 @@ public class CameraController : MonoBehaviour, IObservable {
         arrowMoving = false;
         direction = Vector3.zero;
 
-        if (Input.GetKey(m_MoveCameraUp))
+        if (Input.GetKey(m_MoveCameraForward))
         {
             direction += Vector3.forward;
             arrowMoving = true;
@@ -135,7 +133,7 @@ public class CameraController : MonoBehaviour, IObservable {
             arrowMoving = true;
         }
 
-        if (Input.GetKey(m_MoveCameraDown))
+        if (Input.GetKey(m_MoveCameraBack))
         {
             direction += Vector3.back;
             arrowMoving = true;
@@ -146,6 +144,9 @@ public class CameraController : MonoBehaviour, IObservable {
 
     /// <summary>
     /// Handles edge panning, based on the position of the mouse.
+    /// 
+    /// FIXME: Right now edge panning up or down breaks if the rotation of the
+    /// camera is changed.
     /// </summary>
     private void EdgePan()
     {

@@ -77,6 +77,8 @@ public class Infantry : Unit {
     /// </summary>
     protected override IEnumerator DeathAnimation()
     {
+        GetComponent<Rigidbody>().isKinematic = true;
+        Color fadeOut = m_Surface.material.color;
         float y = transform.position.y;
         float dest = transform.position.y + ASCENSION_HEIGHT;
         for (float x = y; x < dest; x++)
@@ -84,6 +86,10 @@ public class Infantry : Unit {
             newPos = transform.position;
             newPos.y += 10;
             transform.position = newPos;
+
+            fadeOut.a -= 0.3f;
+            Debug.Log(fadeOut.a);
+            m_Surface.material.color = fadeOut;
             yield return 0f;
         }
 

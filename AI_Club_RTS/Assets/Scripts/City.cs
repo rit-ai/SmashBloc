@@ -35,6 +35,25 @@ public class City : MonoBehaviour, IObservable {
     private float health;
     private int incomeLevel;
 
+    /// <summary>
+    /// Constructs and returns an instantiated City.
+    /// </summary>
+    /// <param name="team">The new City's Team.</param>
+    /// <param name="prefab">The </param>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    public static City MakeCity(Team team, City prefab, Vector3 position)
+    {
+        City city = Instantiate(prefab, position, Quaternion.identity);
+        city.Team = team;
+        city.m_Surface = city.GetComponent<MeshRenderer>();
+        Debug.Assert(city.m_Surface != null);
+        city.m_Surface.material.color = team.color;
+        city.cityName = team.title;
+
+        return city;
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -48,24 +67,6 @@ public class City : MonoBehaviour, IObservable {
         // Default values
         health = MAX_HEALTH;
         incomeLevel = DEFAULT_INCOME_LEVEL;
-    }
-
-    /// <summary>
-    /// Handles any data that needs to be passed after a city is instantiated.
-    /// 
-    /// TODO Until a player can spawn cities, this value is set by a public 
-    /// variable.
-    /// </summary>
-    /// <param name="team">The Team the city is on when it is created.</param>
-    public void Init(Team team)
-    {
-        m_Surface = GetComponent<MeshRenderer>();
-        Debug.Assert(m_Surface != null);
-
-        Team = team;
-        m_Surface.material.color = Team.color;
-        cityName = Team.title;
-        Team.cities.Add(this);
     }
 
     /// <summary>

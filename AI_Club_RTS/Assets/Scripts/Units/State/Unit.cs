@@ -46,6 +46,9 @@ public abstract class Unit : MonoBehaviour, IObservable {
     protected Collider collision;
     protected Vector3 newPos;
 
+    // protected fields related to graphics
+    protected MeshRenderer m_Surface;
+
     // protected fields related to behavior
     protected Team team;
     protected Vector3 destination;
@@ -55,7 +58,6 @@ public abstract class Unit : MonoBehaviour, IObservable {
     private const float PASS_INFO_RATE = 1f;
 
     // Private fields
-    private MeshRenderer m_Surface;
     private UnitInfo info;
 
     /// <summary>
