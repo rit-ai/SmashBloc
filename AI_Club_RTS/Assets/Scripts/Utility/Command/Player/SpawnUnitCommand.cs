@@ -23,6 +23,8 @@ public class SpawnUnitCommand : PlayerCommand {
 
     public override void Execute()
     {
+        if (toSpawnAt.Team != body.Team) { return; }
+
         body.SetUnitToSpawn(toSpawnName);
         body.SetCityToSpawnAt(toSpawnAt);
         body.SpawnUnit();

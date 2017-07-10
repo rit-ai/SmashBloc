@@ -17,16 +17,15 @@ using UnityEngine.UI;
  *  * Lite UI (health bar)
  * Any other UI elements (e.g. menus) should be handled by Observers.
  * **/
-public abstract class Unit : MonoBehaviour, Observable {
+public abstract class Unit : MonoBehaviour, IObservable {
 
     // public fields
     public MeshRenderer m_HighlightInner;
     public MeshRenderer m_HighlightOuter;
     public LayerMask ignoreAllButUnits;
-    public int cost;
 
     // protected fields related to unit management
-    protected List<Observer> observers;
+    protected List<IObserver> observers;
 
     // protected fields intended to be changed for balancing or by gameplay
     protected string unitName;
@@ -64,8 +63,12 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     protected virtual void Start()
     {
-        observers = new List<Observer>();
-        observers.Add(new UIObserver());
+
+        observers = new List<IObserver>
+        {
+            gameObject.AddComponent<GameObserver>(),
+            gameObject.AddComponent<UIObserver>()
+        };
 
         info = new UnitInfo();
         alive = true;
@@ -84,7 +87,6 @@ public abstract class Unit : MonoBehaviour, Observable {
         m_Surface = GetComponent<MeshRenderer>();
 
         this.team = team;
-        tag = team.name;
         m_Surface.material.color = team.color;
     }
 
@@ -93,10 +95,10 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     /// <param name="invocation">The name of the invocation.</param>
     /// <param name="data">Any additional data.</param>
-    public void NotifyAll<T>(string invocation, params T[] data)
+    public void NotifyAll(Invocation invocation, params object[] data)
     {
-        foreach (Observer o in observers){
-            o.OnNotify<T>(this, invocation);
+        foreach (IObserver o in observers){
+            o.OnNotify(this, invocation);
         }
     }
 
@@ -150,7 +152,8 @@ public abstract class Unit : MonoBehaviour, Observable {
     private void OnMouseDown()
     {
         Highlight();
-        NotifyAll<VoidObject>(UIObserver.INVOKE_UNIT_DATA);
+        NotifyAll(Invocation.ONE_SELECTED);
+        NotifyAll(Invocation.UNIT_MENU);
     }
 
     /// <summary>
@@ -181,7 +184,7 @@ public abstract class Unit : MonoBehaviour, Observable {
     }
 
     /// <summary>
-    /// Take specified damage, and Kill() if applicable.
+    /// Deal specified damage, and Kill() if applicable.
     /// </summary>
     /// <param name="damage">Damage to Take.</param>
     public virtual void TakeDamage(float damage)
@@ -245,7 +248,8 @@ public abstract class Unit : MonoBehaviour, Observable {
     /// </summary>
     public Vector3 Destination
     {
-        get; set;
+        get { return destination; }
+        set { destination = value; }
     }
 
     /// <summary>
@@ -273,11 +277,12 @@ public abstract class Unit : MonoBehaviour, Observable {
     }
 
     /// <summary>
-    /// Gets the unit's current Health.
+    /// Gets / sets the unit's current Health.
     /// </summary>
     public float Health
     {
         get { return health; }
+        set { health = value; }
     }
 
     /// <summary>
@@ -297,11 +302,44 @@ public abstract class Unit : MonoBehaviour, Observable {
     }
 
     /// <summary>
-    /// Gets the Cost of the unit.
+    /// All units must have code for what they do when another object collides 
+    /// with them, but this behavior may vary from unit to unit, or be 
+    /// otherwise type-specific.
     /// </summary>
-    public int Cost
+    protected virtual void OnCollisionEnter(Collision collision)
     {
-        get { return cost; }
+        Unit unit = collision.gameObject.GetComponent<Unit>();
+        if (unit != null && !(unit.Team.Equals(team)))
+        {
+            TakeDamage(Random.Range(10f, 20f));
+        }
+        City city = collision.gameObject.GetComponent<City>();
+        if (city != null && !(city.Team.Equals(team)))
+        {
+            TakeDamage(Random.Range(10f, 20f));
+        }
+    }
+
+    /// <summary>
+    /// "Animates" the death of the unit, which can be handled as the 
+    /// implementer sees fit. The default behavior is to become very heavy and
+    /// then fade out.
+    /// </summary>
+    protected virtual IEnumerator DeathAnimation()
+    {
+        Color fadeOut = m_Surface.material.color;
+
+        GetComponent<Rigidbody>().mass *= 100;
+        for (float x = 1; x > 0; x -= 0.01f)
+        {
+            fadeOut.a = x;
+            m_Surface.material.color = fadeOut;
+            yield return 0f;
+        }
+
+        Destroy(gameObject);
+
+        yield return null;
     }
 
     /// <summary>
@@ -311,18 +349,9 @@ public abstract class Unit : MonoBehaviour, Observable {
     public abstract string Identity();
 
     /// <summary>
-    /// All units must have code for what they do when another object collides 
-    /// with them, but this behavior may vary from unit to unit, or be 
-    /// otherwise type-specific.
+    /// Returns this unit's cost, in gold.
     /// </summary>
-    protected abstract void OnCollisionEnter(Collision collision);
-
-    /// <summary>
-    /// "Animates" the death of the unit, which can be handled as the 
-    /// implementer sees fit. Infantry units, for example, ascend for a while
-    /// before fading out of existence.
-    /// </summary>
-    protected abstract IEnumerator DeathAnimation();
+    public abstract int Cost();
 
 }
 

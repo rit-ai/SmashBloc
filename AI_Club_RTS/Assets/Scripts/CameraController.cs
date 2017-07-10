@@ -7,39 +7,49 @@ using UnityEngine;
  * @author Paul Galatic
  * 
  * This class handles logic involving the movement of the camera, and player 
- * interaction with the world space (NOT menus).
+ * interaction with the world space (NOT menus). Rather than handling what it 
+ * MEANS when a Player clicks and drags over units, CameraController just 
+ * reports it and leaves the rest to its Observers.
  * 
- * If a menu is opened, CameraController defers to its observer, UIManager.
- * 
- * The two-state behavior is necessary due to the fact that the controller must
- * be able to identify when the user is clicking, clicking and dragging, etc.
+ * This lets the CameraController focus on its two key responsibilities: the
+ * Camera, and the Controls.
  * **/
-public class CameraController : MonoBehaviour, Observable {
+public class CameraController : MonoBehaviour, IObservable {
 
     // Public constants
     public static KeyCode DESELECT_KEY;
 
     // Public fields
     public Camera m_Camera;
-    public LayerMask Terrain_mask;
+    public KeyCode m_PauseButton;
+    // vv "Arrow Keys" vv
+    public KeyCode m_MoveCameraUp;
+    public KeyCode m_MoveCameraLeft;
+    public KeyCode m_MoveCameraRight;
+    public KeyCode m_MoveCameraDown;
 
     // Private constants
-    // Sic: Don't ask me how this works.
-    private static Vector3 SCREEN_CENTER = new Vector3(Screen.width, Screen.height);
-    private static Color BOX_INTERIOR_COLOR = new Color(0.74f, 0.71f, 0.27f, 0.5f);
-    private static Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
-    private static float MAX_CAMERA_SIZE = 200f;
-    private static float MIN_CAMERA_SIZE = 50f;
-    private static float SCROLLSPEED = 50f;
-    private static float BORDER_SIZE = 10f;
-    private static float SPEED = 3f;
+    private readonly Vector3 SCREEN_CENTER = new Vector3(Screen.width / 2, Screen.height / 2);
+    private readonly Color BOX_INTERIOR_COLOR = new Color(0.74f, 0.71f, 0.27f, 0.5f);
+    private readonly Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
+    private const float MAX_CAMERA_SIZE = 200f;
+    private const float MIN_CAMERA_SIZE = 50f;
+    private const float SCROLLSPEED = 50f;
+    private const float BORDER_SIZE = 10f;
+    private const float SPEED = 3f;
 
     // Private fields
-    private List<Observer> m_Observers;
+    private List<IObserver> m_Observers;
     private HashSet<Unit> m_SelectedUnits;
     private State m_CurrentState;
     private Vector3 m_MousePos;
     private Rect m_ScreenBorderInverse;
+
+    private Vector3 direction;
+    private bool pauseLatch = true;
+    private bool arrowMoveLatch = true;
+    private bool arrowMoving = false;
+
 
     // Use this for initialization
     void Start () {
@@ -47,9 +57,11 @@ public class CameraController : MonoBehaviour, Observable {
         DESELECT_KEY = KeyCode.LeftShift; // TODO make custom binds
 
         // Handle private fields
-        m_Observers = new List<Observer>();
-        m_Observers.Add(new UIObserver());
-        m_Observers.Add(new GameObserver());
+        m_Observers = new List<IObserver>
+        {
+            gameObject.AddComponent<UIObserver>(),
+            gameObject.AddComponent<GameObserver>()
+        };
         m_SelectedUnits = new HashSet<Unit>();
 
         // Rectangle that contains everything EXCEPT the screen border
@@ -71,14 +83,16 @@ public class CameraController : MonoBehaviour, Observable {
     void Update () {
         m_CurrentState.StateUpdate();
         Scroll();
+        ArrowMove();
         EdgePan();
+        Pause();
     }
 
-    public void NotifyAll<T>(string invocation, params T[] data)
+    public void NotifyAll(Invocation invoke, params object[] data)
     {
-        foreach (Observer o in m_Observers)
+        foreach (IObserver o in m_Observers)
         {
-            o.OnNotify(this, invocation, data);
+            o.OnNotify(this, invoke, data);
         }
     }
 
@@ -96,20 +110,79 @@ public class CameraController : MonoBehaviour, Observable {
     }
 
     /// <summary>
+    /// Moves the camera based on which "arrow keys" are pressed.
+    /// </summary>
+    private void ArrowMove()
+    {
+        arrowMoving = false;
+        direction = Vector3.zero;
+
+        if (Input.GetKey(m_MoveCameraUp))
+        {
+            direction += Vector3.forward;
+            arrowMoving = true;
+        }
+
+        if (Input.GetKey(m_MoveCameraLeft))
+        {
+            direction += Vector3.left;
+            arrowMoving = true;
+        }
+
+        if (Input.GetKey(m_MoveCameraRight))
+        {
+            direction += Vector3.right;
+            arrowMoving = true;
+        }
+
+        if (Input.GetKey(m_MoveCameraDown))
+        {
+            direction += Vector3.back;
+            arrowMoving = true;
+        }
+
+        MoveCamera(direction);
+    }
+
+    /// <summary>
     /// Handles edge panning, based on the position of the mouse.
     /// </summary>
     private void EdgePan()
     {
+        // Edge panning is disabled while using arrow keys to move.
+        if (arrowMoving) { return; }
+
         // Is the mouse at the edge of the screen?
         if (!m_ScreenBorderInverse.Contains(m_MousePos))
         {
-            Quaternion rotation = m_Camera.transform.rotation;
-            //Vector2 direction = new Vector2(Input.mousePosition.x + Screen.width / 2, Input.mousePosition.y + Screen.height / 2);
-            Vector3 direction = SCREEN_CENTER - m_MousePos;
-            direction.Normalize();
-            direction *= SPEED;
-            transform.Translate(direction.x, 0, direction.y, Space.World);
+            direction = SCREEN_CENTER - m_MousePos;
+            direction.x = -direction.x;
+            MoveCamera(direction);
         }
+    }
+
+    /// <summary>
+    /// Pauses the game when the pause button is pressed.
+    /// </summary>
+    private void Pause()
+    {
+        if (Input.GetKeyDown(m_PauseButton))
+        {
+            NotifyAll(Invocation.TOGGLE_PAUSE);
+        }
+
+    }
+
+    /// <summary>
+    /// Moves the camera in a direction relative to the rotation of the 
+    /// camera.
+    /// </summary>
+    private void MoveCamera(Vector3 direction)
+    {
+        direction = m_Camera.transform.rotation * direction;
+        direction.Normalize();
+        direction *= SPEED;
+        transform.Translate(direction.x, 0, direction.y, Space.World);
     }
 
     /// <summary>
@@ -127,8 +200,8 @@ public class CameraController : MonoBehaviour, Observable {
     private void DeselectAll()
     {
         // If there's a menu up displaying unit info, close it
-        NotifyAll<VoidObject>(UIObserver.CLOSE_ALL);
-        NotifyAll<VoidObject>(GameObserver.UNITS_DESELECTED);
+        NotifyAll(Invocation.CLOSE_ALL);
+        NotifyAll(Invocation.UNITS_DESELECTED);
     }
 
     /// <summary>
@@ -164,10 +237,22 @@ public class CameraController : MonoBehaviour, Observable {
                 {
                     return;
                 }
+
+                // Ignore user clicking on anything but the RTS_terrain
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
                 
-                // Start drawing.
-                m_CameraController.m_CurrentState = new DrawingState(m_CameraController);
-                return;
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+                {
+                    if (hit.collider.CompareTag(RTS_Terrain.TERRAIN_TAG))
+                    {
+                        // Start drawing.
+                        m_CameraController.m_CurrentState = new DrawingState(m_CameraController);
+                        return;
+                    }
+
+                }
+
             }
 
         }
@@ -207,7 +292,7 @@ public class CameraController : MonoBehaviour, Observable {
             // When mouse button is up, switch back to drawing state.
             if (Input.GetMouseButtonUp(0))
             {
-                m_CameraController.NotifyAll(GameObserver.UNITS_SELECTED, m_CameraController.m_SelectedUnits);
+                m_CameraController.NotifyAll(Invocation.UNITS_SELECTED, m_CameraController.m_SelectedUnits);
                 m_CameraController.m_CurrentState = new SelectedState(m_CameraController);
                 return;
             }

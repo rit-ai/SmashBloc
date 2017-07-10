@@ -10,6 +10,7 @@ public class Infantry : Unit {
 
     // Public constants
     public const string IDENTITY = "Infantry";
+    public const int COST = 50;
 
     // Public fields
     public Rigidbody m_Hoverball;
@@ -63,22 +64,11 @@ public class Infantry : Unit {
     }
 
     /// <summary>
-    /// What to do when the unit collides with another unit that's not on the 
-    /// same team.
+    /// The cost of an Infantry unit, in gold.
     /// </summary>
-    /// <param name="collision"></param>
-    protected override void OnCollisionEnter(Collision collision)
+    public override int Cost()
     {
-        Unit unit = collision.gameObject.GetComponent<Unit>();
-        if (unit != null && !(unit.Team.Equals(team)))
-        {
-            TakeDamage(UnityEngine.Random.Range(10f, 20f));
-        }
-        City city = collision.gameObject.GetComponent<City>();
-        if (city != null && !(city.Team.Equals(team)))
-        {
-            TakeDamage(UnityEngine.Random.Range(10f, 20f));
-        }
+        return COST;
     }
 
     /// <summary>
@@ -94,7 +84,7 @@ public class Infantry : Unit {
             newPos = transform.position;
             newPos.y += 10;
             transform.position = newPos;
-            yield return new WaitForFixedUpdate();
+            yield return 0f;
         }
 
         Destroy(gameObject);

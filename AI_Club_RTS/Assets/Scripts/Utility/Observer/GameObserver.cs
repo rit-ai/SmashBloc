@@ -6,79 +6,76 @@ using Microsoft;
 /*
  * @author Paul Galatic
  * 
- * Class designed to coordinate events that occur within the game while also
- * limiting the domain contained in each Observable. 
+ * Class designed to coordinate the passage of data between GameObjects of 
+ * different subtypes. It is also designed to forward messages relevant to the
+ * coordination of the game to GameManager.
  * 
- * An example of this would be having the Terrain communicate to GameObserver
- * that it was right clicked and letting GameObserver handle the rest, rather
- * than having Terrain communicate directly to each selected unit that its
- * destination has changed.
+ * Domain-limiting is important because, for example, it prevents changes in
+ * either the RTS_Terrain class or the Unit class from affecting the other, 
+ * since they both communicate through GameObserver instead of directly 
+ * referencing one another.
  * **/
-public class GameObserver : Observer {
-
-    // Public constant invocations
-    public const string UNITS_SELECTED = "UNITS_SELECTED";
-    public const string UNITS_DESELECTED = "UNITS_DESELECTED";
-    public const string DESTINATION_SET = "DESTINATION_SET";
-
+public class GameObserver : MonoBehaviour, IObserver {
     // Private fields
     // static because there are multiple GameObservers
-    private static HashSet<Unit> selectedUnits; 
+    private static HashSet<Unit> selectedUnits;
+    private static GameManager manager;
+
+    /// <summary>
+    /// Find the Game Manager and store a reference to it.
+    /// </summary>
+    private void Awake()
+    {
+        if (manager == null)
+        {
+            var managers = FindObjectsOfType<GameManager>();
+            if (managers.Length != 1) { throw new UnityException("Incorrect number of UIManagers: " + managers.Length); }
+            manager = managers[0];
+        }
+    }
 
     /// <summary>
     /// Determines the type of action to perform, based on the invocation.
     /// </summary>
     /// <param name="entity">The entity performing the invocation.</param>
-    /// <param name="invocation">The type of invocation.</param>
+    /// <param name="invoke">The type of invocation.</param>
     /// <param name="data">Misc data.</param>
-    public void OnNotify<T>(object entity, string invocation, params T[] data)
+    public void OnNotify(object entity, Invocation invoke, params object[] data)
     {
-        switch (invocation)
+        switch (invoke)
         {
-            // Store units that are selected
-            case UNITS_SELECTED:
+            case Invocation.TOGGLE_PAUSE:
+                manager.TogglePause();
+                break;
+            // Store selected units (just one)
+            case Invocation.ONE_SELECTED:
+                Debug.Assert(entity is Unit);
+                selectedUnits = new HashSet<Unit> { entity as Unit };
+                break;
+            // Store selected units (many)
+            case Invocation.UNITS_SELECTED:
                 Debug.Assert(data != null);
                 Debug.Assert(data[0] is HashSet<Unit>);
                 selectedUnits = data[0] as HashSet<Unit>;
                 Debug.Assert(selectedUnits != null);
                 break;
             // Clear stored units
-            case UNITS_DESELECTED:
+            case Invocation.UNITS_DESELECTED:
                 selectedUnits.Clear();
                 break;
             // Set new destination based on mouse position over terrain
-            case DESTINATION_SET:
+            case Invocation.DESTINATION_SET:
                 Debug.Assert(entity is RTS_Terrain);
-                SetNewDestination((RTS_Terrain)entity);
+                manager.SetNewDestination(selectedUnits, (RTS_Terrain)entity);
+                break;
+            case Invocation.CITY_CAPTURED:
+                Debug.Assert(entity is City);
+                Debug.Assert(data != null);
+                Debug.Assert(data[0] is Team);
+                manager.TransferCity(entity as City, data[0] as Team);
                 break;
             // Invocation not found? Must be for someone else. Ignore.
         }
-    }
-
-    /// <summary>
-    /// Sets the new destination for the unit, if the unit is of the player's
-    /// team.
-    /// </summary>
-    /// <param name="terrain">The terrain, which was right clicked such to 
-    /// invoke this method.</param>
-    private void SetNewDestination(RTS_Terrain terrain)
-    {
-        if (selectedUnits == null) { return; }
-        Camera camera = Camera.main;
-        RaycastHit hit;
-        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-        Team playerTeam = Utils.PlayerOne.Team;
-        if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
-        {
-            // Set the destination of all the units
-            foreach (Unit u in selectedUnits)
-            {
-                if (u.Team == playerTeam)
-                    u.Destination = hit.point;
-            }
-        }
-
-
     }
 
 }

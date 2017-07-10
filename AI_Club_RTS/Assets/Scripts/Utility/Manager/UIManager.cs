@@ -10,7 +10,7 @@ using UnityEngine.UI;
  * main overlay. Should **avoid** logic on what to display or what to pass
  * along if possible.
  */
-public class UI_Manager : MonoBehaviour {
+public class UIManager : MonoBehaviour {
 
     // Private constants
     private const string CAMERA_NAME = "Main Camera";
@@ -21,8 +21,8 @@ public class UI_Manager : MonoBehaviour {
 
     // Public fields
     // GENERAL
-    public Player m_Player;
     public Camera m_Camera;
+    public Canvas m_PauseText;
     // HEADER
     public Dropdown m_UnitSelect;
     public Text m_CurrentGoldAmount;
@@ -64,6 +64,11 @@ public class UI_Manager : MonoBehaviour {
     // Initialize whenever this object loads
     void Start ()
     {
+        // Hide menus
+        m_PauseText.enabled = false;
+        m_UnitMenu.enabled = false;
+        m_CityMenu.enabled = false;
+
         // Instantiate misc UI
         m_TargetRing = Instantiate(m_TargetRing);
 
@@ -71,7 +76,6 @@ public class UI_Manager : MonoBehaviour {
         menuSpawnPos = m_UnitMenu.transform.position;
 
         // Initialization
-
         StartCoroutine(AnimateStart(WAIT_TIME));
         SetUnitToSpawn();
 	}
@@ -90,6 +94,15 @@ public class UI_Manager : MonoBehaviour {
 	}
 
     /// <summary>
+    /// Toggles whether or not the pause text is visible.
+    /// </summary>
+    public void TogglePauseText()
+    {
+        // Set to false if true, true if false
+        m_PauseText.enabled = (m_PauseText.enabled == true) ? false : true;
+    }
+
+    /// <summary>
     /// Sets the unit to spawn based on the value of the dropdown menu,
     /// and communicates that to Player.
     /// </summary>
@@ -105,7 +118,7 @@ public class UI_Manager : MonoBehaviour {
                 toSpawn = Tank.IDENTITY;
                 break;
         }
-        m_Player.SetUnitToSpawn(toSpawn);
+        GameManager.PLAYER.SetUnitToSpawn(toSpawn);
     }
 
     /// <summary>
@@ -113,8 +126,8 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     public void SpawnUnit()
     {
-        m_Player.SetCityToSpawnAt(cityCurrentlyDisplayed);
-        m_Player.SpawnUnit();
+        GameManager.PLAYER.SetCityToSpawnAt(cityCurrentlyDisplayed);
+        GameManager.PLAYER.SpawnUnit();
     }
 
     /// <summary>
@@ -268,7 +281,7 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     private void UpdateGoldAmountText()
     {
-        int gold = m_Player.Gold;
+        int gold = GameManager.PLAYER.Gold;
         string goldText = gold.ToString();
         m_CurrentGoldAmount.text = goldText;
     }
@@ -278,7 +291,7 @@ public class UI_Manager : MonoBehaviour {
     /// </summary>
     private void UpdateUnitAmountText()
     {
-        int units = m_Player.Units.Count;
+        int units = GameManager.PLAYER.Team.units.Count;
         string unitText = units.ToString();
         m_CurrentUnitAmount.text = unitText;
     }

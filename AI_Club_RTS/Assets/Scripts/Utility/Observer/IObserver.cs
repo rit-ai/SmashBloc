@@ -9,7 +9,7 @@ using UnityEngine;
  * unrelated objects and establish functionality outside the scope of said
  * classes.
  * **/
-public interface Observer {
+public interface IObserver {
 
     /// <summary>
     /// How should the Observer behave when it is notified?
@@ -17,6 +17,6 @@ public interface Observer {
     /// <param name="entity">The entity notifying the Observer.</param>
     /// <param name="invocation">The type of invocation.</param>
     /// <param name="data">Any additional data or state that may be useful.</param>
-    void OnNotify<T>(object entity, string invocation, params T[] data);
+    void OnNotify(object entity, Invocation invoke, params object[] data);
 
 }

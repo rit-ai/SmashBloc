@@ -9,10 +9,11 @@ using UnityEngine;
  * Class designed to handle City-specific functionality and state. Like with 
  * other game objects, menus and UI elements should be handled by observers.
  * **/
-public class City : MonoBehaviour, Observable {
+public class City : MonoBehaviour, IObservable {
 
     // Public constants
     public const float MAX_HEALTH = 500f;
+    public const float CAPTURED_HEALTH = 50f;
     public const int MAX_INCOME_LEVEL = 8;
     public const int MIN_INCOME_LEVEL = 1;
 
@@ -27,7 +28,7 @@ public class City : MonoBehaviour, Observable {
 
     // Private fields
     private MeshRenderer m_Surface;
-    private List<Observer> m_Observers;
+    private List<IObserver> m_Observers;
     private Team team;
     private string cityName;
     private string customName;
@@ -38,13 +39,15 @@ public class City : MonoBehaviour, Observable {
     void Start()
     {
         // Handle private fields
-        m_Observers = new List<Observer>();
-        m_Observers.Add(new UIObserver());
+        m_Observers = new List<IObserver>
+        {
+            gameObject.AddComponent<UIObserver>(),
+            gameObject.AddComponent<GameObserver>()
+        };
 
         // Default values
         health = MAX_HEALTH;
         incomeLevel = DEFAULT_INCOME_LEVEL;
-        cityName = team.name;
     }
 
     /// <summary>
@@ -57,19 +60,21 @@ public class City : MonoBehaviour, Observable {
     public void Init(Team team)
     {
         m_Surface = GetComponent<MeshRenderer>();
-
-        this.team = team;
         Debug.Assert(m_Surface != null);
-        m_Surface.material.color = team.color;
+
+        Team = team;
+        m_Surface.material.color = Team.color;
+        cityName = Team.title;
+        Team.cities.Add(this);
     }
 
     /// <summary>
     /// Notifies all observers.
     /// </summary>
     /// <param name="data">The type of notification.</param>
-    public void NotifyAll<T>(string invocation, params T[] data)
+    public void NotifyAll(Invocation invocation, params object[] data)
     {
-        foreach (Observer o in m_Observers){
+        foreach (IObserver o in m_Observers){
             o.OnNotify(this, invocation, data);
         }
     }
@@ -84,18 +89,8 @@ public class City : MonoBehaviour, Observable {
         Unit unit = collision.gameObject.GetComponent<Unit>();
         if (unit != null && !(unit.Team.Equals(team)))
         {
-            TakeDamage(UnityEngine.Random.Range(10f, 20f));
+            TakeDamage(Random.Range(10f, 20f), unit.Team);
         }
-        City city = collision.gameObject.GetComponent<City>();
-        if (city != null && !(city.Team.Equals(team)))
-        {
-            TakeDamage(UnityEngine.Random.Range(10f, 20f));
-        }
-    }
-
-    private void TakeDamage(float damage)
-    {
-        health -= damage;
     }
 
     /// <summary>
@@ -104,7 +99,27 @@ public class City : MonoBehaviour, Observable {
     private void OnMouseDown()
     {
         Highlight();
-        NotifyAll<VoidObject>(UIObserver.INVOKE_CITY_DATA);
+        NotifyAll(Invocation.CITY_MENU);
+    }
+
+    /// <summary>
+    /// Causes the city to lose health. If the city's health goes to or below 
+    /// zero, its team changes to the team that caused the damage, and its 
+    /// health gets set to a CAPTURED_HEALTH (to prevent rapid capturing / 
+    /// recapturing in the event of a major skirmish).
+    /// </summary>
+    /// <param name="damage">The amount of damage to take.</param>
+    /// <param name="source">The source of the damage.</param>
+    private void TakeDamage(float damage, Team source)
+    {
+        health -= damage;
+        if (health < 0f)
+        {
+            health = CAPTURED_HEALTH;
+            m_Surface.material.color = source.color;
+            cityName = source.title;
+            NotifyAll(Invocation.CITY_CAPTURED, source);
+        }
     }
 
     /// <summary>
@@ -158,11 +173,11 @@ public class City : MonoBehaviour, Observable {
     public float Health { get { return health; } }
 
     /// <summary>
-    /// Returns this city's team.
+    /// This city's team.
     /// </summary>
-    public Team Team
-    {
+    public Team Team {
         get { return team; }
+        set { team = value; }
     }
 
     /// <summary>

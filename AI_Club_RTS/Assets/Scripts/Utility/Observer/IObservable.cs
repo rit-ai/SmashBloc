@@ -10,13 +10,13 @@ using UnityEngine;
  * change, Observers receive notifications and forward them to relevant 
  * classes.
  * **/
-public interface Observable {
+public interface IObservable {
 
     /// <summary>
     /// Notify all observers.
     /// </summary>
-    /// <param name="invocation">The title of the event.</param>
+    /// <param name="invoke">The type of event.</param>
     /// <param name="data">Any other useful data.</param>
-    void NotifyAll<T>(string invocation, params T[] data);
+    void NotifyAll(Invocation invoke, params object[] data);
 
 }
