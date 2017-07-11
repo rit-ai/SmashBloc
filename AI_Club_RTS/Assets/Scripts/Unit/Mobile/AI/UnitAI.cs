@@ -28,7 +28,7 @@ public abstract class UnitAI : BaseAI
     // Unit AIs command Players with UnitCommands.
     new protected Queue<UnitCommand> commandQueue;
     // This is the most updated information the AI has from its body.
-    protected UnitInfo info;
+    protected MobileUnitInfo info;
     // The absolute destination of the unit, separate from the local 
     // destination (which this AI should freely change). This value is set by 
     // either the player, or by a "parent AI" that controls all the units.
@@ -45,11 +45,11 @@ public abstract class UnitAI : BaseAI
     // Sealed and protected, to handle the requirements of BaseAI
     public sealed override void UpdateInfo(object info)
     {
-        if (!(info is UnitInfo))
+        if (!(info is MobileUnitInfo))
         {
             throw new ArgumentException("Attempted to call UpdateState with wrong Info type.", "info");
         }
-        this.info = (info as UnitInfo);
+        this.info = (info as MobileUnitInfo);
         Decide();
     }
 

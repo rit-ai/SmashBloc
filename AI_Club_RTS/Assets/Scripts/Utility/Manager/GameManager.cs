@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     /// <param name="terrain">The terrain, which was right clicked such to 
     /// invoke this method.</param>
-    public void SetNewDestination(HashSet<Unit> selectedUnits, RTS_Terrain terrain)
+    public void SetNewDestination(HashSet<MobileUnit> selectedUnits, RTS_Terrain terrain)
     {
         if (selectedUnits == null) { return; }
         RaycastHit hit;
@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour {
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
             // Set the destination of all the units
-            foreach (Unit u in selectedUnits)
+            foreach (MobileUnit u in selectedUnits)
             {
                 if (u.Team == playerTeam)
                     u.Destination = hit.point;

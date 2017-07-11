@@ -112,11 +112,11 @@ public class Player : MonoBehaviour {
             Debug.Assert(toSpawnCost > 0);
             goldAmount -= toSpawnCost;
 
-            Unit newUnit = Utils.IdentityToPrefab(toSpawn);
+            MobileUnit newUnit = Utils.IdentityToPrefab(toSpawn);
             Transform spawnPoint = toSpawnAt.SpawnPoint;
             newUnit = Instantiate(newUnit, spawnPoint.transform.position, Quaternion.identity);
             // Sets default destination to be the location the unit spawns
-            newUnit.Destination = transform.position;
+            newUnit.Destination = newUnit.transform.position;
             newUnit.Init(team);
             newUnit.SetName(newUnit.UnitName + team.units.Count.ToString());
             team.units.Add(newUnit);

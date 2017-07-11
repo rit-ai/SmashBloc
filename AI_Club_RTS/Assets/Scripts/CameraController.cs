@@ -43,7 +43,7 @@ public class CameraController : MonoBehaviour, IObservable {
     private Camera m_Camera;
     private Transform m_CameraRig;
     private List<IObserver> m_Observers;
-    private HashSet<Unit> m_SelectedUnits;
+    private HashSet<MobileUnit> m_SelectedUnits;
     private State m_CurrentState;
     private Vector3 m_MousePos;
     private Rect m_ScreenBorderInverse;
@@ -69,7 +69,7 @@ public class CameraController : MonoBehaviour, IObservable {
             gameObject.AddComponent<UIObserver>(),
             gameObject.AddComponent<GameObserver>()
         };
-        m_SelectedUnits = new HashSet<Unit>();
+        m_SelectedUnits = new HashSet<MobileUnit>();
 
         // Rectangle that contains everything EXCEPT the screen border
         m_ScreenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
@@ -310,14 +310,11 @@ public class CameraController : MonoBehaviour, IObservable {
     {
         private CameraController m_CameraController;
         private Camera m_Camera;
-        //private HashSet<Unit> m_SelectedUnits;
 
         public DrawingState(CameraController controller)
         {
             m_CameraController = controller;
             m_Camera = controller.m_Camera;
-
-            //m_SelectedUnits = controller.m_SelectedUnits;
         }
 
         /// <summary>
@@ -345,7 +342,7 @@ public class CameraController : MonoBehaviour, IObservable {
             HandleInput();
 
             // Take the selection box and highlight all the objects inside
-            foreach (Unit s in FindObjectsOfType<Unit>())
+            foreach (MobileUnit s in FindObjectsOfType<MobileUnit>())
             {
                 if (IsWithinSelectionBounds(s))
                 {
@@ -361,7 +358,7 @@ public class CameraController : MonoBehaviour, IObservable {
         }
 
         // Checks to see if a given object is within the area being selected
-        private bool IsWithinSelectionBounds(Unit unit)
+        private bool IsWithinSelectionBounds(MobileUnit unit)
         {
             Bounds viewportBounds = Utils.GetViewportBounds(m_Camera, m_CameraController.m_MousePos, Input.mousePosition);
             return viewportBounds.Contains(m_Camera.WorldToViewportPoint(unit.transform.position));

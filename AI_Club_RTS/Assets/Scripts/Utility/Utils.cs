@@ -18,8 +18,8 @@ using UnityEngine;
  * **/
 public class Utils : MonoBehaviour {
 
-    private static Unit InfantryPrefab = (Unit)Resources.Load("Prefabs/Units/" + Infantry.IDENTITY, typeof(Unit));
-    private static Unit TankPrefab = (Unit)Resources.Load("Prefabs/Units/" + Tank.IDENTITY, typeof(Unit));
+    private static MobileUnit InfantryPrefab = (MobileUnit)Resources.Load("Prefabs/Units/" + Infantry.IDENTITY, typeof(MobileUnit));
+    private static MobileUnit TankPrefab = (MobileUnit)Resources.Load("Prefabs/Units/" + Tank.IDENTITY, typeof(MobileUnit));
 
     private static Player playerOne;
 
@@ -125,7 +125,7 @@ public class Utils : MonoBehaviour {
     /// <summary>
     /// Returns the prefab associated with a particular type of Unit.
     /// </summary>
-    public static Unit IdentityToPrefab(string identity)
+    public static MobileUnit IdentityToPrefab(string identity)
     {
         switch (identity)
         {

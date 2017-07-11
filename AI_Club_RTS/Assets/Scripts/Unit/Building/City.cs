@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,33 +10,29 @@ using UnityEngine;
  * Class designed to handle City-specific functionality and state. Like with 
  * other game objects, menus and UI elements should be handled by observers.
  * **/
-public class City : MonoBehaviour, IObservable {
+public class City : Unit {
 
     // Public constants
+    public const string IDENTITY = "CITY";
     public const float MAX_HEALTH = 500f;
-    // The health a city has just after it's captured
-    public const float CAPTURED_HEALTH = 50f;
-    // The rate at which a city's health regenerates
-    public const float REGENERATE_HEALTH_RATE = 0.2f;
     public const int MAX_INCOME_LEVEL = 8;
-    public const int MIN_INCOME_LEVEL = 1;
 
     // Public fields
     public Transform m_SpawnPoint;
-    public MeshRenderer m_HighlightInner;
-    public MeshRenderer m_HighlightOuter;
-    
+
     // Private constants
     private const string DEFAULT_NAME = "Dylanto";
+    // The health a city has just after it's captured
+    private const float CAPTURED_HEALTH = 50f;
+    // The rate at which a city's health regenerates
+    private const float REGENERATE_HEALTH_RATE = 0.2f;
+    private const int COST = 500;
+    private const int MIN_INCOME_LEVEL = 1;
     private const int DEFAULT_INCOME_LEVEL = 8;
 
     // Private fields
-    private MeshRenderer m_Surface;
     private List<IObserver> m_Observers;
-    private Team team;
     private string cityName;
-    private string customName;
-    private float health;
     private int incomeLevel;
 
     /// <summary>
@@ -58,29 +55,15 @@ public class City : MonoBehaviour, IObservable {
     }
 
     // Use this for initialization
-    void Start()
+    protected new void Start()
     {
-        // Handle private fields
-        m_Observers = new List<IObserver>
-        {
-            gameObject.AddComponent<UIObserver>(),
-            gameObject.AddComponent<GameObserver>()
-        };
+        maxHealth = MAX_HEALTH;
+        health = maxHealth;
 
         // Default values
-        health = MAX_HEALTH;
         incomeLevel = DEFAULT_INCOME_LEVEL;
-    }
 
-    /// <summary>
-    /// Notifies all observers.
-    /// </summary>
-    /// <param name="data">The type of notification.</param>
-    public void NotifyAll(Invocation invocation, params object[] data)
-    {
-        foreach (IObserver o in m_Observers){
-            o.OnNotify(this, invocation, data);
-        }
+        base.Start();
     }
 
     /// <summary>
@@ -88,12 +71,12 @@ public class City : MonoBehaviour, IObservable {
     /// same team.
     /// </summary>
     /// <param name="collision"></param>
-    private void OnCollisionEnter(Collision collision)
+    protected override void OnCollisionEnter(Collision collision)
     {
         Unit unit = collision.gameObject.GetComponent<Unit>();
         if (unit != null && !(unit.Team.Equals(team)))
         {
-            TakeDamage(Random.Range(10f, 20f), unit.Team);
+            TakeDamage(UnityEngine.Random.Range(10f, 20f), unit);
         }
     }
 
@@ -107,41 +90,29 @@ public class City : MonoBehaviour, IObservable {
     }
 
     /// <summary>
-    /// Causes the city to lose health. If the city's health goes to or below 
+    /// Causes the city to lose health. 
+    /// </summary>
+    /// <param name="damage">The amount of damage to take.</param>
+    /// <param name="source">The source of the damage.</param>
+    public override void TakeDamage(float damage, Unit source)
+    {
+        base.TakeDamage(damage, source);
+    }
+
+    /// <summary>
+    /// If the city's health goes to or below 
     /// zero, its team changes to the team that caused the damage, and its 
     /// health gets set to a CAPTURED_HEALTH (to prevent rapid capturing / 
     /// recapturing in the event of a major skirmish).
     /// </summary>
-    /// <param name="damage">The amount of damage to take.</param>
-    /// <param name="source">The source of the damage.</param>
-    private void TakeDamage(float damage, Team source)
+    /// <param name="capturer">The capturer of the city.</param>
+    protected override void OnDeath(Unit capturer)
     {
-        health -= damage;
-        if (health < 0f)
-        {
-            health = CAPTURED_HEALTH;
-            m_Surface.material.color = source.color;
-            cityName = source.title;
-            NotifyAll(Invocation.CITY_CAPTURED, source);
-        }
-    }
-
-    /// <summary>
-    /// Highlights the unit.
-    /// </summary>
-    public void Highlight()
-    {
-        m_HighlightInner.enabled = true;
-        m_HighlightOuter.enabled = true;
-    }
-
-    /// <summary>
-    /// Removes highlighting on the unit.
-    /// </summary>
-    public void RemoveHighlight()
-    {
-        m_HighlightInner.enabled = false;
-        m_HighlightOuter.enabled = false;
+        health = CAPTURED_HEALTH;
+        m_Surface.material.color = capturer.Team.color;
+        cityName = capturer.Team.title;
+        NotifyAll(Invocation.CITY_CAPTURED, capturer.Team);
+        Debug.Log("yes");
     }
 
     /// <summary>
@@ -174,29 +145,13 @@ public class City : MonoBehaviour, IObservable {
         }
     }
 
-    /// <summary>
-    /// The health of a city.
-    /// </summary>
-    public float Health {
-        get { return health; }
-        set { health = value; }
-    }
-
-    /// <summary>
-    /// This city's team.
-    /// </summary>
-    public Team Team {
-        get { return team; }
-        set { team = value; }
-    }
-
-    /// <summary>
-    /// Sets the custom name of the city.
-    /// </summary>
-    public void SetCustomName(string newName)
+    public override string Identity()
     {
-        customName = newName;
+        return IDENTITY;
     }
 
-
+    public override int Cost()
+    {
+        return COST;
+    }
 }
