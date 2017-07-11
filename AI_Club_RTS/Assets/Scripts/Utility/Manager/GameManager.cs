@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour {
     private static List<Player> players;
 
     private Camera m_Camera;
+    private CameraController m_CameraController;
     private RTS_Terrain m_Terrain;
     private bool oneTeamLeft = false;
 
@@ -77,10 +78,12 @@ public class GameManager : MonoBehaviour {
     private void Awake()
     {
         m_Camera = Camera.main;
+        m_CameraController = m_Camera.GetComponent<CameraController>();
 
         m_Terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
         citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
 
+        Debug.Assert(m_CameraController != null);
         Debug.Assert(m_Terrain != null);
         Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
 
@@ -114,7 +117,7 @@ public class GameManager : MonoBehaviour {
         PLAYER = players[0];
 
         // Set main camera to be behind the player's first city
-        CenterCameraBehindPosition(teams[0].cities[0].transform.position);
+        m_CameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position, m_Terrain.transform.position);
     }
 
     private void Start()
@@ -174,22 +177,6 @@ public class GameManager : MonoBehaviour {
             yield return new WaitForSeconds(GOLD_INCREMENT_RATE);
 
         }
-    }
-
-    private void CenterCameraBehindPosition(Vector3 position)
-    {
-        // Move the camera over the position
-        Vector3 dest = position;
-        // Rotate the camera toward the center of the map
-        Vector3 towardCenter = dest - m_Terrain.transform.position;
-        Quaternion rotation = Quaternion.LookRotation(towardCenter);
-        rotation.x = 0; rotation.z = 0; // x and z aren't relevant
-        // Set values so that the orientation of the camera is unchanged
-        dest = rotation * dest;
-        dest.y = m_Camera.transform.position.y;
-        dest.z += 200; // offset to account for angle of camera
-        
-        m_Camera.transform.position = dest;
     }
     
 }

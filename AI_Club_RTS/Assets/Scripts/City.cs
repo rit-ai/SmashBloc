@@ -13,7 +13,10 @@ public class City : MonoBehaviour, IObservable {
 
     // Public constants
     public const float MAX_HEALTH = 500f;
+    // The health a city has just after it's captured
     public const float CAPTURED_HEALTH = 50f;
+    // The rate at which a city's health regenerates
+    public const float REGENERATE_HEALTH_RATE = 0.2f;
     public const int MAX_INCOME_LEVEL = 8;
     public const int MIN_INCOME_LEVEL = 1;
 
@@ -171,7 +174,13 @@ public class City : MonoBehaviour, IObservable {
         }
     }
 
-    public float Health { get { return health; } }
+    /// <summary>
+    /// The health of a city.
+    /// </summary>
+    public float Health {
+        get { return health; }
+        set { health = value; }
+    }
 
     /// <summary>
     /// This city's team.
