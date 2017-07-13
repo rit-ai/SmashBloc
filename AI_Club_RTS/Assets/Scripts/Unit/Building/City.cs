@@ -112,7 +112,6 @@ public class City : Unit {
         m_Surface.material.color = capturer.Team.color;
         cityName = capturer.Team.title;
         NotifyAll(Invocation.CITY_CAPTURED, capturer.Team);
-        Debug.Log("yes");
     }
 
     /// <summary>
@@ -145,11 +144,17 @@ public class City : Unit {
         }
     }
 
+    /// <summary>
+    /// Returns the class name of the unit in the form of a string.
+    /// </summary>
     public override string Identity()
     {
         return IDENTITY;
     }
 
+    /// <summary>
+    /// Returns how much a city would cost to place.
+    /// </summary>
     public override int Cost()
     {
         return COST;

@@ -79,6 +79,22 @@ public enum Invocation {
     /***************/
 
     /// <summary>
+    /// Expresses that the game is starting, so that UI Observer can play the 
+    /// starting animation.
+    /// 
+    /// Entity: GameManager
+    /// </summary>
+    GAME_STARTING,
+
+    /// <summary>
+    /// Expresses that the game is ending, so that the UI Observer can play the 
+    /// ending animation.
+    /// 
+    /// Entity: GameManager
+    /// </summary>
+    GAME_ENDING,
+
+    /// <summary>
     /// Expresses that a menu should be opened to display information about a
     /// Unit.
     /// 

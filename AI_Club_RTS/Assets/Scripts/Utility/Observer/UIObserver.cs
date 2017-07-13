@@ -13,19 +13,17 @@ public class UIObserver : MonoBehaviour, IObserver {
     // We keep a reference to the UI Manager to tell it what we want it to show
     private static UIManager manager;
     private static Team PLAYER_TEAM;
-
+    private static string START_GAME_TEXT = "BEGIN!";
+    private static string END_GAME_TEXT = "FINISH!";
 
     /// <summary>
     /// Find the UI Manager and store a reference to it.
     /// </summary>
     private void Start()
     {
-        if (manager == null)
-        {
-            var managers = FindObjectsOfType<UIManager>();
-            if (managers.Length != 1) { throw new UnityException("Incorrect number of UIManagers: " + managers.Length); }
-            manager = managers[0];
-        }
+        manager = Toolbox.UIManager;
+
+        Debug.Assert(manager);
 
         PLAYER_TEAM = GameManager.PLAYER.Team;
     }
@@ -42,6 +40,12 @@ public class UIObserver : MonoBehaviour, IObserver {
         bool enabled = false;
         switch (invoke)
         {
+            case Invocation.GAME_STARTING:
+                StartCoroutine(manager.AnimateText(START_GAME_TEXT));
+                break;
+            case Invocation.GAME_ENDING:
+                StartCoroutine(manager.AnimateText(END_GAME_TEXT));
+                break;
             case Invocation.TOGGLE_PAUSE:
                 manager.TogglePauseText();
                 break;

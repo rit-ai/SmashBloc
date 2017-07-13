@@ -115,12 +115,11 @@ public abstract class Unit : MonoBehaviour, IObservable {
     /// Deal specified damage, and Kill() if applicable.
     /// </summary>
     /// <param name="damage">Damage to Take.</param>
-    public virtual void TakeDamage(float damage, Unit source)
+    public virtual void TakeDamage(float damage, Unit source = null)
     {
 
         health -= damage;
         m_Surface.material.color = Color.Lerp(Color.black, team.color, health / MaxHealth);
-        Debug.Log(Identity());
         if (health <= 0) { OnDeath(source); }
     }
 

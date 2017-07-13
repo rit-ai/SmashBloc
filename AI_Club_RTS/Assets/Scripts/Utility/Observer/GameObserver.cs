@@ -26,12 +26,7 @@ public class GameObserver : MonoBehaviour, IObserver {
     /// </summary>
     private void Awake()
     {
-        if (manager == null)
-        {
-            var managers = FindObjectsOfType<GameManager>();
-            if (managers.Length != 1) { throw new UnityException("Incorrect number of UIManagers: " + managers.Length); }
-            manager = managers[0];
-        }
+        manager = Toolbox.GameManager;
     }
 
     /// <summary>

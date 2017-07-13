@@ -105,7 +105,7 @@ public class Player : MonoBehaviour {
     /// </summary>
     public void SpawnUnit()
     {
-        if (team.units.Count >= MAX_UNITS) { return; }
+        if (team.mobiles.Count >= MAX_UNITS) { return; }
 
         if (goldAmount > toSpawnCost)
         {
@@ -118,18 +118,9 @@ public class Player : MonoBehaviour {
             // Sets default destination to be the location the unit spawns
             newUnit.Destination = newUnit.transform.position;
             newUnit.Init(team);
-            newUnit.SetName(newUnit.UnitName + team.units.Count.ToString());
-            team.units.Add(newUnit);
+            newUnit.SetName(newUnit.UnitName + team.mobiles.Count.ToString());
+            team.mobiles.Add(newUnit);
         }
-    }
-
-    /// <summary>
-    /// Removes a unit from the list of units this player controls.
-    /// </summary>
-    /// <param name="unit">The unit to remove.</param>
-    public void RemoveUnit(Unit unit)
-    {
-        team.units.Remove(unit);
     }
 
     /// <summary>

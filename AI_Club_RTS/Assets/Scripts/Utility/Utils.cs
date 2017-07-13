@@ -18,9 +18,6 @@ using UnityEngine;
  * **/
 public class Utils : MonoBehaviour {
 
-    private static MobileUnit InfantryPrefab = (MobileUnit)Resources.Load("Prefabs/Units/" + Infantry.IDENTITY, typeof(MobileUnit));
-    private static MobileUnit TankPrefab = (MobileUnit)Resources.Load("Prefabs/Units/" + Tank.IDENTITY, typeof(MobileUnit));
-
     private static Player playerOne;
 
     static Texture2D whiteTexture;
@@ -130,11 +127,9 @@ public class Utils : MonoBehaviour {
         switch (identity)
         {
             case Infantry.IDENTITY:
-                Debug.Assert(InfantryPrefab);
-                return InfantryPrefab;
+                return Toolbox.InfantryPrefab;
             case Tank.IDENTITY:
-                Debug.Assert(TankPrefab);
-                return TankPrefab;
+                return Toolbox.TankPrefab;
         }
 
         throw new KeyNotFoundException("Bad value passed to UnitToPrefab()");

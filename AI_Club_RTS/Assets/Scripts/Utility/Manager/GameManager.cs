@@ -1,29 +1,49 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour {
+/*
+ * @author Paul Galatic
+ * 
+ * This game manager manages the game. Pretty simple, eh?
+ * 
+ * Its responsibilities are pretty complex, so hold onto your coffee. The Game
+ * Manager handles the loading of scenes, the starting and ending of rounds, 
+ * and also keeps track of all Players, Teams, and game statstics. It receives
+ * commands from GameObserver, but can also forward commands to Observers 
+ * (particularly UIObserver, as the UI Manager needs to know when rounds start
+ * and end).
+ * 
+ * Everything that involves changing the state of the game as a whole should go
+ * in this class.
+ * **/
+public class GameManager : MonoBehaviour, IObservable {
 
     // Public constants
     // The first created player, which will always be the main player.
     public static Player PLAYER;
-
-    // Public fields
-    public City cityPrefab;
 
     private const string CITY_SPAWN_TAG = "CitySpawn";
     private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
     private const int MAX_MONEY = 999; // richness ceiling
     private const int NUM_AI_PLAYERS = 1;
 
-    private static GameObject[] citySpawnPoints;
-    private static List<Team> teams;
-    private static List<Player> players;
+    private GameObject[] citySpawnPoints;
+    private List<Team> teams;
+    private List<Player> players;
+    private List<IObserver> observers;
 
-    private Camera m_Camera;
     private CameraController m_CameraController;
     private RTS_Terrain m_Terrain;
-    private bool oneTeamLeft = false;
+
+    public void NotifyAll(Invocation invoke, params object[] data)
+    {
+        foreach (IObserver o in observers)
+        {
+            o.OnNotify(this, invoke, data);
+        }
+    }
 
     /// <summary>
     /// Pauses or unpauses the game, depending on the current timescale.
@@ -44,7 +64,7 @@ public class GameManager : MonoBehaviour {
     {
         if (selectedUnits == null) { return; }
         RaycastHit hit;
-        Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Team playerTeam = PLAYER.Team;
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
@@ -72,13 +92,32 @@ public class GameManager : MonoBehaviour {
         city.Team = newTeam;
 
         // Have all the team's cities been eliminated?
+        foreach (Team t in teams)
+        {
+            if (t.cities.Count == 0)
+            {
+                t.DestroyTeam();
+            }
+        }
 
+        // This is a little redundant, but won't matter unless we want 1000+ 
+        // teams.
+        teams.RemoveAll(t => t.cities.Count == 0);
     }
 
+    /// <summary>
+    /// EXTREMELY IMPORTANT INITAILIZATION METHOD.
+    /// 
+    /// This is one of the first initialization methods to occur in the game. 
+    /// Since Game Manager forwards its state to many other classes, ensuring 
+    /// said state is valid and accurate is very important to avoid crashes.
+    /// 
+    /// When editing this method, take care to validate you additions with 
+    /// Debug.Assert().
+    /// </summary>
     private void Awake()
     {
-        m_Camera = Camera.main;
-        m_CameraController = m_Camera.GetComponent<CameraController>();
+        m_CameraController = Camera.main.GetComponent<CameraController>();
 
         m_Terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
         citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
@@ -87,7 +126,10 @@ public class GameManager : MonoBehaviour {
         Debug.Assert(m_Terrain != null);
         Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
 
-        City curr;
+        observers = new List<IObserver>
+        {
+            gameObject.AddComponent<UIObserver>()
+        };
 
         teams = new List<Team>
         {
@@ -101,56 +143,94 @@ public class GameManager : MonoBehaviour {
             Player.MakePlayer(true, teams[1])
         };
 
+        PLAYER = players[0];
+    }
+
+    /// <summary>
+    /// Starts the game loop and takes care of any low-priority initialization.
+    /// </summary>
+    private void Start()
+    {
         // Every player should have at least one city, and we need places to 
         // put them.
         Debug.Assert(citySpawnPoints.Length >= NUM_AI_PLAYERS + 1);
         // The number of cities to instantiate is capped both by the number of
         // places to spawn them as well as the total number of players in the 
         // game. 
+        City curr;
         for (int x = 0; ((x < citySpawnPoints.Length) && (x < NUM_AI_PLAYERS + 1)); x++)
         {
-            curr = City.MakeCity(teams[x], cityPrefab, citySpawnPoints[x].transform.position);
+            curr = City.MakeCity(teams[x], Toolbox.CityPrefab, citySpawnPoints[x].transform.position);
             teams[x].cities.Add(curr);
 
         }
 
-        PLAYER = players[0];
-
         // Set main camera to be behind the player's first city
         m_CameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position, m_Terrain.transform.position);
-    }
 
-    private void Start()
-    {
         StartCoroutine(GameLoop());
 
     }
 
+    /// <summary>
+    /// Simple game loop that goes through the three phases--Starting, Playing,
+    /// and Ending--then repeats.
+    /// </summary>
     private IEnumerator GameLoop()
     {
         yield return StartCoroutine(RoundStarting());
         yield return StartCoroutine(RoundPlaying());
         yield return StartCoroutine(RoundEnding());
 
+        ResetGame();
+
         StartCoroutine(GameLoop());
     }
 
+    /// <summary>
+    /// Starts the round.
+    /// 
+    /// FIXME For some reason, Game Manager isn't giving Toolbox enough time to
+    /// find the UI Observer before starting the game.
+    /// </summary>
     private IEnumerator RoundStarting()
     {
+        yield return new WaitForSeconds(1); // FIXMe
+
+        NotifyAll(Invocation.GAME_STARTING);
+
         yield return new WaitForSeconds(1);
+
+        // Start IEnumerators
+        StartCoroutine(IncrementGold());
     }
 
+    /// <summary>
+    /// This loop runs until there is only one team left.
+    /// </summary>
     private IEnumerator RoundPlaying()
     {
-        // Handle IEnumerators
-        StartCoroutine(IncrementGold());
-        yield return new WaitUntil(() => oneTeamLeft == true);
+        yield return new WaitUntil(() => teams.Count == 1);
     }
 
+    /// <summary>
+    /// Finishes the round.
+    /// </summary>
     private IEnumerator RoundEnding()
     {
+        // Stop IEnumerators
         StopCoroutine(IncrementGold());
-        yield return new WaitForSeconds(1);
+
+        NotifyAll(Invocation.GAME_ENDING);
+        yield return null;
+    }
+
+    /// <summary>
+    /// Resets the game to its original state.
+    /// </summary>
+    private void ResetGame()
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -178,5 +258,4 @@ public class GameManager : MonoBehaviour {
 
         }
     }
-    
 }

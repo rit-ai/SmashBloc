@@ -15,7 +15,6 @@ public abstract class MobileUnit : Unit
     protected UnitAI ai;
     protected Vector3 newPos;
     protected Vector3 destination;
-    protected bool alive;
     protected float damage;
     protected float sightRange;
     protected float attackRange;
@@ -29,7 +28,6 @@ public abstract class MobileUnit : Unit
     protected override void Start()
     {
         base.Start();
-        alive = true;
         destination = team.cities[0].transform.position;
         info = new MobileUnitInfo();
 
@@ -48,6 +46,15 @@ public abstract class MobileUnit : Unit
 
         this.team = team;
         m_Surface.material.color = team.color;
+    }
+
+    /// <summary>
+    /// Causes the unit's health to become zero.
+    /// </summary>
+    public void ForceKill()
+    {
+        health = 0;
+        OnDeath(null);
     }
 
     /// <summary>
@@ -98,7 +105,6 @@ public abstract class MobileUnit : Unit
     /// </summary>
     protected override void OnDeath(Unit killer)
     {
-        alive = false;
         StartCoroutine(DeathAnimation());
     }
 
