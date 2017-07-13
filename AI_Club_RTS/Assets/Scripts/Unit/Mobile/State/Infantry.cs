@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Infantry : Unit {
+public class Infantry : MobileUnit {
     // Author: Ben Fairlamb
     // Author: Paul Galatic
     // Purpose: Infantry unit
@@ -28,7 +28,7 @@ public class Infantry : Unit {
 
     // Methods
     // Use this for initialization
-    protected override void Start () {
+    protected new void Start () {
         // Handle components
         physics = new InfantryPhysics(this);
         ai = gameObject.AddComponent<UnitAI_Template>();
@@ -38,11 +38,10 @@ public class Infantry : Unit {
         dmgType = DMG_TYPE;
         // team = "NULL";
         maxHealth = MAXHEALTH;
-        health = MAXHEALTH;
+        health = MAXHEALTH - 10f;
         damage = DAMAGE;
         attackRange = RANGE;
         // Handle fields
-        TakeDamage(UnityEngine.Random.Range(10f, 50f));
         base.Start();
     }
 
@@ -77,6 +76,8 @@ public class Infantry : Unit {
     /// </summary>
     protected override IEnumerator DeathAnimation()
     {
+        GetComponent<Rigidbody>().isKinematic = true;
+        Color fadeOut = m_Surface.material.color;
         float y = transform.position.y;
         float dest = transform.position.y + ASCENSION_HEIGHT;
         for (float x = y; x < dest; x++)
@@ -84,6 +85,9 @@ public class Infantry : Unit {
             newPos = transform.position;
             newPos.y += 10;
             transform.position = newPos;
+
+            fadeOut.a -= 0.3f;
+            m_Surface.material.color = fadeOut;
             yield return 0f;
         }
 
@@ -91,4 +95,5 @@ public class Infantry : Unit {
 
         yield return null;
     }
+
 }

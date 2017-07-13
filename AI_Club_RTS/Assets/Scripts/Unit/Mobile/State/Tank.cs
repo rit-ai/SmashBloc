@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tank : Unit {
+public class Tank : MobileUnit {
     // Author: Ben Fairlamb
     // Purpose: Tank unit
 
@@ -61,5 +61,10 @@ public class Tank : Unit {
     protected override IEnumerator DeathAnimation()
     {
         yield return null;
+    }
+
+    protected override void OnDeath(Unit killer)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -22,7 +22,6 @@ public abstract class Unit : MonoBehaviour, IObservable {
     // public fields
     public MeshRenderer m_HighlightInner;
     public MeshRenderer m_HighlightOuter;
-    public LayerMask ignoreAllButUnits;
 
     // protected fields related to unit management
     protected List<IObserver> observers;
@@ -32,62 +31,34 @@ public abstract class Unit : MonoBehaviour, IObservable {
     protected string customName; // user-assigned names
     protected float maxHealth;
     protected float health;
-    protected float damage;
-    protected float sightRange;
-    protected float attackRange;
 
     // protected fields related to fundamentals of unit type
     protected ArmorType armorType;
     protected DamageType dmgType;
-    protected UnitAI ai;
 
     // protected fields related to physics
     protected Rigidbody body;
     protected Collider collision;
-    protected Vector3 newPos;
+
+    // protected fields related to graphics
+    protected MeshRenderer m_Surface;
 
     // protected fields related to behavior
     protected Team team;
-    protected Vector3 destination;
-    protected bool alive;
-
-    // Private constants
-    private const float PASS_INFO_RATE = 1f;
-
-    // Private fields
-    private MeshRenderer m_Surface;
-    private UnitInfo info;
 
     /// <summary>
     /// Sets up Observers and other state common between Units.
     /// </summary>
     protected virtual void Start()
     {
-
         observers = new List<IObserver>
         {
             gameObject.AddComponent<GameObserver>(),
             gameObject.AddComponent<UIObserver>()
         };
 
-        info = new UnitInfo();
-        alive = true;
+        m_Surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
 
-        // Pass info to the AI component every second
-        StartCoroutine(PassInfo());
-    }
-
-    /// <summary>
-    /// Handles any processing that must occur only AFTER the Unit is 
-    /// instantiated. For example, a Unit can only be told what team it's on
-    /// after it's been created.
-    /// </summary>
-    public void Init(Team team)
-    {
-        m_Surface = GetComponent<MeshRenderer>();
-
-        this.team = team;
-        m_Surface.material.color = team.color;
     }
 
     /// <summary>
@@ -98,51 +69,8 @@ public abstract class Unit : MonoBehaviour, IObservable {
     public void NotifyAll(Invocation invocation, params object[] data)
     {
         foreach (IObserver o in observers){
-            o.OnNotify(this, invocation);
+            o.OnNotify(this, invocation, data);
         }
-    }
-
-    /// <summary>
-    /// Grabs all relevant information and builds it into an EnvironmentInfo 
-    /// struct to pass into the unit's AI component.
-    /// </summary>
-    protected IEnumerator PassInfo()
-    {
-        // Add all units within line of sight to the unitsInSightRange list.
-        Unit current;
-        List<Unit> enemiesInSight = new List<Unit>();
-        List<Unit> alliesInSight = new List<Unit>();
-        List<Unit> enemiesInAttackRange = new List<Unit>();
-        List<Collider> collidersInSight;
-        collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButUnits));
-        foreach (Collider c in collidersInSight)
-        {
-            current = c.gameObject.GetComponent<Unit>();
-            // Only be aggressive to units on the other team.
-            if (current.team != team)
-            {
-                // If they're close enough to attack, add them to the second list.
-                if (c.transform.position.magnitude - transform.position.magnitude < attackRange)
-                    enemiesInAttackRange.Add(current);
-                enemiesInSight.Add(current);
-            }
-            else
-            {
-                alliesInSight.Add(current);
-            }
-        }
-
-        // Build the info struct.
-        info.team = team;
-        info.healthPercentage = health / maxHealth;
-        info.damage = damage;
-
-        info.enemiesInSight = enemiesInSight;
-        info.alliesInSight = alliesInSight;
-        info.enemiesInAttackRange = enemiesInAttackRange;
-
-        ai.UpdateInfo(info);
-        yield return new WaitForSeconds(PASS_INFO_RATE);
     }
 
     /// <summary>
@@ -187,20 +115,12 @@ public abstract class Unit : MonoBehaviour, IObservable {
     /// Deal specified damage, and Kill() if applicable.
     /// </summary>
     /// <param name="damage">Damage to Take.</param>
-    public virtual void TakeDamage(float damage)
+    public virtual void TakeDamage(float damage, Unit source = null)
     {
-        health -= damage;
-        m_Surface.material.color = Color.Lerp(Team.color, Color.black, health / MaxHealth);
-        if (health <= 0f) { health = 0f; Kill(); }
-    }
 
-    /// <summary>
-    /// Kill this instance.
-    /// </summary>
-    public void Kill()
-    {
-        alive = false;
-        StartCoroutine(DeathAnimation());
+        health -= damage;
+        m_Surface.material.color = Color.Lerp(Color.black, team.color, health / MaxHealth);
+        if (health <= 0) { OnDeath(source); }
     }
 
     // Properties
@@ -210,6 +130,7 @@ public abstract class Unit : MonoBehaviour, IObservable {
     public Team Team
     {
         get { return team; }
+        set { team = value; }
     }
 
     /// <summary>
@@ -241,15 +162,6 @@ public abstract class Unit : MonoBehaviour, IObservable {
     public void SetCustomName(string newName)
     {
         customName = newName;
-    }
-
-    /// <summary>
-    /// Returns this unit's destination.
-    /// </summary>
-    public Vector3 Destination
-    {
-        get { return destination; }
-        set { destination = value; }
     }
 
     /// <summary>
@@ -285,62 +197,15 @@ public abstract class Unit : MonoBehaviour, IObservable {
         set { health = value; }
     }
 
-    /// <summary>
-    /// Gets the Damage dealt by the unit.
-    /// </summary>
-    public float Damage
-    {
-        get { return damage; }
-    }
-
-    /// <summary>
-    /// Gets the unit's Range.
-    /// </summary>
-    public float Range
-    {
-        get { return attackRange; }
-    }
 
     /// <summary>
     /// All units must have code for what they do when another object collides 
     /// with them, but this behavior may vary from unit to unit, or be 
     /// otherwise type-specific.
     /// </summary>
-    protected virtual void OnCollisionEnter(Collision collision)
-    {
-        Unit unit = collision.gameObject.GetComponent<Unit>();
-        if (unit != null && !(unit.Team.Equals(team)))
-        {
-            TakeDamage(Random.Range(10f, 20f));
-        }
-        City city = collision.gameObject.GetComponent<City>();
-        if (city != null && !(city.Team.Equals(team)))
-        {
-            TakeDamage(Random.Range(10f, 20f));
-        }
-    }
+    protected abstract void OnCollisionEnter(Collision collision);
 
-    /// <summary>
-    /// "Animates" the death of the unit, which can be handled as the 
-    /// implementer sees fit. The default behavior is to become very heavy and
-    /// then fade out.
-    /// </summary>
-    protected virtual IEnumerator DeathAnimation()
-    {
-        Color fadeOut = m_Surface.material.color;
-
-        GetComponent<Rigidbody>().mass *= 100;
-        for (float x = 1; x > 0; x -= 0.01f)
-        {
-            fadeOut.a = x;
-            m_Surface.material.color = fadeOut;
-            yield return 0f;
-        }
-
-        Destroy(gameObject);
-
-        yield return null;
-    }
+    protected abstract void OnDeath(Unit killer);
 
     /// <summary>
     /// Returns the "identity" of the unit, a unique identifier for the purpose

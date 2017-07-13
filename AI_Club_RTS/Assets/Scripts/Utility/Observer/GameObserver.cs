@@ -18,7 +18,7 @@ using Microsoft;
 public class GameObserver : MonoBehaviour, IObserver {
     // Private fields
     // static because there are multiple GameObservers
-    private static HashSet<Unit> selectedUnits;
+    private static HashSet<MobileUnit> selectedUnits;
     private static GameManager manager;
 
     /// <summary>
@@ -26,12 +26,7 @@ public class GameObserver : MonoBehaviour, IObserver {
     /// </summary>
     private void Awake()
     {
-        if (manager == null)
-        {
-            var managers = FindObjectsOfType<GameManager>();
-            if (managers.Length != 1) { throw new UnityException("Incorrect number of UIManagers: " + managers.Length); }
-            manager = managers[0];
-        }
+        manager = Toolbox.GameManager;
     }
 
     /// <summary>
@@ -50,13 +45,13 @@ public class GameObserver : MonoBehaviour, IObserver {
             // Store selected units (just one)
             case Invocation.ONE_SELECTED:
                 Debug.Assert(entity is Unit);
-                selectedUnits = new HashSet<Unit> { entity as Unit };
+                selectedUnits = new HashSet<MobileUnit> { entity as MobileUnit };
                 break;
             // Store selected units (many)
             case Invocation.UNITS_SELECTED:
                 Debug.Assert(data != null);
-                Debug.Assert(data[0] is HashSet<Unit>);
-                selectedUnits = data[0] as HashSet<Unit>;
+                Debug.Assert(data[0] is HashSet<MobileUnit>);
+                selectedUnits = data[0] as HashSet<MobileUnit>;
                 Debug.Assert(selectedUnits != null);
                 break;
             // Clear stored units
@@ -71,6 +66,7 @@ public class GameObserver : MonoBehaviour, IObserver {
             case Invocation.CITY_CAPTURED:
                 Debug.Assert(entity is City);
                 Debug.Assert(data != null);
+                Debug.Assert(data.Length == 1);
                 Debug.Assert(data[0] is Team);
                 manager.TransferCity(entity as City, data[0] as Team);
                 break;

@@ -13,29 +13,40 @@ public class Team {
     public readonly string title;
     public readonly Color color;
 
-    public List<Unit> units;
+    public List<MobileUnit> mobiles;
     public List<City> cities;
 
     /// <summary>
     /// Constructs a new Team.
     /// </summary>
     /// <param name="owner">The owner of the team.</param>
-    /// <param name="name">The name of the team.</param>
+    /// <param name="title">The name of the team.</param>
     /// <param name="color">The team's color.</param>
-    public Team (string name = "NULL", Color color = default(Color))
+    public Team (string title = "NULL", Color color = default(Color))
     {
-        this.title = name;
+        this.title = title;
         this.color = color;
-        units = new List<Unit>();
+        mobiles = new List<MobileUnit>();
         cities = new List<City>();
     }
 
-    public Team(string name, Color color, List<Unit> units, List<City> cities)
+    public Team(string title, Color color, List<MobileUnit> mobiles, List<City> cities)
     {
-        this.title = name;
+        this.title = title;
         this.color = color;
-        this.units = units;
+        this.mobiles = mobiles;
         this.cities = cities;
+    }
+
+    /// <summary>
+    /// Kills all units in a team.
+    /// </summary>
+    public void DestroyTeam()
+    {
+        foreach (MobileUnit m in mobiles)
+        {
+            m.ForceKill();
+        };
     }
 
     public static bool operator ==(Team t1, Team t2)
