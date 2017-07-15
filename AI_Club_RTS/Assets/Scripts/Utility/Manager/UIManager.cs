@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ using UnityEngine.UI;
  * main overlay. Should **avoid** logic on what to display or what to pass
  * along if possible.
  */
-public class UIManager : MonoBehaviour {
+public class UIManager : MonoBehaviour, IObservable {
 
     // Public constants
     public const string ATTACHED_TO = "Overlay";
@@ -26,6 +27,9 @@ public class UIManager : MonoBehaviour {
     // GENERAL
     public Camera m_Camera;
     public Canvas m_PauseText;
+    // MENU
+    public Canvas m_PauseMenu;
+    public Button m_ResetButton;
     // HEADER
     public Dropdown m_UnitSelect;
     public Text m_CurrentGoldAmount;
@@ -46,18 +50,34 @@ public class UIManager : MonoBehaviour {
     public GameObject m_TargetRing;
 
     // Private fields
+    private List<IObserver> observers;
     private Unit unitCurrentlyDisplayed;
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
     private Vector3 menuSpawnPos;
+
+    public void NotifyAll(Invocation invoke, params object[] data)
+    {
+        foreach (IObserver o in observers)
+        {
+            o.OnNotify(this, invoke, data);
+        }
+    }
+
+    /// <summary>
+    /// Toggles whether or not the pause menu is visible.
+    /// </summary>
+    public void TogglePauseMenu()
+    {
+        m_PauseMenu.enabled = !(m_PauseMenu.enabled);
+    }
 
     /// <summary>
     /// Toggles whether or not the pause text is visible.
     /// </summary>
     public void TogglePauseText()
     {
-        // Set to false if true, true if false
-        m_PauseText.enabled = (m_PauseText.enabled == true) ? false : true;
+        m_PauseText.enabled = !(m_PauseText.enabled);
     }
 
     /// <summary>
@@ -215,7 +235,7 @@ public class UIManager : MonoBehaviour {
             yield return null;
         }
 
-        yield return null;
+        NotifyAll(Invocation.ANIMATION_FINISHED);
     }
 
     // Initialize only once
@@ -229,13 +249,20 @@ public class UIManager : MonoBehaviour {
         m_UnitMenuNameInput.onEndEdit.AddListener(delegate { UpdateCityName(); });
         // Handlers for pressing a button on a menu
         m_CityMenuSpawnButton.onClick.AddListener(delegate { SpawnUnit(); });
+        m_ResetButton.onClick.AddListener(delegate { ResetButtonPressed(); });
     }
 
     // Initialize whenever this object loads
     void Start ()
     {
+        observers = new List<IObserver>
+        {
+            gameObject.AddComponent<GameObserver>()
+        };
+
         // Hide menus
         m_PauseText.enabled = false;
+        m_PauseMenu.enabled = false;
         m_UnitMenu.enabled = false;
         m_CityMenu.enabled = false;
 
@@ -261,6 +288,14 @@ public class UIManager : MonoBehaviour {
 
         oldMousePos = Input.mousePosition;
 	}
+
+    /// <summary>
+    /// Announces that the reset button was pressed.
+    /// </summary>
+    private void ResetButtonPressed()
+    {
+        NotifyAll(Invocation.RESET_GAME);
+    }
 
     /// <summary>
     /// Updates the city menu based on the dynamic status of the city, if a
@@ -355,6 +390,4 @@ public class UIManager : MonoBehaviour {
         string unitText = units.ToString();
         m_CurrentUnitAmount.text = unitText;
     }
-
-
 }

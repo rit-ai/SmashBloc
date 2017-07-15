@@ -27,18 +27,27 @@ public class Infantry : MobileUnit {
     private const int RANGE = 25;
 
     // Methods
+
+    /// <summary>
+    /// Constructs and returns an inactive Infantry game object.
+    /// </summary>
+    public static Infantry MakeInfantry()
+    {
+        Infantry newInfantry = Instantiate(Toolbox.InfantryPrefab as Infantry);
+        newInfantry.physics = newInfantry.gameObject.AddComponent<InfantryPhysics>();
+        newInfantry.ai = newInfantry.gameObject.AddComponent<UnitAI_Template>();
+        newInfantry.ai.Body = newInfantry;
+
+        newInfantry.gameObject.SetActive(false);
+        return newInfantry;
+    }
+
     // Use this for initialization
     protected new void Start () {
-        // Handle components
-        physics = new InfantryPhysics(this);
-        ai = gameObject.AddComponent<UnitAI_Template>();
-        ai.Body = this;
         // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
-        // team = "NULL";
         maxHealth = MAXHEALTH;
-        health = MAXHEALTH - 10f;
         damage = DAMAGE;
         attackRange = RANGE;
         // Handle fields
@@ -91,7 +100,7 @@ public class Infantry : MobileUnit {
             yield return 0f;
         }
 
-        Destroy(gameObject);
+        Toolbox.Pool.ReturnInfantry(this);
 
         yield return null;
     }

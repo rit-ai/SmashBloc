@@ -39,8 +39,14 @@ public class GameObserver : MonoBehaviour, IObserver {
     {
         switch (invoke)
         {
+            // Pause the game
+            case Invocation.PAUSE_AND_LOCK:
             case Invocation.TOGGLE_PAUSE:
                 manager.TogglePause();
+                break;
+            // Reset the game
+            case Invocation.RESET_GAME:
+                manager.ResetGame();
                 break;
             // Store selected units (just one)
             case Invocation.ONE_SELECTED:

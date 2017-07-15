@@ -122,15 +122,15 @@ public class Utils : MonoBehaviour {
     /// <summary>
     /// Returns the prefab associated with a particular type of Unit.
     /// </summary>
-    public static MobileUnit IdentityToPrefab(string identity)
+    public static MobileUnit IdentityToGameObject(string identity)
     {
         switch (identity)
         {
             case Infantry.IDENTITY:
-                return Toolbox.InfantryPrefab;
+                return Toolbox.Pool.RetrieveInfantry();
             case Tank.IDENTITY:
-                return Toolbox.TankPrefab;
-        }
+                return Toolbox.Pool.RetrieveTank();
+           }
 
         throw new KeyNotFoundException("Bad value passed to UnitToPrefab()");
     }

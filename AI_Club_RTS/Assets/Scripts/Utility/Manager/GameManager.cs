@@ -29,13 +29,15 @@ public class GameManager : MonoBehaviour, IObservable {
     private const int MAX_MONEY = 999; // richness ceiling
     private const int NUM_AI_PLAYERS = 1;
 
+    private CameraController m_CameraController;
+    private RTS_Terrain m_Terrain;
     private GameObject[] citySpawnPoints;
+
     private List<Team> teams;
     private List<Player> players;
     private List<IObserver> observers;
 
-    private CameraController m_CameraController;
-    private RTS_Terrain m_Terrain;
+    private bool waitingOnAnimation = false;
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
@@ -106,6 +108,30 @@ public class GameManager : MonoBehaviour, IObservable {
     }
 
     /// <summary>
+    /// Resets the game to its original state.
+    /// </summary>
+    public void ResetGame()
+    {
+        // Destroy all teams
+        foreach (Team t in teams)
+        {
+            t.DestroyTeam();
+        }
+
+        DistributeCities();
+
+        foreach (Player p in players)
+        {
+            p.Start();
+        }
+
+        // Set main camera to be behind the player's first city
+        m_CameraController.CenterCameraBehindPosition(PLAYER.Team.cities[0].transform.position, m_Terrain.transform.position);
+
+        StartCoroutine(GameLoop());
+    }
+
+    /// <summary>
     /// EXTREMELY IMPORTANT INITAILIZATION METHOD.
     /// 
     /// This is one of the first initialization methods to occur in the game. 
@@ -151,19 +177,7 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private void Start()
     {
-        // Every player should have at least one city, and we need places to 
-        // put them.
-        Debug.Assert(citySpawnPoints.Length >= NUM_AI_PLAYERS + 1);
-        // The number of cities to instantiate is capped both by the number of
-        // places to spawn them as well as the total number of players in the 
-        // game. 
-        City curr;
-        for (int x = 0; ((x < citySpawnPoints.Length) && (x < NUM_AI_PLAYERS + 1)); x++)
-        {
-            curr = City.MakeCity(teams[x], Toolbox.CityPrefab, citySpawnPoints[x].transform.position);
-            teams[x].cities.Add(curr);
-
-        }
+        DistributeCities();
 
         // Set main camera to be behind the player's first city
         m_CameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position, m_Terrain.transform.position);
@@ -181,10 +195,6 @@ public class GameManager : MonoBehaviour, IObservable {
         yield return StartCoroutine(RoundStarting());
         yield return StartCoroutine(RoundPlaying());
         yield return StartCoroutine(RoundEnding());
-
-        ResetGame();
-
-        StartCoroutine(GameLoop());
     }
 
     /// <summary>
@@ -221,16 +231,31 @@ public class GameManager : MonoBehaviour, IObservable {
         // Stop IEnumerators
         StopCoroutine(IncrementGold());
 
+        waitingOnAnimation = true; // wait for ending animation
         NotifyAll(Invocation.GAME_ENDING);
-        yield return null;
+        yield return new WaitUntil(() => waitingOnAnimation == false);
+        NotifyAll(Invocation.PAUSE_AND_LOCK);
     }
 
     /// <summary>
-    /// Resets the game to its original state.
+    /// Builds cities at the city spawn points and gives each Player a City.
+    /// 
+    /// The number of cities to instantiate is capped both by the number of
+    /// places to spawn them as well as the total number of players in the 
+    /// game. 
     /// </summary>
-    private void ResetGame()
+    private void DistributeCities()
     {
-        throw new NotImplementedException();
+        // Every player should have at least one city, and we need places to 
+        // put them.
+        Debug.Assert(citySpawnPoints.Length >= NUM_AI_PLAYERS + 1);
+
+        City curr;
+        for (int x = 0; ((x < citySpawnPoints.Length) && (x < NUM_AI_PLAYERS + 1)); x++)
+        {
+            curr = Toolbox.Pool.RetrieveCity(teams[x], citySpawnPoints[x].transform.position);
+            teams[x].cities.Add(curr);
+        }
     }
 
     /// <summary>

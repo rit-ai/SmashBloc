@@ -10,12 +10,13 @@ using UnityEngine.UI;
  * This Toolbox houses single instances of classes to be referred to elsewhere
  * in code. Please think very, very carefully before modifying this file.
  * **/
-public class Toolbox : Singleton<Toolbox> {
+public sealed class Toolbox : Singleton<Toolbox> {
 
-    protected Toolbox() { }
+    private Toolbox() { }
 
-    private static GameManager gameManager;
     private static UIManager uiManager;
+    private static GameManager gameManager;
+    private static ObjectPool pool;
 
     private static City cityPrefab;
     private static MobileUnit infantryPrefab;
@@ -23,13 +24,17 @@ public class Toolbox : Singleton<Toolbox> {
 
     // Public accessors and private variables to ensure that the contents of 
     // the variables will never change
-    public static GameManager GameManager
+    public static ObjectPool Pool
     {
-        get { return gameManager; }
+        get { return pool; }
     }
     public static UIManager UIManager
     {
         get { return uiManager; }
+    }
+    public static GameManager GameManager
+    {
+        get { return gameManager; }
     }
     public static City CityPrefab
     {
@@ -46,6 +51,8 @@ public class Toolbox : Singleton<Toolbox> {
 
     /// <summary>
     /// TODO make UI Manager find or build all of its public variables.
+    /// 
+    /// Order in this function is EXTREMELY important.
     /// </summary>
     private void Awake()
     {
@@ -53,6 +60,7 @@ public class Toolbox : Singleton<Toolbox> {
         infantryPrefab = Resources.Load<Infantry>("Prefabs/Units/" + Infantry.IDENTITY);
         tankPrefab = Resources.Load<Tank>("Prefabs/Units/" + Tank.IDENTITY);
 
+        pool = gameObject.AddComponent<ObjectPool>();
         uiManager = FindObjectOfType<UIManager>();
         gameManager = gameObject.AddComponent<GameManager>();
 

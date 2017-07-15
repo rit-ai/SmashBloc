@@ -40,12 +40,19 @@ public class UIObserver : MonoBehaviour, IObserver {
         bool enabled = false;
         switch (invoke)
         {
+            // Plays the starting animation text
             case Invocation.GAME_STARTING:
                 StartCoroutine(manager.AnimateText(START_GAME_TEXT));
                 break;
+            // Plays the ending animation text
             case Invocation.GAME_ENDING:
                 StartCoroutine(manager.AnimateText(END_GAME_TEXT));
                 break;
+            // Opens the pause menu
+            case Invocation.PAUSE_AND_LOCK:
+                manager.TogglePauseMenu();
+                goto case Invocation.TOGGLE_PAUSE;
+            // Toggles the pause text
             case Invocation.TOGGLE_PAUSE:
                 manager.TogglePauseText();
                 break;
@@ -61,6 +68,7 @@ public class UIObserver : MonoBehaviour, IObserver {
                 enabled = (((City)entity).Team == PLAYER_TEAM);
                 manager.DisplayCityInfo((City)entity, enabled);
                 break;
+            // Moves and renders the target ring
             case Invocation.TARGET_RING:
                 Debug.Assert(entity is RTS_Terrain);
                 manager.DisplayTargetRing((RTS_Terrain)entity);

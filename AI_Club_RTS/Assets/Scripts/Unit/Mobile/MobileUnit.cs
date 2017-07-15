@@ -25,27 +25,22 @@ public abstract class MobileUnit : Unit
     // Private fields
     private MobileUnitInfo info;
 
+    // Initializtion; i.e. values that don't change or need to be initialized
     protected override void Start()
     {
-        base.Start();
-        destination = team.cities[0].transform.position;
         info = new MobileUnitInfo();
+        base.Start();
+    }
+
+    // Set initial state for when a MobileUnit is created
+    protected new virtual void OnEnable()
+    {
+        destination = transform.position;
 
         // Pass info to the AI component every second
         StartCoroutine(PassInfo());
-    }
 
-    /// <summary>
-    /// Handles any processing that must occur only AFTER the Unit is 
-    /// instantiated. For example, a Unit can only be told what team it's on
-    /// after it's been created.
-    /// </summary>
-    public void Init(Team team)
-    {
-        m_Surface = GetComponent<MeshRenderer>();
-
-        this.team = team;
-        m_Surface.material.color = team.color;
+        base.OnEnable();
     }
 
     /// <summary>

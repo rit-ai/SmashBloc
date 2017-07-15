@@ -69,6 +69,17 @@ public class Player : MonoBehaviour {
     }
 
     /// <summary>
+    /// Stops coroutines associated with this Player.
+    /// </summary>
+    public virtual void Stop()
+    {
+        if (brain != null)
+        {
+            StopCoroutine(PassInfo());
+        }
+    }
+
+    /// <summary>
     /// Sets the unit to spawn. Throws an exception on an invalid name being 
     /// passed.
     /// </summary>
@@ -112,12 +123,9 @@ public class Player : MonoBehaviour {
             Debug.Assert(toSpawnCost > 0);
             goldAmount -= toSpawnCost;
 
-            MobileUnit newUnit = Utils.IdentityToPrefab(toSpawn);
+            MobileUnit newUnit = Utils.IdentityToGameObject(toSpawn);
             Transform spawnPoint = toSpawnAt.SpawnPoint;
-            newUnit = Instantiate(newUnit, spawnPoint.transform.position, Quaternion.identity);
             // Sets default destination to be the location the unit spawns
-            newUnit.Destination = newUnit.transform.position;
-            newUnit.Init(team);
             newUnit.SetName(newUnit.UnitName + team.mobiles.Count.ToString());
             team.mobiles.Add(newUnit);
         }

@@ -25,6 +25,14 @@ public enum Invocation {
     /********************************/
 
     /// <summary>
+    /// Expresses that game is being paused.
+    /// 
+    /// Entity: CameraController
+    /// (UIObserver -- Whether to open the pause menu or the end-game screen).
+    /// </summary>
+    PAUSE_AND_LOCK,
+
+    /// <summary>
     /// Expresses that the user has paused the game.
     /// 
     /// Entity: CameraController
@@ -73,6 +81,21 @@ public enum Invocation {
     /// (GameObserver): Team -- The team that captured the city
     /// </summary>
     CITY_CAPTURED,
+
+    /// <summary>
+    /// Expresses that the game is to be reset.
+    /// 
+    /// Entity: UIManager
+    /// </summary>
+    RESET_GAME,
+
+    /// <summary>
+    /// Expresses that an animation playing on the screen has finished, in case
+    /// something in GameManager was waiting on it.
+    /// 
+    /// Entity: UIManager
+    /// </summary>
+    ANIMATION_FINISHED,
 
     /***************/
     // UI Observer //

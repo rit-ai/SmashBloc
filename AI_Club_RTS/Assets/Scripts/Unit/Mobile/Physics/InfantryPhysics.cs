@@ -10,7 +10,7 @@ using UnityEngine;
  * many times a second. Being that this design precludes the use of conditional
  * branches, it may be a bit confusing to read.
  * **/
-public class InfantryPhysics : RTS_Component {
+public class InfantryPhysics : MonoBehaviour, RTS_Component {
 
     // This class should have no public state or methods besides its 
     // constructor and ComponentUpdate().

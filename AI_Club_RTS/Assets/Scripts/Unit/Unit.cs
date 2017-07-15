@@ -57,8 +57,13 @@ public abstract class Unit : MonoBehaviour, IObservable {
             gameObject.AddComponent<UIObserver>()
         };
 
-        m_Surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
+    }
 
+    protected virtual void OnEnable()
+    {
+        health = maxHealth;
+        m_Surface = GetComponent<MeshRenderer>();
+        m_Surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
     }
 
     /// <summary>
@@ -204,7 +209,12 @@ public abstract class Unit : MonoBehaviour, IObservable {
     /// otherwise type-specific.
     /// </summary>
     protected abstract void OnCollisionEnter(Collision collision);
-
+    
+    /// <summary>
+    /// All units must have code to handle what happens when they die. At the 
+    /// very least, the incident should be logged (TODO).
+    /// </summary>
+    /// <param name="killer">The unit's killer.</param>
     protected abstract void OnDeath(Unit killer);
 
     /// <summary>

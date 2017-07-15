@@ -36,34 +36,23 @@ public class City : Unit {
     private int incomeLevel;
 
     /// <summary>
-    /// Constructs and returns an instantiated City.
+    /// Constructs and returns an instantiated and disabled City.
     /// </summary>
-    /// <param name="team">The new City's Team.</param>
-    /// <param name="prefab">The </param>
-    /// <param name="position"></param>
-    /// <returns></returns>
-    public static City MakeCity(Team team, City prefab, Vector3 position)
+    public static City MakeCity()
     {
-        City city = Instantiate(prefab, position, Quaternion.identity);
-        city.Team = team;
-        city.m_Surface = city.GetComponent<MeshRenderer>();
-        Debug.Assert(city.m_Surface != null);
-        city.m_Surface.material.color = team.color;
-        city.cityName = team.title;
+        City city = Instantiate(Toolbox.CityPrefab);
+        city.gameObject.SetActive(false);
 
         return city;
     }
 
-    // Use this for initialization
-    protected new void Start()
+    // Initial state upon creation
+    protected new void OnEnable()
     {
         maxHealth = MAX_HEALTH;
-        health = maxHealth;
-
         // Default values
         incomeLevel = DEFAULT_INCOME_LEVEL;
-
-        base.Start();
+        base.OnEnable();
     }
 
     /// <summary>

@@ -10,36 +10,41 @@ using UnityEngine;
  * **/
 public class Team {
 
+    // The name of the team.
     public readonly string title;
+    // The color, or "uniform," of the team.
     public readonly Color color;
-
+    // The Players that make up the team.
+    public readonly List<Player> members;
+    // The mobile units owned by the team.
     public List<MobileUnit> mobiles;
+    // The cities owned by the team.
     public List<City> cities;
 
     /// <summary>
     /// Constructs a new Team.
     /// </summary>
-    /// <param name="owner">The owner of the team.</param>
-    /// <param name="title">The name of the team.</param>
-    /// <param name="color">The team's color.</param>
     public Team (string title = "NULL", Color color = default(Color))
     {
         this.title = title;
         this.color = color;
+        members = new List<Player>();
         mobiles = new List<MobileUnit>();
         cities = new List<City>();
     }
 
-    public Team(string title, Color color, List<MobileUnit> mobiles, List<City> cities)
+    public Team(string title, Color color, List<Player> members, List<MobileUnit> mobiles, List<City> cities)
     {
         this.title = title;
         this.color = color;
+        this.members = members;
         this.mobiles = mobiles;
         this.cities = cities;
     }
 
     /// <summary>
-    /// Kills all units in a team.
+    /// Kills all units in a team, obliterates all its cities, and deactivates
+    /// all its members.
     /// </summary>
     public void DestroyTeam()
     {
@@ -47,6 +52,17 @@ public class Team {
         {
             m.ForceKill();
         };
+        foreach (City c in cities)
+        {
+            Toolbox.Pool.ReturnCity(c);
+        }
+        foreach (Player p in members)
+        {
+            p.Stop();
+        }
+
+        
+
     }
 
     public static bool operator ==(Team t1, Team t2)

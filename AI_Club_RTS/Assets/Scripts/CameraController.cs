@@ -20,12 +20,13 @@ public class CameraController : MonoBehaviour, IObservable {
     public static KeyCode DESELECT_KEY;
 
     // Public fields
-    public KeyCode m_PauseButton;
+    public KeyCode m_Pause;
+    public KeyCode m_PauseMenu;
     // vv "Arrow Keys" vv
     public KeyCode m_MoveCameraForward;
     public KeyCode m_MoveCameraLeft;
-    public KeyCode m_MoveCameraRight;
     public KeyCode m_MoveCameraBack;
+    public KeyCode m_MoveCameraRight;
 
     // Private constants
     private readonly Vector3 SCREEN_CENTER = new Vector3(Screen.width / 2, Screen.height / 2, 0f);
@@ -89,10 +90,7 @@ public class CameraController : MonoBehaviour, IObservable {
 
     void Update () {
         m_CurrentState.StateUpdate();
-        Scroll();
-        ArrowMove();
-        EdgePan();
-        Pause();
+        CheckForInput();
     }
 
     public void NotifyAll(Invocation invoke, params object[] data)
@@ -126,6 +124,18 @@ public class CameraController : MonoBehaviour, IObservable {
         dest = Vector3.ClampMagnitude(dest, CAMERA_BEHIND_OFFSET);
         m_CameraRig.transform.Translate(dest);
         m_CameraRig.transform.rotation = rotation;
+    }
+
+    /// <summary>
+    /// Checks for input on relevant keys.
+    /// </summary>
+    private void CheckForInput()
+    {
+        Scroll();
+        ArrowMove();
+        EdgePan();
+        Pause();
+        PauseMenu();
     }
 
     /// <summary>
@@ -215,11 +225,22 @@ public class CameraController : MonoBehaviour, IObservable {
     /// </summary>
     private void Pause()
     {
-        if (Input.GetKeyDown(m_PauseButton))
+        if (Input.GetKeyDown(m_Pause))
         {
             NotifyAll(Invocation.TOGGLE_PAUSE);
         }
-
+    }
+    
+    /// <summary>
+    /// Expresses that the button to open the pause menu has been pressed.
+    /// </summary>
+    private void PauseMenu()
+    {
+        if (Input.GetKeyDown(m_PauseMenu))
+        {
+            Debug.Log("yes");
+            NotifyAll(Invocation.PAUSE_AND_LOCK);
+        }
     }
 
     /// <summary>
