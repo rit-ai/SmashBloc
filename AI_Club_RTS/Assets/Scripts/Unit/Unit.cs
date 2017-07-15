@@ -47,26 +47,6 @@ public abstract class Unit : MonoBehaviour, IObservable {
     protected Team team;
 
     /// <summary>
-    /// Sets up Observers and other state common between Units.
-    /// </summary>
-    protected virtual void Start()
-    {
-        observers = new List<IObserver>
-        {
-            gameObject.AddComponent<GameObserver>(),
-            gameObject.AddComponent<UIObserver>()
-        };
-
-    }
-
-    protected virtual void OnEnable()
-    {
-        health = maxHealth;
-        m_Surface = GetComponent<MeshRenderer>();
-        m_Surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
-    }
-
-    /// <summary>
     /// Notifies all observers.
     /// </summary>
     /// <param name="invocation">The name of the invocation.</param>
@@ -87,6 +67,27 @@ public abstract class Unit : MonoBehaviour, IObservable {
         Highlight();
         NotifyAll(Invocation.ONE_SELECTED);
         NotifyAll(Invocation.UNIT_MENU);
+    }
+
+    /// <summary>
+    /// Sets up Observers and other state common between Units.
+    /// </summary>
+    public virtual void Init()
+    {
+        observers = new List<IObserver>
+        {
+            Toolbox.GameObserver,
+            Toolbox.UIObserver
+        };
+
+    }
+
+    public virtual void Activate()
+    {
+        health = maxHealth;
+        unitName = Identity();
+        m_Surface = GetComponent<MeshRenderer>();
+        m_Surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
     }
 
     /// <summary>

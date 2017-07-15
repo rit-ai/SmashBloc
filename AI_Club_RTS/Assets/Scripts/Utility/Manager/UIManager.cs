@@ -70,6 +70,7 @@ public class UIManager : MonoBehaviour, IObservable {
     public void TogglePauseMenu()
     {
         m_PauseMenu.enabled = !(m_PauseMenu.enabled);
+        m_PauseMenu.transform.SetAsLastSibling();
     }
 
     /// <summary>
@@ -114,8 +115,12 @@ public class UIManager : MonoBehaviour, IObservable {
     /// enabled depending on whether or not the player owns that unit.
     /// </summary>
     /// <param name="unit">The unit whose info is to be displayed.</param>
-    public void DisplayUnitInfo(Unit unit, bool enableCommand)
+    public void DisplayUnitInfo(MobileUnit unit, bool enableCommand)
     {
+        // Only allow one highlighting ring
+        if (unitCurrentlyDisplayed != null && unitCurrentlyDisplayed != unit)
+            unitCurrentlyDisplayed.RemoveHighlight();
+
         unitCurrentlyDisplayed = unit;
         //float damage = unitCurrentlyDisplayed.Damage;
         //float range = unitCurrentlyDisplayed.Range;
@@ -145,7 +150,8 @@ public class UIManager : MonoBehaviour, IObservable {
     /// <param name="city">The city to display.</param>
     public void DisplayCityInfo(City city, bool enabled)
     {
-        if (cityCurrentlyDisplayed != null)
+        // Only allow one highlighting ring
+        if (cityCurrentlyDisplayed != null && cityCurrentlyDisplayed != city)
             cityCurrentlyDisplayed.RemoveHighlight();
 
         cityCurrentlyDisplayed = city;
@@ -155,7 +161,7 @@ public class UIManager : MonoBehaviour, IObservable {
 
         // Handle city name input field
         m_CityMenuNameInput.enabled = enabled;
-        m_CityMenuNameInput.placeholder.GetComponent<Text>().text = city.CityName;
+        m_CityMenuNameInput.placeholder.GetComponent<Text>().text = city.UnitName;
 
         // Handle spawn button
         m_CityMenuSpawnButton.enabled = enabled;
@@ -190,6 +196,9 @@ public class UIManager : MonoBehaviour, IObservable {
     /// animation, in seconds.</param>
     public IEnumerator AnimateText(string text)
     {
+        // Don't animate if we're already animating something
+        if (m_Message.enabled) { yield break; }
+
         const int FRAMES_TO_LINGER = 60;
         const float MOVE_DISTANCE_LARGE = 15f;
         const float MOVE_DISTANCE_SMALL = 2f;
@@ -235,6 +244,7 @@ public class UIManager : MonoBehaviour, IObservable {
             yield return null;
         }
 
+        m_Message.enabled = false;
         NotifyAll(Invocation.ANIMATION_FINISHED);
     }
 
@@ -260,11 +270,12 @@ public class UIManager : MonoBehaviour, IObservable {
             gameObject.AddComponent<GameObserver>()
         };
 
-        // Hide menus
+        // Hide menus / messages
         m_PauseText.enabled = false;
         m_PauseMenu.enabled = false;
         m_UnitMenu.enabled = false;
         m_CityMenu.enabled = false;
+        m_Message.enabled = false;
 
         // Instantiate misc UI
         m_TargetRing = Instantiate(m_TargetRing);
@@ -294,6 +305,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     private void ResetButtonPressed()
     {
+        m_Message.enabled = false;
         NotifyAll(Invocation.RESET_GAME);
     }
 

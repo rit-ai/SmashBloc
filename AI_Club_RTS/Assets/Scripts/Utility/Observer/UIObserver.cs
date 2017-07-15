@@ -58,9 +58,9 @@ public class UIObserver : MonoBehaviour, IObserver {
                 break;
             // Display unit info
             case Invocation.UNIT_MENU:
-                Debug.Assert(entity is Unit); // don't pass bad objects
-                enabled = (((Unit)entity).Team == PLAYER_TEAM);
-                manager.DisplayUnitInfo((Unit)entity, enabled);
+                Debug.Assert(entity is MobileUnit); // don't pass bad objects
+                enabled = (((MobileUnit)entity).Team == PLAYER_TEAM);
+                manager.DisplayUnitInfo((MobileUnit)entity, enabled);
                 break;
             // Display city info
             case Invocation.CITY_MENU:

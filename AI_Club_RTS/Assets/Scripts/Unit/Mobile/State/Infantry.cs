@@ -17,7 +17,6 @@ public class Infantry : MobileUnit {
     public Rigidbody m_BottomWeight;
 
     // Private constants
-    private InfantryPhysics physics;
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
     private const float ASCENSION_HEIGHT = 1000f;
@@ -28,40 +27,18 @@ public class Infantry : MobileUnit {
 
     // Methods
 
-    /// <summary>
-    /// Constructs and returns an inactive Infantry game object.
-    /// </summary>
-    public static Infantry MakeInfantry()
-    {
-        Infantry newInfantry = Instantiate(Toolbox.InfantryPrefab as Infantry);
-        newInfantry.physics = newInfantry.gameObject.AddComponent<InfantryPhysics>();
-        newInfantry.ai = newInfantry.gameObject.AddComponent<UnitAI_Template>();
-        newInfantry.ai.Body = newInfantry;
-
-        newInfantry.gameObject.SetActive(false);
-        return newInfantry;
-    }
-
     // Use this for initialization
-    protected new void Start () {
+    public new void Init () {
         // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
         maxHealth = MAXHEALTH;
         damage = DAMAGE;
         attackRange = RANGE;
-        // Handle fields
-        base.Start();
+
+        base.Init();
     }
 
-    /// <summary>
-    /// Handles general physics properties of units through the physics 
-    /// component.
-    /// </summary>
-    public void FixedUpdate()
-    {
-        physics.ComponentUpdate();
-    }
 
     /// <summary>
     /// Returns identity of the unit, for disambiguation purposes.
@@ -100,7 +77,7 @@ public class Infantry : MobileUnit {
             yield return 0f;
         }
 
-        Toolbox.Pool.ReturnInfantry(this);
+        Toolbox.InfantryPool.Return(this);
 
         yield return null;
     }

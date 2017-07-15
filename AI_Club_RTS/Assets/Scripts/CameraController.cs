@@ -67,8 +67,8 @@ public class CameraController : MonoBehaviour, IObservable {
         // Handle private fields
         m_Observers = new List<IObserver>
         {
-            gameObject.AddComponent<UIObserver>(),
-            gameObject.AddComponent<GameObserver>()
+            Toolbox.GameObserver,
+            Toolbox.UIObserver
         };
         m_SelectedUnits = new HashSet<MobileUnit>();
 
@@ -238,7 +238,6 @@ public class CameraController : MonoBehaviour, IObservable {
     {
         if (Input.GetKeyDown(m_PauseMenu))
         {
-            Debug.Log("yes");
             NotifyAll(Invocation.PAUSE_AND_LOCK);
         }
     }

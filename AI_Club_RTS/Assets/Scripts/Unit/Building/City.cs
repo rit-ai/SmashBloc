@@ -32,27 +32,15 @@ public class City : Unit {
 
     // Private fields
     private List<IObserver> m_Observers;
-    private string cityName;
     private int incomeLevel;
 
-    /// <summary>
-    /// Constructs and returns an instantiated and disabled City.
-    /// </summary>
-    public static City MakeCity()
-    {
-        City city = Instantiate(Toolbox.CityPrefab);
-        city.gameObject.SetActive(false);
-
-        return city;
-    }
-
-    // Initial state upon creation
-    protected new void OnEnable()
+    public override void Activate()
     {
         maxHealth = MAX_HEALTH;
         // Default values
         incomeLevel = DEFAULT_INCOME_LEVEL;
-        base.OnEnable();
+
+        base.Activate();
     }
 
     /// <summary>
@@ -99,7 +87,6 @@ public class City : Unit {
     {
         health = CAPTURED_HEALTH;
         m_Surface.material.color = capturer.Team.color;
-        cityName = capturer.Team.title;
         NotifyAll(Invocation.CITY_CAPTURED, capturer.Team);
     }
 
@@ -117,21 +104,6 @@ public class City : Unit {
     public int IncomeLevel {
 		get { return incomeLevel; }
 	}
-
-    /// <summary>
-    /// Gets the name of the city.
-    /// </summary>
-    public string CityName
-    {
-        get
-        {
-            if (customName == null)
-            {
-                return cityName;
-            }
-            return customName;
-        }
-    }
 
     /// <summary>
     /// Returns the class name of the unit in the form of a string.

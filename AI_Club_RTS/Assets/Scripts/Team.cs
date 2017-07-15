@@ -21,6 +21,7 @@ public class Team {
     // The cities owned by the team.
     public List<City> cities;
 
+    private bool active = true;
     /// <summary>
     /// Constructs a new Team.
     /// </summary>
@@ -42,11 +43,22 @@ public class Team {
         this.cities = cities;
     }
 
+
+    public void Activate()
+    {
+        foreach (Player p in members)
+        {
+            p.Activate();
+        }
+
+        active = true;
+    }
+
     /// <summary>
-    /// Kills all units in a team, obliterates all its cities, and deactivates
+    /// Kills all units in a team, returns all its cities, and deactivates
     /// all its members.
     /// </summary>
-    public void DestroyTeam()
+    public void Deactivate()
     {
         foreach (MobileUnit m in mobiles)
         {
@@ -54,15 +66,21 @@ public class Team {
         };
         foreach (City c in cities)
         {
-            Toolbox.Pool.ReturnCity(c);
+            c.gameObject.SetActive(false);
+            Toolbox.CityPool.Return(c);
         }
         foreach (Player p in members)
         {
-            p.Stop();
+            p.Deactivate();
         }
 
-        
+        active = false;
 
+    }
+
+    public bool IsActive
+    {
+        get { return active; }
     }
 
     public static bool operator ==(Team t1, Team t2)

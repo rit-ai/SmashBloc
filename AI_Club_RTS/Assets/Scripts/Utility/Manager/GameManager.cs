@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour, IObservable {
     private List<Player> players;
     private List<IObserver> observers;
 
+    private int activeTeams;
     private bool waitingOnAnimation = false;
 
     public void NotifyAll(Invocation invoke, params object[] data)
@@ -96,15 +97,12 @@ public class GameManager : MonoBehaviour, IObservable {
         // Have all the team's cities been eliminated?
         foreach (Team t in teams)
         {
-            if (t.cities.Count == 0)
+            if (t.IsActive && t.cities.Count == 0)
             {
-                t.DestroyTeam();
+                t.Deactivate();
+                activeTeams--;
             }
         }
-
-        // This is a little redundant, but won't matter unless we want 1000+ 
-        // teams.
-        teams.RemoveAll(t => t.cities.Count == 0);
     }
 
     /// <summary>
@@ -112,18 +110,18 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     public void ResetGame()
     {
+        StopCoroutine(GameLoop());
+
         // Destroy all teams
         foreach (Team t in teams)
         {
-            t.DestroyTeam();
+            t.Deactivate();
+            t.Activate();
         }
+
+        activeTeams = teams.Count;
 
         DistributeCities();
-
-        foreach (Player p in players)
-        {
-            p.Start();
-        }
 
         // Set main camera to be behind the player's first city
         m_CameraController.CenterCameraBehindPosition(PLAYER.Team.cities[0].transform.position, m_Terrain.transform.position);
@@ -152,16 +150,13 @@ public class GameManager : MonoBehaviour, IObservable {
         Debug.Assert(m_Terrain != null);
         Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
 
-        observers = new List<IObserver>
-        {
-            gameObject.AddComponent<UIObserver>()
-        };
-
         teams = new List<Team>
         {
             new Team("Dylante", Color.cyan),
             new Team("AI Team", Color.red)
         };
+
+        activeTeams = teams.Count;
 
         players = new List<Player>
         {
@@ -177,6 +172,11 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private void Start()
     {
+        observers = new List<IObserver>
+        {
+            Toolbox.UIObserver
+        };
+
         DistributeCities();
 
         // Set main camera to be behind the player's first city
@@ -250,11 +250,15 @@ public class GameManager : MonoBehaviour, IObservable {
         // put them.
         Debug.Assert(citySpawnPoints.Length >= NUM_AI_PLAYERS + 1);
 
-        City curr;
+        City city;
         for (int x = 0; ((x < citySpawnPoints.Length) && (x < NUM_AI_PLAYERS + 1)); x++)
         {
-            curr = Toolbox.Pool.RetrieveCity(teams[x], citySpawnPoints[x].transform.position);
-            teams[x].cities.Add(curr);
+            city = Toolbox.CityPool.Rent();
+            city.Team = teams[x];
+            city.transform.position = citySpawnPoints[x].transform.position;
+            teams[x].cities.Add(city);
+            city.gameObject.SetActive(true);
+            city.Activate();
         }
     }
 

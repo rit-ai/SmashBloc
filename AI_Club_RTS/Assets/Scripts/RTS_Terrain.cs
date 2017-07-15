@@ -25,8 +25,8 @@ public class RTS_Terrain : MonoBehaviour, IObservable
     {
         m_Observers = new List<IObserver>
         {
-            gameObject.AddComponent<UIObserver>(),
-            gameObject.AddComponent<GameObserver>()
+            Toolbox.GameObserver,
+            Toolbox.UIObserver
         };
     }
 

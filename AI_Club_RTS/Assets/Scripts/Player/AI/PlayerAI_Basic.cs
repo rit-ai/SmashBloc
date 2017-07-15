@@ -11,7 +11,7 @@ using UnityEngine;
 public sealed class PlayerAI_Basic : PlayerAI {
 
     // Try to spawn a unit every SPAWN_UNIT_RATE seconds
-    private const float SPAWN_UNIT_RATE = 5f;
+    private const float SPAWN_UNIT_RATE = 3f;
 
     protected override void Start () {
         base.Start();

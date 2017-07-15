@@ -22,8 +22,7 @@ public class Tank : MobileUnit {
 
     // Methods
     // Use this for initialization
-    protected override void Start () {
-        base.Start();
+    protected new void Init () {
         // Handle constants
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
@@ -34,6 +33,7 @@ public class Tank : MobileUnit {
         attackRange = RANGE;
         // Handle fields
         health = MAXHEALTH;
+        base.Init();
     }
 
     /// <summary>

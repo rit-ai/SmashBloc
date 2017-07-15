@@ -10,12 +10,14 @@ using UnityEngine;
  * many times a second. Being that this design precludes the use of conditional
  * branches, it may be a bit confusing to read.
  * **/
-public class InfantryPhysics : MonoBehaviour, RTS_Component {
+public class InfantryPhysics : MobilePhysics {
 
     // This class should have no public state or methods besides its 
     // constructor and ComponentUpdate().
 
     // Private constants
+    private const string HOVERBALL_TAG = "Hoverball";
+    private const string BOTTOM_WEIGHT_TAG = "BottomWeight";
     // Height above ground at which float force is applied
     private const float MAX_FLOAT_THRESHOLD = 10f;
     // Distance from destination at which deceleration begins (squared)
@@ -34,26 +36,23 @@ public class InfantryPhysics : MonoBehaviour, RTS_Component {
     private Rigidbody m_Hoverball;
     private Rigidbody m_BottomWeight;
 
-    public InfantryPhysics(Infantry parent)
+    private void Start()
     {
-        Debug.Assert(parent is Infantry);
-        m_Parent = parent;
-
         // Private fields
-        m_Rigidbody = parent.GetComponent<Rigidbody>();
-        m_Hoverball = parent.m_Hoverball;
-        m_BottomWeight = parent.m_BottomWeight;
+        m_Parent = GetComponent<Infantry>();
+        m_Rigidbody = m_Parent.GetComponent<Rigidbody>();
+        m_Hoverball = m_Parent.m_Hoverball;
+        m_BottomWeight = m_Parent.m_BottomWeight;
     }
 
     /// <summary>
     /// Blanket to update all private methods.
     /// </summary>
-    public void ComponentUpdate()
+    protected override void Navigate()
     {
         Hover();
         Guide();
     }
-
 
     /// <summary>
     /// Infantry Units hover above the ground, based on their current distance 

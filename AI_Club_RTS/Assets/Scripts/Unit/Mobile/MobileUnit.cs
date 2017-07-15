@@ -25,23 +25,17 @@ public abstract class MobileUnit : Unit
     // Private fields
     private MobileUnitInfo info;
 
-    // Initializtion; i.e. values that don't change or need to be initialized
-    protected override void Start()
-    {
-        info = new MobileUnitInfo();
-        base.Start();
-    }
-
     // Set initial state for when a MobileUnit is created
-    protected new virtual void OnEnable()
+    public override void Activate()
     {
         destination = transform.position;
-
         // Pass info to the AI component every second
+        info = new MobileUnitInfo();
         StartCoroutine(PassInfo());
 
-        base.OnEnable();
+        base.Activate();
     }
+
 
     /// <summary>
     /// Causes the unit's health to become zero.
@@ -82,7 +76,7 @@ public abstract class MobileUnit : Unit
             }
         }
 
-        // Build the info struct.
+        // Build the info object.
         info.team = team;
         info.healthPercentage = health / maxHealth;
         info.damage = damage;
@@ -120,7 +114,7 @@ public abstract class MobileUnit : Unit
             yield return 0f;
         }
 
-        Destroy(gameObject);
+
 
         yield return null;
     }
@@ -137,6 +131,12 @@ public abstract class MobileUnit : Unit
     public abstract override int Cost();
 
     public abstract override string Identity();
+
+    public UnitAI AI
+    {
+        get { return ai; }
+        set { ai = value; }
+    }
 
     /// <summary>
     /// Returns this unit's destination.

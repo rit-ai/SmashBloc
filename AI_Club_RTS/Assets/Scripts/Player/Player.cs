@@ -44,6 +44,7 @@ public class Player : MonoBehaviour {
             player.Brain.Body = player;
         }
         player.Team = team;
+        player.Activate();
         return player;
     }
 
@@ -53,12 +54,12 @@ public class Player : MonoBehaviour {
     /// </summary>
     public virtual void Awake()
     {
+        info = new PlayerInfo();
     }
 
     // Use this for initialization
-    public virtual void Start () {
+    public virtual void Activate () {
         // Handle private fields
-        info = new PlayerInfo();
         goldAmount = 0;
 
         // Handle Coroutines
@@ -71,7 +72,7 @@ public class Player : MonoBehaviour {
     /// <summary>
     /// Stops coroutines associated with this Player.
     /// </summary>
-    public virtual void Stop()
+    public virtual void Deactivate()
     {
         if (brain != null)
         {
@@ -124,10 +125,12 @@ public class Player : MonoBehaviour {
             goldAmount -= toSpawnCost;
 
             MobileUnit newUnit = Utils.IdentityToGameObject(toSpawn);
-            Transform spawnPoint = toSpawnAt.SpawnPoint;
-            // Sets default destination to be the location the unit spawns
+            newUnit.Team = team;
+            newUnit.transform.position = toSpawnAt.SpawnPoint.transform.position;
             newUnit.SetName(newUnit.UnitName + team.mobiles.Count.ToString());
             team.mobiles.Add(newUnit);
+            newUnit.gameObject.SetActive(true);
+            newUnit.Activate();
         }
     }
 

@@ -127,10 +127,10 @@ public class Utils : MonoBehaviour {
         switch (identity)
         {
             case Infantry.IDENTITY:
-                return Toolbox.Pool.RetrieveInfantry();
+                return Toolbox.InfantryPool.Rent();
             case Tank.IDENTITY:
-                return Toolbox.Pool.RetrieveTank();
-           }
+                throw new System.NotImplementedException();
+        }
 
         throw new KeyNotFoundException("Bad value passed to UnitToPrefab()");
     }
