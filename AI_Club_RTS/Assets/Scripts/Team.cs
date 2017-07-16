@@ -74,6 +74,9 @@ public class Team {
             p.Deactivate();
         }
 
+        mobiles.Clear();
+        cities.Clear();
+
         active = false;
 
     }

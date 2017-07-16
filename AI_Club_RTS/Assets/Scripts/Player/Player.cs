@@ -44,6 +44,7 @@ public class Player : MonoBehaviour {
             player.Brain.Body = player;
         }
         player.Team = team;
+        team.members.Add(player);
         player.Activate();
         return player;
     }
@@ -59,10 +60,6 @@ public class Player : MonoBehaviour {
 
     // Use this for initialization
     public virtual void Activate () {
-        // Handle private fields
-        goldAmount = 0;
-
-        // Handle Coroutines
         if (brain != null)
         {
             StartCoroutine(PassInfo());
@@ -74,6 +71,7 @@ public class Player : MonoBehaviour {
     /// </summary>
     public virtual void Deactivate()
     {
+        goldAmount = 0;
         if (brain != null)
         {
             StopCoroutine(PassInfo());

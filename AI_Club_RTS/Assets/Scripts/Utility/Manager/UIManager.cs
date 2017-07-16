@@ -271,11 +271,7 @@ public class UIManager : MonoBehaviour, IObservable {
         };
 
         // Hide menus / messages
-        m_PauseText.enabled = false;
-        m_PauseMenu.enabled = false;
-        m_UnitMenu.enabled = false;
-        m_CityMenu.enabled = false;
-        m_Message.enabled = false;
+        CloseAll();
 
         // Instantiate misc UI
         m_TargetRing = Instantiate(m_TargetRing);
@@ -305,7 +301,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     private void ResetButtonPressed()
     {
-        m_Message.enabled = false;
+        CloseAll();
         NotifyAll(Invocation.RESET_GAME);
     }
 
@@ -341,7 +337,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// <summary>
     /// Displays the target ring at the current mouse position.
     /// </summary>
-    /// <param name="terrain"></param>
+    /// <param name="terrain">The GameObject currently serving as the ground.</param>
     public void DisplayTargetRing(RTS_Terrain terrain)
     {
         RaycastHit hit;
@@ -349,12 +345,16 @@ public class UIManager : MonoBehaviour, IObservable {
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
             m_TargetRing.transform.position = hit.point;
-            m_TargetRing.GetComponent<Renderer>().enabled = true;
-            foreach (Renderer r in m_TargetRing.GetComponentsInChildren<Renderer>())
-            {
-                r.enabled = true;
-            }
+            m_TargetRing.gameObject.SetActive(true);
         }
+    }
+
+    /// <summary>
+    /// Hides the target ring.
+    /// </summary>
+    public void HideTargetRing()
+    {
+        m_TargetRing.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -362,13 +362,12 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void CloseAll()
     {
-        m_TargetRing.GetComponent<Renderer>().enabled = false;
-        foreach (Renderer r in m_TargetRing.GetComponentsInChildren<Renderer>())
-        {
-            r.enabled = false;
-        }
+        m_TargetRing.gameObject.SetActive(false);
+        m_PauseText.enabled = false;
+        m_PauseMenu.enabled = false;
         m_UnitMenu.enabled = false;
         m_CityMenu.enabled = false;
+        m_Message.enabled = false;
     }
 
     /// <summary>

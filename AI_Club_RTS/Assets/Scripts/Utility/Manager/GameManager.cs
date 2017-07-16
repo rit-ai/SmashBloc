@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     public void ResetGame()
     {
-        StopCoroutine(GameLoop());
+        StopAllCoroutines();
 
         // Destroy all teams
         foreach (Team t in teams)
@@ -175,7 +175,6 @@ public class GameManager : MonoBehaviour, IObservable {
         DistributeCities();
 
         // Set main camera to be behind the player's first city
-        Debug.Log(PLAYER.Team.title);
         m_CameraController.CenterCameraBehindPosition(PLAYER.Team.cities[0].transform.position);
 
         StartCoroutine(GameLoop());
@@ -188,6 +187,8 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private IEnumerator GameLoop()
     {
+        if (Time.timeScale == 0) { TogglePause(); }
+
         yield return StartCoroutine(RoundStarting());
         yield return StartCoroutine(RoundPlaying());
         yield return StartCoroutine(RoundEnding());
@@ -216,7 +217,7 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private IEnumerator RoundPlaying()
     {
-        yield return new WaitUntil(() => teams.Count == 1);
+        yield return new WaitUntil(() => activeTeams == 1);
     }
 
     /// <summary>
