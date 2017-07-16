@@ -29,11 +29,12 @@ public class CameraController : MonoBehaviour, IObservable {
     public KeyCode m_MoveCameraRight;
 
     // Private constants
+    private readonly Vector3 DEFAULT_CAMERA_LOC = new Vector3(0, 250, 0);
     private readonly Vector3 SCREEN_CENTER = new Vector3(Screen.width / 2, Screen.height / 2, 0f);
     private readonly Color BOX_INTERIOR_COLOR = new Color(0.74f, 0.71f, 0.27f, 0.5f);
     private readonly Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
     private const string CAMERA_RIG_TAG = "CameraRig";
-    private const float CAMERA_BEHIND_OFFSET = 200f;
+    private const float CAMERA_BEHIND_OFFSET = 500f;
     private const float MAX_CAMERA_SIZE = 200f;
     private const float MIN_CAMERA_SIZE = 50f;
     private const float SCROLLSPEED = 50f;
@@ -102,28 +103,27 @@ public class CameraController : MonoBehaviour, IObservable {
     }
 
     /// <summary>
-    /// Centers the camera behind a position
+    /// Centers the camera behind a target.
+    /// 
+    /// TODO right now the camera is always facing the center of the map, but
+    /// that could be changed if needed.
     /// </summary>
-    /// <param name="position"></param>
-    /// <param name="target"></param>
-    public void CenterCameraBehindPosition(Vector3 position, Vector3 target)
+    /// <param name="target">What to look at.</param>
+    public void CenterCameraBehindPosition(Vector3 target)
     {
-        // Move the camera over and behind the position
-        Vector3 dest = position;
-        // Set values so that the orientation of the camera is unchanged
-        dest.y = m_CameraRig.transform.position.y;
+        // Reset camera to center of map
+        m_CameraRig.transform.position = DEFAULT_CAMERA_LOC;
+        // Get rotation looking away from target
+        Quaternion rotation = Quaternion.LookRotation(-target);
+        rotation.x = 0; rotation.z = 0; // We don't care about these values
 
-        m_CameraRig.transform.position = dest;
-        // Rotate the camera toward target (TODO: right now is just map center)
-        Quaternion rotation = Quaternion.LookRotation(target - dest);
-        rotation.x = 0; rotation.z = 0; // x and z aren't relevant
+        // Get opposite of target and extend it to exactly the desired length
+        Vector3 position = target;
+        position.Normalize();
+        position *= CAMERA_BEHIND_OFFSET;
+        position.y = DEFAULT_CAMERA_LOC.y; // ignore y component of dest
 
-        // Apply an offset so that we end up behind the target
-        dest -= target;
-        dest.y = 0;
-        dest = Vector3.ClampMagnitude(dest, CAMERA_BEHIND_OFFSET);
-        m_CameraRig.transform.Translate(dest);
-        m_CameraRig.transform.rotation = rotation;
+        m_CameraRig.transform.SetPositionAndRotation(position, rotation);
     }
 
     /// <summary>

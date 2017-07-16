@@ -121,12 +121,7 @@ public class GameManager : MonoBehaviour, IObservable {
 
         activeTeams = teams.Count;
 
-        DistributeCities();
-
-        // Set main camera to be behind the player's first city
-        m_CameraController.CenterCameraBehindPosition(PLAYER.Team.cities[0].transform.position, m_Terrain.transform.position);
-
-        StartCoroutine(GameLoop());
+        Start();
     }
 
     /// <summary>
@@ -180,7 +175,8 @@ public class GameManager : MonoBehaviour, IObservable {
         DistributeCities();
 
         // Set main camera to be behind the player's first city
-        m_CameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position, m_Terrain.transform.position);
+        Debug.Log(PLAYER.Team.title);
+        m_CameraController.CenterCameraBehindPosition(PLAYER.Team.cities[0].transform.position);
 
         StartCoroutine(GameLoop());
 
@@ -205,7 +201,7 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private IEnumerator RoundStarting()
     {
-        yield return new WaitForSeconds(1); // FIXMe
+        yield return new WaitForSeconds(1); // FIXME
 
         NotifyAll(Invocation.GAME_STARTING);
 

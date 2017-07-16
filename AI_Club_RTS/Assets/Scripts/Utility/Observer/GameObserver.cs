@@ -27,6 +27,7 @@ public class GameObserver : MonoBehaviour, IObserver {
     private void Awake()
     {
         manager = Toolbox.GameManager;
+        selectedUnits = new HashSet<MobileUnit>(); // error-proofing
     }
 
     /// <summary>
