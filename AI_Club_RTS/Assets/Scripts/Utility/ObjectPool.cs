@@ -9,7 +9,7 @@ using UnityEngine;
  * The Object Pool is designed to keep a contiguous list of active an inactive 
  * objects. This allows the program to do the most programatically expensive 
  * work of creating them at the start of the program, avoiding performance 
- * issues caused by creating objects during gameplay. It utilizes a queue 
+ * issues caused by instantiating objects during gameplay. It utilizes a queue 
  * structure to accomplish this.
  * **/
 public sealed class ObjectPool<T> {

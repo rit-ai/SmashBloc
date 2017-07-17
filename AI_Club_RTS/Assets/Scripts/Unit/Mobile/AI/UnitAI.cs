@@ -24,9 +24,9 @@ public abstract class UnitAI : BaseAI
 {
     // Unit AIs control Units. However, the AIs aren't allowed to reference
     // their Units themselves—they can only do so through Commands.
-    new private Unit body;
+    new private MobileUnit body;
     // Unit AIs command Players with UnitCommands.
-    new protected Queue<UnitCommand> commandQueue;
+    new protected Queue<MobileCommand> commandQueue;
     // This is the most updated information the AI has from its body.
     protected MobileUnitInfo info;
     // The absolute destination of the unit, separate from the local 
@@ -34,7 +34,7 @@ public abstract class UnitAI : BaseAI
     // either the player, or by a "parent AI" that controls all the units.
     protected Vector3 absoluteDest;
 
-    public Unit Body { set { body = value; } }
+    public MobileUnit Body { set { body = value; } }
 
     /// <summary>
     /// Decide how to handle new information. Will be called after every update
@@ -56,18 +56,18 @@ public abstract class UnitAI : BaseAI
     // Sealed and protected, to handle the requirements of BaseAI
     protected sealed override void AddCommand(Command command)
     {
-        if (!(command is UnitCommand))
+        if (!(command is MobileCommand))
         {
             throw new ArgumentException("Attempted to call AddCommand with wrong Command type.", "command");
         }
-        AddCommand(command as UnitCommand);
+        AddCommand(command as MobileCommand);
     }
 
     /// <summary>
     /// Enqueues a command to the commandQueue.
     /// </summary>
     /// <param name="command">The command to enqueue.</param>
-    protected void AddCommand(UnitCommand command)
+    protected void AddCommand(MobileCommand command)
     {
         while (commandQueue.Count >= MAX_NUM_COMMANDS) { return; }
         command.Body = body;
@@ -82,7 +82,7 @@ public abstract class UnitAI : BaseAI
         {
             while (commandQueue.Count == 0) { yield return new WaitForSeconds(COMMAND_PROCESS_RATE); }
             Command command = commandQueue.Dequeue();
-            if (!(command is UnitCommand))
+            if (!(command is MobileCommand))
             {
                 throw new ArgumentException("Attempted to call AddCommand with wrong Command type.", "command");
             }
@@ -93,7 +93,7 @@ public abstract class UnitAI : BaseAI
 
     protected new virtual void Start()
     {
-        commandQueue = new Queue<UnitCommand>();
+        commandQueue = new Queue<MobileCommand>();
 
         base.Start();
     }

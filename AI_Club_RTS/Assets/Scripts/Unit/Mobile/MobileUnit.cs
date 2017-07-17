@@ -15,6 +15,7 @@ public abstract class MobileUnit : Unit
     protected UnitAI ai;
     protected Vector3 newPos;
     protected Vector3 destination;
+    protected Vector3 storedDestination = default(Vector3);
     protected float damage;
     protected float sightRange;
     protected float attackRange;
@@ -119,6 +120,9 @@ public abstract class MobileUnit : Unit
         yield return null;
     }
 
+    /// <summary>
+    /// Units take damage when they collide with a unit of the enemy team.
+    /// </summary>
     protected override void OnCollisionEnter(Collision collision)
     {
         Unit unit = collision.gameObject.GetComponent<Unit>();
@@ -127,6 +131,11 @@ public abstract class MobileUnit : Unit
             base.TakeDamage(UnityEngine.Random.Range(10f, 20f), unit);
         }
     }
+
+    /// <summary>
+    /// All Mobile Units must be able to shoot at other Units.
+    /// </summary>
+    public abstract IEnumerator Shoot(Unit target, float maxAimTime);
 
     public abstract override int Cost();
 
@@ -144,7 +153,16 @@ public abstract class MobileUnit : Unit
     public Vector3 Destination
     {
         get { return destination; }
-        set { destination = value; }
+        set {
+            // Don't change the destination if we're currently waiting to fire
+            if (storedDestination != default(Vector3)) { 
+                storedDestination = value;
+            }
+            else
+            {
+                destination = value;
+            }
+        }
     }
 
     /// <summary>

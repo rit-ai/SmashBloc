@@ -8,11 +8,11 @@ using UnityEngine;
  * This abstract class is designed to contain state and denote methods common
  * between all Commands a Unit AI can receive.
  * **/
-public abstract class UnitCommand : Command {
+public abstract class MobileCommand : Command {
 
-    protected Unit body;
+    protected MobileUnit body;
 
-    public Unit Body { set { body = value; } }
+    public MobileUnit Body { set { body = value; } }
 
     public abstract void Execute();
 }

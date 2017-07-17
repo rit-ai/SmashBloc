@@ -39,6 +39,36 @@ public class Infantry : MobileUnit {
         base.Init();
     }
 
+    /// <summary>
+    /// Prompts an Infantry unit to aim at another Unit, shooting either when
+    /// locked on or after a specified amount of time elapses.
+    /// </summary>
+    /// <param name="target">The Unit to shoot at.</param>
+    /// <param name="maxAimTime"></param>
+    /// <returns></returns>
+    public override IEnumerator Shoot(Unit target, float maxAimTime)
+    {
+        throw new NotImplementedException();
+
+        float timeLeft = maxAimTime;
+        // Infantry cannot navigate to a destination and aim at the same time, 
+        // so the destination is temporarily stored.
+        storedDestination = destination;
+
+        while (timeLeft > 0f)
+        {
+            // aim
+            // if (foundTarget) {break;}
+            timeLeft -= Time.deltaTime;
+            yield return null; // waits for next frame
+        }
+
+        // shoot
+
+        destination = storedDestination;
+        storedDestination = default(Vector3);
+
+    }
 
     /// <summary>
     /// Returns identity of the unit, for disambiguation purposes.

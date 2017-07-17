@@ -67,4 +67,9 @@ public class Tank : MobileUnit {
     {
         throw new NotImplementedException();
     }
+
+    public override IEnumerator Shoot(Unit target, float maxAimTime)
+    {
+        throw new NotImplementedException();
+    }
 }
