@@ -20,13 +20,11 @@ using UnityEngine;
  * implementing Decide(), building Commands, and calling AddCommand(). 
  * Everything else is handled externally.
  * **/
-public abstract class PlayerAI : BaseAI {
+public abstract class PlayerAI : AbstractAI {
 
     // Player AIs control Players. However, the AIs aren't allowed to reference
     // their Players themselves—they can only do so through Commands.
     new private Player body;
-    // Player AIs command Players with PlayerCommands.
-    new private Queue<PlayerCommand> commandQueue;
     // This is the most recent information the AI has from its body.
     protected PlayerInfo info;
 
@@ -54,7 +52,7 @@ public abstract class PlayerAI : BaseAI {
     }
 
     // Protected and sealed to satisfy the base class
-    protected sealed override void SetCurrentAction(ICommand command)
+    protected sealed override void SetCurrentCommand(ICommand command)
     {
         if (!(command is PlayerCommand))
         {
@@ -69,9 +67,8 @@ public abstract class PlayerAI : BaseAI {
     /// <param name="command">The command to add.</param>
     protected void AddCommand(PlayerCommand command)
     {
-        if (commandQueue.Count >= MAX_NUM_COMMANDS) { return; }
         command.Body = body;
-        commandQueue.Enqueue(command);
+        currentCommand = command;
     }
 
     /// <summary>
@@ -81,22 +78,13 @@ public abstract class PlayerAI : BaseAI {
     {
         while (true)
         {
-            while (commandQueue.Count == 0) { yield return new WaitForSeconds(COMMAND_PROCESS_RATE); }
-            ICommand command = commandQueue.Dequeue();
-            if (!(command is PlayerCommand))
+            if (currentCommand != null)
             {
-                throw new ArgumentException("Attempted to call AddCommand with wrong Command type.", "command");
+                currentCommand.Execute();
+                currentCommand = null;
             }
-            command.Execute();
             yield return new WaitForSeconds(COMMAND_PROCESS_RATE);
         }
-    }
-
-    protected override void Start()
-    {
-        commandQueue = new Queue<PlayerCommand>();
-
-        base.Start();
     }
 
 

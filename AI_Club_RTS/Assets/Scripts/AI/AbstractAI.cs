@@ -11,7 +11,7 @@ using UnityEngine;
  * transitions between states according to an internal state machine that is 
  * defined based on the particular implementation.
  * **/
-public abstract class BaseAI : MonoBehaviour {
+public abstract class AbstractAI : MonoBehaviour {
 
     // This is the rate at which the 'current command' variable will be checked
     // to see if a command is available for execution.

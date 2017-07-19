@@ -20,7 +20,7 @@ using UnityEngine;
  * implementing Decide(), building Commands, and calling AddCommand(). 
  * Everything else is handled externally.
  * **/
-public abstract class MobileAI : BaseAI
+public abstract class MobileAI : AbstractAI
 {
     // Unit AIs control Units. However, the AIs aren't allowed to reference
     // their Units themselves—they can only do so through Commands.
@@ -76,8 +76,11 @@ public abstract class MobileAI : BaseAI
     {
         while (true)
         {
-            currentCommand.Execute();
-            currentCommand = null;
+            if (currentCommand != null)
+            {
+                currentCommand.Execute();
+                currentCommand = null;
+            }
             yield return new WaitForSeconds(COMMAND_PROCESS_RATE);
         }
     }
