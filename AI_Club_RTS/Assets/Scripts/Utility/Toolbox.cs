@@ -109,7 +109,7 @@ public sealed class Toolbox : Singleton<Toolbox> {
         Infantry newInfantry = Instantiate(InfantryPrefab as Infantry);
         newInfantry.gameObject.SetActive(false);
         newInfantry.gameObject.AddComponent<InfantryPhysics>();
-        newInfantry.AI = newInfantry.gameObject.AddComponent<UnitAI_Template>();
+        newInfantry.AI = newInfantry.gameObject.AddComponent<MobileAI_Basic>();
         newInfantry.AI.Body = newInfantry;
         newInfantry.Init();
 

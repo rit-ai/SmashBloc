@@ -6,16 +6,13 @@ using UnityEngine;
  * @author Paul Galatic
  * 
  * This abstract class is designed to contain state and denote methods common
- * between all Commands a Player AI can receive.
- * 
- * Command methods should not contain a parameter to replace
+ * between all Commands a Unit AI can receive.
  * **/
-public abstract class PlayerCommand : Command{
+public abstract class MobileCommand : ICommand {
 
-    protected Player body;
+    protected MobileUnit body;
 
-    public Player Body { set { body = value; } }
+    public MobileUnit Body { set { body = value; } }
 
     public abstract void Execute();
-
 }

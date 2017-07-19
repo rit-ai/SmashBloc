@@ -14,40 +14,16 @@ using UnityEngine;
  * Decide() is called. At that point, it is the responsibility of the AI to 
  * construct Commands and use AddCommand() to relay said commands to the body.
  * **/
-public sealed class UnitAI_Template : UnitAI
+public sealed class MobileAI_Basic : MobileAI
 {
 
     protected override void Start()
     {
         base.Start();
-        currentState = new IdleState();
     }
 
     protected override void Decide()
     {
-
-    }
-
-
-    public class IdleState : State
-    {
-
-
-
-        public void StateUpdate()
-        {
-
-        }
-
-    }
-
-    public class AggressiveState : State
-    {
-
-
-        public void StateUpdate()
-        {
-
-        }
+        
     }
 }

@@ -12,7 +12,7 @@ public abstract class MobileUnit : Unit
 {
     public LayerMask ignoreAllButUnits;
 
-    protected UnitAI ai;
+    protected MobileAI ai;
     protected Vector3 newPos;
     protected Vector3 destination;
     protected Vector3 storedDestination = default(Vector3);
@@ -141,25 +141,30 @@ public abstract class MobileUnit : Unit
 
     public abstract override string Identity();
 
-    public UnitAI AI
+    /// <summary>
+    /// The Unit's brain.
+    /// </summary>
+    public MobileAI AI
     {
         get { return ai; }
         set { ai = value; }
     }
 
     /// <summary>
-    /// Returns this unit's destination.
+    /// This unit's current destination.
     /// </summary>
     public Vector3 Destination
     {
         get { return destination; }
         set {
             // Don't change the destination if we're currently waiting to fire
-            if (storedDestination != default(Vector3)) { 
+            if (storedDestination != default(Vector3)) {
+                value.y = 0;
                 storedDestination = value;
             }
             else
             {
+                value.y = 0;
                 destination = value;
             }
         }

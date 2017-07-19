@@ -13,33 +13,19 @@ using UnityEngine;
  * **/
 public abstract class BaseAI : MonoBehaviour {
 
-    // This is the rate at which commands will be added to the commandQueue.
-    protected const float COMMAND_ENQUEUE_RATE = 1f;
-
-    // This is the rate at which commands will be passed to the body. Lower is
-    // faster, but puts adds processing load.
-    protected const float COMMAND_PROCESS_RATE = 1f;
-
-    // This is the limits on the number of commands an AI's commandQueue can 
-    // hold, based on the rate commands are processed.
-    protected const int MAX_NUM_COMMANDS = (int)(10 / COMMAND_PROCESS_RATE);
-
-    // This is the Queue of commands that the AI will feed back to its Body. 
-    // Any number of commands can be enqueued, but they will be passed to the 
-    // body at the rate of COMMAND_PASS_RATE.
-    protected Queue<Command> commandQueue;
-
-    // The current state of the AI. AIs can have any number of potential
-    // states, but only one state can be active at a time. A AI's state handles
-    // its frame-by-frame behavior—is it aggressively pursuing enemies, or is 
-    // it running away? Is it regrouping, advancing, or retreating?
-    protected State currentState;
+    // This is the rate at which the 'current command' variable will be checked
+    // to see if a command is available for execution.
+    protected const float COMMAND_PROCESS_RATE = 0.5f;
 
     // This is a reference to the base object that the AI controls. Every AI
     // subclass should have a "wrapper" that makes the type of body more 
     // specific, while also restricting its usage so that any concrete classes
     // can only pass commands to the body.
-    protected UnityEngine.Object body;
+    protected GameObject body;
+
+    // This is the next command that the Body will execute when ProcessNext() 
+    // is called.
+    protected ICommand currentCommand;
 
     /// <summary>
     /// Allows the body to provide updated info to the brain.
@@ -60,13 +46,39 @@ public abstract class BaseAI : MonoBehaviour {
     /// It is expected that child classes will make the Command parameter more 
     /// specific.
     /// <param name="command">The command to add.</param>
-    protected abstract void AddCommand(Command command);
+    protected abstract void SetCurrentCommand(ICommand command);
 
     /// <summary>
-    /// Attempts to dequeue a command and execute it. Does nothing if there is
-    /// no command.
+    /// Attempts to execute the current command. Does nothing if there is no
+    /// command.
     /// </summary>
     protected abstract IEnumerator ProcessNext();
+
+    /// <summary>
+    /// Chooses a Command to add to the CommandQueue based on a weighted 
+    /// distribution of values mapped to Commands.
+    /// </summary>
+    /// <param name="weightedCommands"></param>
+    /// <returns></returns>
+    protected void Prioritize(Dictionary<float, ICommand> weightedCommands)
+    {
+        // Take the total of all the keys.
+        float total = 0f;
+        foreach (float v in weightedCommands.Keys)
+        {
+            total += v;
+        }
+        // Use the total to determine the max random value.
+        float rand = UnityEngine.Random.Range(0f, total);
+        total = 0f;
+        // Higher values are more likely to be chosen.
+        foreach (float v in weightedCommands.Keys)
+        {
+            total += v;
+            if (rand <= total) { SetCurrentCommand(weightedCommands[v]); }
+        }
+        throw new Exception("Unreachable value in AbstractAI.Prioritize()!");
+    }
 
     /// <summary>
     /// Sets up the executeCommand() IEnumerator, which executes every 
@@ -76,7 +88,6 @@ public abstract class BaseAI : MonoBehaviour {
     {
         // Handle IEnumerators
         StartCoroutine(ProcessNext());
-
     }
 
 }

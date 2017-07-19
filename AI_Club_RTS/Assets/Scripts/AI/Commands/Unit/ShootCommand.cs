@@ -7,7 +7,8 @@ using UnityEngine;
  * @author Paul Galatic
  * 
  * Commands a MobileUnit to attack another Unit. Longer aim times will be more
- * accurate, but as Units stop while they take aim, 
+ * accurate, but as Units stop while they take aim, they will also be more 
+ * vulnerable to enemy fire.
  * **/
 public class ShootCommand : MobileCommand
 {

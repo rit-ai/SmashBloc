@@ -15,42 +15,25 @@ public sealed class PlayerAI_Basic : PlayerAI {
 
     protected override void Start () {
         base.Start();
-
-        currentState = new IdleState(this);
-	}
+        StartCoroutine(SpawnInfantry());
+    }
 
     protected override void Decide()
     {
         
     }
 
-
-    private class IdleState : State
+    private IEnumerator SpawnInfantry()
     {
-        private PlayerAI_Basic brain;
-
-        public IdleState(PlayerAI_Basic brain)
+        while (true)
         {
-            this.brain = brain;
-
-            brain.StartCoroutine(SpawnInfantry());
-        }
-
-        public void StateUpdate()
-        {
-        }
-
-        private IEnumerator SpawnInfantry()
-        {
-            while (true)
+            while (info == null) { yield return new WaitForSeconds(SPAWN_UNIT_RATE); }
+            foreach (City city in info.team.cities)
             {
-                while (brain.info == null) { yield return new WaitForSeconds(SPAWN_UNIT_RATE); }
-                foreach (City city in brain.info.team.cities)
-                {
-                    brain.AddCommand(new SpawnUnitCommand(Infantry.IDENTITY, city));
-                }
-                yield return new WaitForSeconds(SPAWN_UNIT_RATE);
+                AddCommand(new SpawnUnitCommand(Infantry.IDENTITY, city));
             }
+            yield return new WaitForSeconds(SPAWN_UNIT_RATE);
         }
     }
+
 }

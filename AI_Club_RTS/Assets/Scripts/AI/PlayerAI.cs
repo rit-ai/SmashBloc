@@ -54,7 +54,7 @@ public abstract class PlayerAI : BaseAI {
     }
 
     // Protected and sealed to satisfy the base class
-    protected sealed override void AddCommand(Command command)
+    protected sealed override void SetCurrentAction(ICommand command)
     {
         if (!(command is PlayerCommand))
         {
@@ -82,7 +82,7 @@ public abstract class PlayerAI : BaseAI {
         while (true)
         {
             while (commandQueue.Count == 0) { yield return new WaitForSeconds(COMMAND_PROCESS_RATE); }
-            Command command = commandQueue.Dequeue();
+            ICommand command = commandQueue.Dequeue();
             if (!(command is PlayerCommand))
             {
                 throw new ArgumentException("Attempted to call AddCommand with wrong Command type.", "command");

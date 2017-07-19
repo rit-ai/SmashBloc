@@ -20,13 +20,11 @@ using UnityEngine;
  * implementing Decide(), building Commands, and calling AddCommand(). 
  * Everything else is handled externally.
  * **/
-public abstract class UnitAI : BaseAI
+public abstract class MobileAI : BaseAI
 {
     // Unit AIs control Units. However, the AIs aren't allowed to reference
     // their Units themselves—they can only do so through Commands.
     new private MobileUnit body;
-    // Unit AIs command Players with UnitCommands.
-    new protected Queue<MobileCommand> commandQueue;
     // This is the most updated information the AI has from its body.
     protected MobileUnitInfo info;
     // The absolute destination of the unit, separate from the local 
@@ -54,47 +52,33 @@ public abstract class UnitAI : BaseAI
     }
 
     // Sealed and protected, to handle the requirements of BaseAI
-    protected sealed override void AddCommand(Command command)
+    protected sealed override void SetCurrentCommand(ICommand command)
     {
         if (!(command is MobileCommand))
         {
             throw new ArgumentException("Attempted to call AddCommand with wrong Command type.", "command");
         }
-        AddCommand(command as MobileCommand);
+        SetCurrentCommand(command as MobileCommand);
     }
 
     /// <summary>
     /// Enqueues a command to the commandQueue.
     /// </summary>
     /// <param name="command">The command to enqueue.</param>
-    protected void AddCommand(MobileCommand command)
+    protected void SetCurrentCommand(MobileCommand command)
     {
-        while (commandQueue.Count >= MAX_NUM_COMMANDS) { return; }
         command.Body = body;
-        commandQueue.Enqueue(command);
+        currentCommand = command;
     }
-
-
+    
     // Sealed and protected, to handle the requirements of BaseAI
     protected sealed override IEnumerator ProcessNext()
     {
         while (true)
         {
-            while (commandQueue.Count == 0) { yield return new WaitForSeconds(COMMAND_PROCESS_RATE); }
-            Command command = commandQueue.Dequeue();
-            if (!(command is MobileCommand))
-            {
-                throw new ArgumentException("Attempted to call AddCommand with wrong Command type.", "command");
-            }
-            command.Execute();
+            currentCommand.Execute();
+            currentCommand = null;
             yield return new WaitForSeconds(COMMAND_PROCESS_RATE);
         }
-    }
-
-    protected new virtual void Start()
-    {
-        commandQueue = new Queue<MobileCommand>();
-
-        base.Start();
     }
 }
