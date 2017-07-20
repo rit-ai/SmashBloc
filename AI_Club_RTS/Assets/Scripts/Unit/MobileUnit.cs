@@ -54,15 +54,14 @@ public abstract class MobileUnit : Unit
     protected IEnumerator PassInfo()
     {
         // Add all units within line of sight to the unitsInSightRange list.
-        MobileUnit current;
-        List<MobileUnit> enemiesInSight = new List<MobileUnit>();
-        List<MobileUnit> alliesInSight = new List<MobileUnit>();
-        List<MobileUnit> enemiesInAttackRange = new List<MobileUnit>();
-        List<Collider> collidersInSight;
-        collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButUnits));
+        Unit current;
+        List<Unit> enemiesInSight = new List<Unit>();
+        List<Unit> alliesInSight = new List<Unit>();
+        List<Unit> enemiesInAttackRange = new List<Unit>();
+        List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButUnits));
         foreach (Collider c in collidersInSight)
         {
-            current = c.gameObject.GetComponent<MobileUnit>();
+            current = c.gameObject.GetComponent<Unit>();
             // Only be aggressive to units on the other team.
             if (current.Team != team)
             {

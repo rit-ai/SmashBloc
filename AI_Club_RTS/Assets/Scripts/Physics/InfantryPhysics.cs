@@ -15,26 +15,39 @@ public class InfantryPhysics : MobilePhysics {
     // This class should have no public state or methods besides its 
     // constructor and ComponentUpdate().
 
-    // Private constants
-    private const string HOVERBALL_TAG = "Hoverball";
-    private const string BOTTOM_WEIGHT_TAG = "BottomWeight";
+    // Thresholds for unit convergence and separation
+    private const float MAX_DISTANCE_FROM = 500f; // "sight range"
+    private const float MIN_DISTANCE_FROM_SQR = 50f;
     // Height above ground at which float force is applied
     private const float MAX_FLOAT_THRESHOLD = 10f;
     // Distance from destination at which deceleration begins (squared)
     private const float DECELERATION_THRESHOLD_SQRD = 1000f;
     // Max force that can be applied to a rigidbody
-    private const float MAX_VECTOR_FORCE = 100f;
-    private const float MAX_GUIDING_FORCE = 50f;
-    // Higher increases speed threshhold before deceleration begins
-    private const float MAX_SPEED = 75f;
+    private const float MAX_VECTOR_FORCE = 200f;
+    private const float GUIDANCE_FORCE = 100f;
     // Higher resists motion more (ONLY BETWEEN 0-1)
     private const float RESISTANCE_FACTOR = 0.7f;
+    // Default steering force strength
+    private const float STEER = 100f;
+    // Adjusts the intensity of steering forces
+    private const float GUIDANCE_FACTOR = 1f;
+    private const float CONVERGE_FACTOR = 0.6f;
+    private const float DIVERGE_FACTOR = 1.2f;
+    private const float ALIGNMENT_FACTOR = 1f;
 
     // Private fields
     private Infantry m_Parent;
     private Rigidbody m_Rigidbody;
     private Rigidbody m_Hoverball;
     private Rigidbody m_BottomWeight;
+
+    private List<Collider> withinSight;
+    private List<Collider> withinMaxDistance;
+    private List<Collider> withinMinDistance;
+
+    private Vector3 converge;
+    private Vector3 diverge;
+    private Vector3 align;
 
     private void Start()
     {
@@ -52,6 +65,7 @@ public class InfantryPhysics : MobilePhysics {
     {
         Hover();
         Guide();
+        Flock();
     }
 
     /// <summary>
@@ -74,7 +88,7 @@ public class InfantryPhysics : MobilePhysics {
             // Get the destination height
             Vector3 destination = Vector3.up * MAX_FLOAT_THRESHOLD * Mathf.Abs(Physics.gravity.y);
             // Adjust UP by the masses of the hoverball and parent rigidbody
-            Vector3 desire = Vector3.up * (destination.y - m_Rigidbody.velocity.y * MAX_GUIDING_FORCE);
+            Vector3 desire = Vector3.up * (destination.y - m_Rigidbody.velocity.y * GUIDANCE_FORCE);
 
             // Cap the amount of force (to prevent strange launches)
             desire = Vector3.ClampMagnitude(desire, MAX_VECTOR_FORCE);
@@ -88,7 +102,8 @@ public class InfantryPhysics : MobilePhysics {
     }
 
     /// <summary>
-    /// Guides the hoverball toward the destination.
+    /// Guides the hoverball toward the destination, while avoiding other 
+    /// hoverballs.
     /// </summary>
     private void Guide()
     {
@@ -96,18 +111,110 @@ public class InfantryPhysics : MobilePhysics {
         Vector3 desire = m_Parent.Destination - m_Parent.transform.position;
         // Store the magnitude for later use
         float desireMagnitude = desire.sqrMagnitude;
-        // Normalize and adjust the vector to use max speed by default
-        desire = desire.normalized * MAX_SPEED;
-        // Lower that speed depending on its distance from the destination
-        desire *= Decelerate(desireMagnitude / DECELERATION_THRESHOLD_SQRD);
-        // Steering = desired - velocity
-        desire -= m_Rigidbody.velocity;
         // Get rid of the Y factor so that the hover stays the same
         desire.y = 0;
+        // Normalize and adjust the vector to use max speed by default
+        desire = desire.normalized * STEER * GUIDANCE_FACTOR;
+        // Lower that speed depending on its distance from the destination
+        desire *= Decelerate(desireMagnitude / DECELERATION_THRESHOLD_SQRD);
+        // Steering = desire - velocity
+        desire -= m_Rigidbody.velocity;
         // Cap the amount of force (to prevent strange launches)
-        desire = Vector3.ClampMagnitude(desire, MAX_GUIDING_FORCE);
+        desire = Vector3.ClampMagnitude(desire, GUIDANCE_FORCE);
         // Add the force
         m_Hoverball.AddForce(desire, ForceMode.Acceleration);
+    }
+
+    /// <summary>
+    /// Hoverballs will try to stay within a certain radius of each other, but 
+    /// also outside a certain radius of each other, and also generally go in
+    /// the same direction as others.
+    /// </summary>
+    /// <returns>A normalized Vector3 that accounts for both convergent, 
+    /// divergent and alignment forces.</returns>
+    private void Flock()
+    {
+        Unit current;
+        // Get all units that are within a very small "sight" range.
+        withinSight = new List<Collider>(Physics.OverlapSphere(transform.position, MAX_DISTANCE_FROM, m_Parent.ignoreAllButUnits));
+        withinMaxDistance = new List<Collider>();
+        withinMinDistance = new List<Collider>();
+        foreach (Collider c in withinSight)
+        {
+            current = c.gameObject.GetComponent<Unit>();
+            // Only keep allies in the list.
+            if (current.Team == m_Parent.Team)
+            {
+                // Move allies that are too close into another list.
+                if ((c.transform.position - m_Parent.transform.position).sqrMagnitude < MIN_DISTANCE_FROM_SQR)
+                {
+                    withinMinDistance.Add(c);
+                }
+                else
+                {
+                    withinMaxDistance.Add(c);
+                }
+            }
+        }
+
+        // Multiply the components of the convergent force by the components of
+        // the divergent force and normalize the result.
+        converge = Converge(withinMaxDistance).normalized;
+        diverge = Diverge(withinMinDistance).normalized;
+        align = Align(withinSight).normalized;
+
+        converge = Vector3.ClampMagnitude(converge * STEER * CONVERGE_FACTOR, MAX_VECTOR_FORCE);
+        diverge = Vector3.ClampMagnitude(diverge * STEER * DIVERGE_FACTOR, MAX_VECTOR_FORCE);
+        align = Vector3.ClampMagnitude(align * STEER * ALIGNMENT_FACTOR, MAX_VECTOR_FORCE);
+
+        m_Rigidbody.AddForce(converge, ForceMode.Acceleration);
+        m_Rigidbody.AddForce(diverge, ForceMode.Acceleration);
+        m_Rigidbody.AddForce(align, ForceMode.Acceleration);
+    }
+
+    /// <summary>
+    /// Returns a vector representing the direction of the general center of 
+    /// the group.
+    /// </summary>
+    private Vector3 Converge(List<Collider> goToward)
+    {
+        if (goToward.Count == 0) { return Vector3.zero; }
+        Vector3 result = Vector3.zero;
+        foreach (Collider c in goToward)
+        {
+            result += c.transform.position;
+        }
+        return (m_Parent.transform.position - result);
+    }
+
+    /// <summary>
+    /// Returns a  vector in the general direction away from units that are too 
+    /// close.
+    /// </summary>
+    private Vector3 Diverge(List<Collider> goAwayFrom)
+    {
+        if (goAwayFrom.Count == 0) { return Vector3.zero; }
+        Vector3 result = Vector3.zero;
+        foreach (Collider c in goAwayFrom)
+        {
+            result -= c.transform.position;
+        }
+        return (m_Parent.transform.position - result);
+    }
+
+    /// <summary>
+    /// Returns a vector that is the normalized average of the velocity vectors
+    /// of all neighboring units.
+    /// </summary>
+    private Vector3 Align(List<Collider> alignWith)
+    {
+        if (alignWith.Count == 0) { return Vector3.zero; }
+        Vector3 result = Vector3.zero;
+        foreach (Collider c in alignWith)
+        {
+            result += c.GetComponent<Rigidbody>().velocity;
+        }
+        return (m_Parent.transform.position - result);
     }
 
     /// <summary>

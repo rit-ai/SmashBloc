@@ -21,9 +21,10 @@ public class Infantry : MobileUnit {
     private const DamageType DMG_TYPE = DamageType.BULLET;
     private const float ASCENSION_HEIGHT = 1000f;
     // Default values
-    private const int MAXHEALTH = 100;
-    private const int DAMAGE = 10;
-    private const int RANGE = 25;
+    private const float MAXHEALTH = 100f;
+    private const float DAMAGE = 10f;
+    private const float SIGHT_RANGE = 500f;
+    private const float RANGE = 50f;
 
     // Methods
 
@@ -34,6 +35,7 @@ public class Infantry : MobileUnit {
         dmgType = DMG_TYPE;
         maxHealth = MAXHEALTH;
         damage = DAMAGE;
+        sightRange = SIGHT_RANGE;
         attackRange = RANGE;
 
         base.Init();

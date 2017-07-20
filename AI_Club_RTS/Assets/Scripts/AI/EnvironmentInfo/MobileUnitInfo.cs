@@ -24,15 +24,15 @@ public class MobileUnitInfo {
     public Vector3 destination;
 
     // Any enemies that are in the Unit's sight range.
-    public List<MobileUnit> enemiesInSight;
+    public List<Unit> enemiesInSight;
     // Any allies that are in the Unit's sight range.
-    public List<MobileUnit> alliesInSight;
+    public List<Unit> alliesInSight;
     // Any enemies that are in the Unit's attack range.
-    public List<MobileUnit> enemiesInAttackRange;
+    public List<Unit> enemiesInAttackRange;
 
     public MobileUnitInfo() { }
 
-    public MobileUnitInfo(Team team, float healthPercentage, float damage, Vector3 destination, List<MobileUnit> enemiesInSight, List<MobileUnit> alliesInSight, List<MobileUnit> enemiesInAttackRange)
+    public MobileUnitInfo(Team team, float healthPercentage, float damage, Vector3 destination, List<Unit> enemiesInSight, List<Unit> alliesInSight, List<Unit> enemiesInAttackRange)
     {
         this.team = team;
         this.healthPercentage = healthPercentage;
