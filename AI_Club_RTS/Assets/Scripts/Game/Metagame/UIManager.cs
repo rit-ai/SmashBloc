@@ -401,4 +401,11 @@ public class UIManager : MonoBehaviour, IObservable {
         string unitText = units.ToString();
         m_CurrentUnitAmount.text = unitText;
     }
+
+    private IEnumerator AnimateTargetRing()
+    {
+        Transform ring = m_TargetRing.GetComponent<Transform>();
+        Transform[] cones = m_TargetRing.GetComponentsInChildren<Transform>();
+        yield return 0f;
+    }
 }

@@ -29,6 +29,8 @@ public sealed class Toolbox : Singleton<Toolbox> {
     private static MobileUnit infantryPrefab;
     private static MobileUnit tankPrefab;
 
+    private static RTS_Terrain terrain;
+
     // Public accessors and private variables to ensure that the contents of 
     // the variables will never change
     public static ObjectPool<Infantry> InfantryPool
@@ -67,6 +69,10 @@ public sealed class Toolbox : Singleton<Toolbox> {
     {
         get { return tankPrefab; }
     }
+    public static RTS_Terrain Terrain
+    {
+        get { return terrain; }
+    }
 
     // A private constructor makes sure that this object will never be 
     // accidentally created in code
@@ -91,6 +97,8 @@ public sealed class Toolbox : Singleton<Toolbox> {
 
         infantryPool = new ObjectPool<Infantry>(MakeInfantry, MEDIUM_POOL);
         cityPool = new ObjectPool<City>(MakeCity, SMALL_POOL);
+
+        terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
 
         Debug.Assert(CityPrefab);
         Debug.Assert(InfantryPrefab);

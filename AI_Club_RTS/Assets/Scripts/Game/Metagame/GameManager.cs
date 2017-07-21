@@ -30,7 +30,6 @@ public class GameManager : MonoBehaviour, IObservable {
     private const int NUM_AI_PLAYERS = 1;
 
     private CameraController m_CameraController;
-    private RTS_Terrain m_Terrain;
     private GameObject[] citySpawnPoints;
 
     private List<Team> teams;
@@ -137,12 +136,9 @@ public class GameManager : MonoBehaviour, IObservable {
     private void Awake()
     {
         m_CameraController = Camera.main.GetComponent<CameraController>();
-
-        m_Terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
         citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
 
         Debug.Assert(m_CameraController != null);
-        Debug.Assert(m_Terrain != null);
         Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
 
         teams = new List<Team>

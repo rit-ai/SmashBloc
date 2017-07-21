@@ -16,24 +16,23 @@ public class InfantryPhysics : MobilePhysics {
     // constructor and ComponentUpdate().
 
     // Thresholds for unit convergence and separation
-    private const float MAX_DISTANCE_FROM = 500f; // "sight range"
-    private const float MIN_DISTANCE_FROM_SQR = 50f;
+    private const float MAX_DISTANCE_FROM = 400f; // "sight range"
+    private const float MIN_DISTANCE_FROM_SQR = 80f;
     // Height above ground at which float force is applied
-    private const float MAX_FLOAT_THRESHOLD = 10f;
+    private const float MAX_FLOAT_THRESHOLD = 20f;
     // Distance from destination at which deceleration begins (squared)
     private const float DECELERATION_THRESHOLD_SQRD = 1000f;
     // Max force that can be applied to a rigidbody
     private const float MAX_VECTOR_FORCE = 200f;
-    private const float GUIDANCE_FORCE = 100f;
-    // Higher resists motion more (ONLY BETWEEN 0-1)
-    private const float RESISTANCE_FACTOR = 0.7f;
+    private const float UP_FORCE = 100f;
     // Default steering force strength
     private const float STEER = 100f;
     // Adjusts the intensity of steering forces
     private const float GUIDANCE_FACTOR = 1f;
-    private const float CONVERGE_FACTOR = 0.6f;
-    private const float DIVERGE_FACTOR = 1.2f;
-    private const float ALIGNMENT_FACTOR = 1f;
+    private const float CONVERGE_FACTOR = 0.25f;
+    private const float DIVERGE_FACTOR = 0.5f;
+    private const float ALIGNMENT_FACTOR = 0.75f;
+
 
     // Private fields
     private Infantry m_Parent;
@@ -83,19 +82,20 @@ public class InfantryPhysics : MobilePhysics {
         RaycastHit hit;
         // If the unit is too far from the floor, don't apply any force to the
         // hoverball
-        if (Physics.Raycast(m_Hoverball.transform.position, Vector3.down, out hit, MAX_FLOAT_THRESHOLD))
+        if (Physics.Raycast(m_Hoverball.transform.position, Vector3.down, out hit, MAX_FLOAT_THRESHOLD, Toolbox.Terrain.ignoreAllButTerrain))
         {
             // Get the destination height
             Vector3 destination = Vector3.up * MAX_FLOAT_THRESHOLD * Mathf.Abs(Physics.gravity.y);
             // Adjust UP by the masses of the hoverball and parent rigidbody
-            Vector3 desire = Vector3.up * (destination.y - m_Rigidbody.velocity.y * GUIDANCE_FORCE);
-
+            Vector3 desire = Vector3.up * (destination.y - m_Rigidbody.velocity.y * UP_FORCE);
+            desire -= m_Hoverball.velocity;
             // Cap the amount of force (to prevent strange launches)
             desire = Vector3.ClampMagnitude(desire, MAX_VECTOR_FORCE);
             // Apply force
             m_Hoverball.AddForce(desire, ForceMode.Acceleration);
         }
 
+        
         // Add downward force to the bottom weight and resist changes in motion
         Vector3 downForce = Vector3.down * Mathf.Abs(Physics.gravity.y) * m_BottomWeight.mass;
         m_BottomWeight.AddForce(downForce, ForceMode.Acceleration);
@@ -118,9 +118,12 @@ public class InfantryPhysics : MobilePhysics {
         // Lower that speed depending on its distance from the destination
         desire *= Decelerate(desireMagnitude / DECELERATION_THRESHOLD_SQRD);
         // Steering = desire - velocity
-        desire -= m_Rigidbody.velocity;
+        Vector3 velocity = m_Rigidbody.velocity;
+        velocity.y = 0;
+        desire -= velocity;
         // Cap the amount of force (to prevent strange launches)
-        desire = Vector3.ClampMagnitude(desire, GUIDANCE_FORCE);
+        desire = Vector3.ClampMagnitude(desire, MAX_VECTOR_FORCE);
+        // Reduce the amount of force if not hovering
         // Add the force
         m_Hoverball.AddForce(desire, ForceMode.Acceleration);
     }
@@ -184,6 +187,7 @@ public class InfantryPhysics : MobilePhysics {
         {
             result += c.transform.position;
         }
+        result.y = 0;
         return (m_Parent.transform.position - result);
     }
 
@@ -199,6 +203,7 @@ public class InfantryPhysics : MobilePhysics {
         {
             result -= c.transform.position;
         }
+        result.y = 0;
         return (m_Parent.transform.position - result);
     }
 
@@ -214,6 +219,7 @@ public class InfantryPhysics : MobilePhysics {
         {
             result += c.GetComponent<Rigidbody>().velocity;
         }
+        result.y = 0;
         return (m_Parent.transform.position - result);
     }
 
