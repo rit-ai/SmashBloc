@@ -21,6 +21,7 @@ public class Infantry : MobileUnit {
     private const DamageType DMG_TYPE = DamageType.BULLET;
     private const float ASCENSION_HEIGHT = 1000f;
     // Default values
+    private const float DEST_DEVIATION_RADIUS = 50f;
     private const float MAXHEALTH = 100f;
     private const float DAMAGE = 10f;
     private const float SIGHT_RANGE = 500f;
@@ -33,6 +34,7 @@ public class Infantry : MobileUnit {
         // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
+        destDeviationRadius = DEST_DEVIATION_RADIUS;
         maxHealth = MAXHEALTH;
         damage = DAMAGE;
         sightRange = SIGHT_RANGE;

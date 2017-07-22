@@ -70,18 +70,4 @@ public abstract class MobileAI : AbstractAI
         command.Body = body;
         currentCommand = command;
     }
-    
-    // Sealed and protected, to handle the requirements of BaseAI
-    protected sealed override IEnumerator ProcessNext()
-    {
-        while (true)
-        {
-            if (currentCommand != null)
-            {
-                currentCommand.Execute();
-                currentCommand = null;
-            }
-            yield return new WaitForSeconds(COMMAND_PROCESS_RATE);
-        }
-    }
 }

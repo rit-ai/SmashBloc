@@ -58,7 +58,9 @@ public class GameManager : MonoBehaviour, IObservable {
 
     /// <summary>
     /// Sets the new destination for the unit, if the unit is of the player's
-    /// team.
+    /// team. New destinations take the form of MoveCommands, which means that 
+    /// the unit will deviate from its destination based on its 
+    /// destDeviationRadius value.
     /// </summary>
     /// <param name="terrain">The terrain, which was right clicked such to 
     /// invoke this method.</param>
@@ -71,10 +73,14 @@ public class GameManager : MonoBehaviour, IObservable {
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
             // Set the destination of all the units
+            MoveCommand move = new MoveCommand(hit.point);
             foreach (MobileUnit u in selectedUnits)
             {
                 if (u.Team == playerTeam)
-                    u.Destination = hit.point;
+                {
+                    move.Body = u;
+                    move.Execute();
+                }
             }
         }
     }

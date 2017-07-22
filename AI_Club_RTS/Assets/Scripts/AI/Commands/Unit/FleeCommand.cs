@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /*
+ * @author Paul Galatic
+ * 
  * Tells the Mobile to run away from a group of GameObjects, usually enemy 
  * Units, and also provides a default distance to run away.
  * **/

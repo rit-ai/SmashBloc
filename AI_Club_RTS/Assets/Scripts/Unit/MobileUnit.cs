@@ -16,6 +16,7 @@ public abstract class MobileUnit : Unit
     protected Vector3 newPos;
     protected Vector3 destination;
     protected Vector3 storedDestination = default(Vector3);
+    protected float destDeviationRadius;
     protected float damage;
     protected float sightRange;
     protected float attackRange;
@@ -147,6 +148,15 @@ public abstract class MobileUnit : Unit
     {
         get { return ai; }
         set { ai = value; }
+    }
+
+    /// <summary>
+    /// Units will deviate from any assigned movement by an amount based on 
+    /// this radius. Set to 0 to disable.
+    /// </summary>
+    public float DestDeviationRadius
+    {
+        get { return destDeviationRadius; }
     }
 
     /// <summary>

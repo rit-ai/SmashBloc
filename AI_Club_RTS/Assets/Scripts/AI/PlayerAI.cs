@@ -71,21 +71,5 @@ public abstract class PlayerAI : AbstractAI {
         currentCommand = command;
     }
 
-    /// <summary>
-    /// Executes the next command in the queue, if one is present.
-    /// </summary>
-    protected sealed override IEnumerator ProcessNext()
-    {
-        while (true)
-        {
-            if (currentCommand != null)
-            {
-                currentCommand.Execute();
-                currentCommand = null;
-            }
-            yield return new WaitForSeconds(COMMAND_PROCESS_RATE);
-        }
-    }
-
 
 }

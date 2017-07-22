@@ -26,6 +26,9 @@ public abstract class AbstractAI : MonoBehaviour {
     // This is the next command that the Body will execute when ProcessNext() 
     // is called.
     protected ICommand currentCommand;
+    // This is the most recent command that the Body executed. Useful if you
+    // don't want to execute the same type of command again and again.
+    protected ICommand mostRecentCommand;
 
     /// <summary>
     /// Allows the body to provide updated info to the brain.
@@ -49,10 +52,22 @@ public abstract class AbstractAI : MonoBehaviour {
     protected abstract void SetCurrentCommand(ICommand command);
 
     /// <summary>
-    /// Attempts to execute the current command. Does nothing if there is no
-    /// command.
+    /// Attempts to execute the current command. Does nothing if currentCommand
+    /// is null, as that implies the body hasn't been given orders.
     /// </summary>
-    protected abstract IEnumerator ProcessNext();
+    protected IEnumerator ProcessNext()
+    {
+        while (true)
+        {
+            if (currentCommand != null)
+            {
+                currentCommand.Execute();
+                mostRecentCommand = currentCommand;
+                currentCommand = null;
+            }
+            yield return new WaitForSeconds(COMMAND_PROCESS_RATE);
+        }
+    }
 
     /// <summary>
     /// Chooses a Command to add to the CommandQueue based on a weighted 
