@@ -47,7 +47,7 @@ public class UIManager : MonoBehaviour, IObservable {
     public Slider m_CityMenuIncome;
     public Button m_CityMenuSpawnButton;
     // MISC UI
-    public GameObject m_TargetRing;
+    public TargetRing m_TargetRing;
 
     // Private fields
     private List<IObserver> observers;
@@ -344,7 +344,7 @@ public class UIManager : MonoBehaviour, IObservable {
         Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
-            m_TargetRing.transform.position = hit.point;
+            m_TargetRing.UpdatePosition(hit.point);
             m_TargetRing.gameObject.SetActive(true);
         }
     }
@@ -402,10 +402,5 @@ public class UIManager : MonoBehaviour, IObservable {
         m_CurrentUnitAmount.text = unitText;
     }
 
-    private IEnumerator AnimateTargetRing()
-    {
-        Transform ring = m_TargetRing.GetComponent<Transform>();
-        Transform[] cones = m_TargetRing.GetComponentsInChildren<Transform>();
-        yield return 0f;
-    }
+
 }

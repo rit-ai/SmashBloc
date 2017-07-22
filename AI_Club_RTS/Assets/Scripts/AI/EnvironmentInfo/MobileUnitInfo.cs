@@ -30,6 +30,7 @@ public class MobileUnitInfo {
     // Any enemies that are in the Unit's attack range.
     public List<Unit> enemiesInAttackRange;
 
+    // Empty constructor in case we want to assign values piecemeal
     public MobileUnitInfo() { }
 
     public MobileUnitInfo(Team team, float healthPercentage, float damage, Vector3 destination, List<Unit> enemiesInSight, List<Unit> alliesInSight, List<Unit> enemiesInAttackRange)

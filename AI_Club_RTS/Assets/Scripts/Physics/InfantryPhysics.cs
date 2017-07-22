@@ -139,7 +139,7 @@ public class InfantryPhysics : MobilePhysics {
     {
         Unit current;
         // Get all units that are within a very small "sight" range.
-        withinSight = new List<Collider>(Physics.OverlapSphere(transform.position, MAX_DISTANCE_FROM, m_Parent.ignoreAllButUnits));
+        withinSight = new List<Collider>(Physics.OverlapSphere(transform.position, MAX_DISTANCE_FROM, m_Parent.ignoreAllButMobiles));
         withinMaxDistance = new List<Collider>();
         withinMinDistance = new List<Collider>();
         foreach (Collider c in withinSight)

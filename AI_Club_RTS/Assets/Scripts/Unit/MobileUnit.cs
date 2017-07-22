@@ -6,11 +6,14 @@ using UnityEngine;
 /*
  * @author Paul Galatic
  * 
- * This abstract class represents Units that can move.
+ * This abstract class represents Units that can move (as opposed to buildings, 
+ * like Cities). This type of unit is the core of a Player's capabilities and
+ * influence in the game. Whether or not they're effective depends largely on 
+ * the type of brain they've been given.
  * **/
 public abstract class MobileUnit : Unit
 {
-    public LayerMask ignoreAllButUnits;
+    public LayerMask ignoreAllButMobiles;
 
     protected MobileAI ai;
     protected Vector3 newPos;
@@ -30,7 +33,13 @@ public abstract class MobileUnit : Unit
     // Set initial state for when a MobileUnit is created
     public override void Activate()
     {
-        destination = transform.position;
+        // Units, by default, hover a a short distance around their spawn pos
+        MoveCommand idle = new MoveCommand(transform.position)
+        {
+            Body = this
+        };
+        idle.Execute();
+
         // Pass info to the AI component every second
         info = new MobileUnitInfo();
         StartCoroutine(PassInfo());
@@ -59,7 +68,7 @@ public abstract class MobileUnit : Unit
         List<Unit> enemiesInSight = new List<Unit>();
         List<Unit> alliesInSight = new List<Unit>();
         List<Unit> enemiesInAttackRange = new List<Unit>();
-        List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButUnits));
+        List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButMobiles));
         foreach (Collider c in collidersInSight)
         {
             current = c.gameObject.GetComponent<Unit>();
