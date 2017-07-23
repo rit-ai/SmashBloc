@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tank : MobileUnit {
+public class Boomy : MobileUnit {
     // Author: Ben Fairlamb
     // Purpose: Tank unit
 
-    public const string IDENTITY = "Tank";
+    public const string IDENTITY = "Boomy";
     public const int COST = 500;
 
     // CONSTANTS -- intimately related to unit design
@@ -15,7 +15,7 @@ public class Tank : MobileUnit {
     private const DamageType DMG_TYPE = DamageType.EXPLOSIVE;
 
     // Default values
-    private const string NAME = "Tank";
+    private const string NAME = "Boomy";
     private const int MAXHEALTH = 200;
     private const int DAMAGE = 100;
     private const int RANGE = 100;

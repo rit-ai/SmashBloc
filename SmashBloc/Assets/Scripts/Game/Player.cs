@@ -90,11 +90,11 @@ public class Player : MonoBehaviour {
 
         switch (unitIdentity)
         {
-            case Infantry.IDENTITY:
-                toSpawnCost = Infantry.COST;
+            case Twirl.IDENTITY:
+                toSpawnCost = Twirl.COST;
                 break;
-            case Tank.IDENTITY:
-                toSpawnCost = Tank.COST;
+            case Boomy.IDENTITY:
+                toSpawnCost = Boomy.COST;
                 break;
             default:
                 throw new KeyNotFoundException("SetUnitToSpawn given invalid string");

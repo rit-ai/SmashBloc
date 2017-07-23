@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Infantry : MobileUnit {
+public class Twirl : MobileUnit {
     // Author: Ben Fairlamb
     // Author: Paul Galatic
-    // Purpose: Infantry unit
+    // Purpose: Twirly!
 
     // Public constants
-    public const string IDENTITY = "Infantry";
+    public const string IDENTITY = "Twirl";
     public const int COST = 50;
 
     // Public fields
@@ -44,7 +44,7 @@ public class Infantry : MobileUnit {
     }
 
     /// <summary>
-    /// Prompts an Infantry unit to aim at another Unit, shooting either when
+    /// Prompts an Twirl unit to aim at another Unit, shooting either when
     /// locked on or after a specified amount of time elapses.
     /// </summary>
     /// <param name="target">The Unit to shoot at.</param>
@@ -55,7 +55,7 @@ public class Infantry : MobileUnit {
         throw new NotImplementedException();
 
         float timeLeft = maxAimTime;
-        // Infantry cannot navigate to a destination and aim at the same time, 
+        // Twirl cannot navigate to a destination and aim at the same time, 
         // so the destination is temporarily stored.
         storedDestination = destination;
 
@@ -83,7 +83,7 @@ public class Infantry : MobileUnit {
     }
 
     /// <summary>
-    /// The cost of an Infantry unit, in gold.
+    /// The cost of an Twirl unit, in gold.
     /// </summary>
     public override int Cost()
     {
@@ -91,7 +91,7 @@ public class Infantry : MobileUnit {
     }
 
     /// <summary>
-    /// In this animation, the Infantry unit sails into the air before being
+    /// In this animation, the Twirl unit sails into the air before being
     /// destroyed. Particle effects are TODO.
     /// </summary>
     protected override IEnumerator DeathAnimation()
@@ -111,7 +111,7 @@ public class Infantry : MobileUnit {
             yield return 0f;
         }
 
-        Toolbox.InfantryPool.Return(this);
+        Toolbox.TwirlPool.Return(this);
 
         yield return null;
     }

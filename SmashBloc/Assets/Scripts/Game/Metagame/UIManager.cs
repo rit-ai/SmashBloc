@@ -91,10 +91,10 @@ public class UIManager : MonoBehaviour, IObservable {
         switch (m_UnitSelect.value)
         {
             case 0:
-                toSpawn = Infantry.IDENTITY;
+                toSpawn = Twirl.IDENTITY;
                 break;
             default:
-                toSpawn = Tank.IDENTITY;
+                toSpawn = Boomy.IDENTITY;
                 break;
         }
         GameManager.PLAYER.SetUnitToSpawn(toSpawn);

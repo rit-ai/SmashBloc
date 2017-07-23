@@ -126,9 +126,9 @@ public class Utils : MonoBehaviour {
     {
         switch (identity)
         {
-            case Infantry.IDENTITY:
-                return Toolbox.InfantryPool.Rent();
-            case Tank.IDENTITY:
+            case Twirl.IDENTITY:
+                return Toolbox.TwirlPool.Rent();
+            case Boomy.IDENTITY:
                 throw new System.NotImplementedException();
         }
 

@@ -18,7 +18,7 @@ public sealed class Toolbox : Singleton<Toolbox> {
     private const int SMALL_POOL = 10;
     private const int MEDIUM_POOL = 50;
 
-    private static ObjectPool<Infantry> infantryPool;
+    private static ObjectPool<Twirl> twirlPool;
     private static ObjectPool<City> cityPool;
     private static UIManager uiManager;
     private static GameManager gameManager;
@@ -26,16 +26,16 @@ public sealed class Toolbox : Singleton<Toolbox> {
     private static GameObserver gameObserver;
 
     private static City cityPrefab;
-    private static MobileUnit infantryPrefab;
+    private static MobileUnit twirlPrefab;
     private static MobileUnit tankPrefab;
 
     private static RTS_Terrain terrain;
 
     // Public accessors and private variables to ensure that the contents of 
     // the variables will never change
-    public static ObjectPool<Infantry> InfantryPool
+    public static ObjectPool<Twirl> TwirlPool
     {
-        get { return infantryPool; }
+        get { return twirlPool; }
     }
     public static ObjectPool<City> CityPool
     {
@@ -61,9 +61,9 @@ public sealed class Toolbox : Singleton<Toolbox> {
     {
         get { return cityPrefab; }
     }
-    public static MobileUnit InfantryPrefab
+    public static MobileUnit TwirlPrefab
     {
-        get { return infantryPrefab; }
+        get { return twirlPrefab; }
     }
     public static MobileUnit TankPrefab
     {
@@ -86,8 +86,8 @@ public sealed class Toolbox : Singleton<Toolbox> {
     private void Awake()
     {
         cityPrefab = Resources.Load<City>("Prefabs/Units/" + City.IDENTITY);
-        infantryPrefab = Resources.Load<Infantry>("Prefabs/Units/" + Infantry.IDENTITY);
-        tankPrefab = Resources.Load<Tank>("Prefabs/Units/" + Tank.IDENTITY);
+        twirlPrefab = Resources.Load<Twirl>("Prefabs/Units/" + Twirl.IDENTITY);
+        tankPrefab = Resources.Load<Boomy>("Prefabs/Units/" + Boomy.IDENTITY);
 
         uiManager = FindObjectOfType<UIManager>();
         gameManager = gameObject.AddComponent<GameManager>();
@@ -95,13 +95,13 @@ public sealed class Toolbox : Singleton<Toolbox> {
         uiObserver = gameObject.AddComponent<UIObserver>();
         gameObserver = gameObject.AddComponent<GameObserver>();
 
-        infantryPool = new ObjectPool<Infantry>(MakeInfantry, MEDIUM_POOL);
+        twirlPool = new ObjectPool<Twirl>(MakeTwirl, MEDIUM_POOL);
         cityPool = new ObjectPool<City>(MakeCity, SMALL_POOL);
 
         terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
 
         Debug.Assert(CityPrefab);
-        Debug.Assert(InfantryPrefab);
+        Debug.Assert(TwirlPrefab);
         Debug.Assert(TankPrefab);
         Debug.Assert(gameManager);
         Debug.Assert(uiManager);
@@ -110,18 +110,18 @@ public sealed class Toolbox : Singleton<Toolbox> {
     }
 
     /// <summary>
-    /// Constructs and returns an inactive Infantry game object.
+    /// Constructs and returns an inactive Twirl game object.
     /// </summary>
-    private Infantry MakeInfantry()
+    private Twirl MakeTwirl()
     {
-        Infantry newInfantry = Instantiate(InfantryPrefab as Infantry);
-        newInfantry.gameObject.SetActive(false);
-        newInfantry.gameObject.AddComponent<InfantryPhysics>();
-        newInfantry.AI = newInfantry.gameObject.AddComponent<MobileAI_Basic>();
-        newInfantry.AI.Body = newInfantry;
-        newInfantry.Init();
+        Twirl newTwirl = Instantiate(TwirlPrefab as Twirl);
+        newTwirl.gameObject.SetActive(false);
+        newTwirl.gameObject.AddComponent<TwirlPhysics>();
+        newTwirl.AI = newTwirl.gameObject.AddComponent<MobileAI_Basic>();
+        newTwirl.AI.Body = newTwirl;
+        newTwirl.Init();
 
-        return newInfantry;
+        return newTwirl;
     }
 
     /// <summary>

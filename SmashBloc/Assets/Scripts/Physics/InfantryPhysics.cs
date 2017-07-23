@@ -5,12 +5,12 @@ using UnityEngine;
 /*
  * @author Paul Galatic
  * 
- * Class designed to handle the physics of the Infantry Unit. The functions in 
+ * Class designed to handle the physics of the Twirl Unit. The functions in 
  * this file are designed in such a way to reasonably accomodate being called
  * many times a second. Being that this design precludes the use of conditional
  * branches, it may be a bit confusing to read.
  * **/
-public class InfantryPhysics : MobilePhysics {
+public class TwirlPhysics : MobilePhysics {
 
     // This class should have no public state or methods besides its 
     // constructor and ComponentUpdate().
@@ -35,7 +35,7 @@ public class InfantryPhysics : MobilePhysics {
 
 
     // Private fields
-    private Infantry m_Parent;
+    private Twirl m_Parent;
     private Rigidbody m_Rigidbody;
     private Rigidbody m_Hoverball;
     private Rigidbody m_BottomWeight;
@@ -51,7 +51,7 @@ public class InfantryPhysics : MobilePhysics {
     private void Start()
     {
         // Private fields
-        m_Parent = GetComponent<Infantry>();
+        m_Parent = GetComponent<Twirl>();
         m_Rigidbody = m_Parent.GetComponent<Rigidbody>();
         m_Hoverball = m_Parent.m_Hoverball;
         m_BottomWeight = m_Parent.m_BottomWeight;
@@ -68,13 +68,12 @@ public class InfantryPhysics : MobilePhysics {
     }
 
     /// <summary>
-    /// Infantry Units hover above the ground, based on their current distance 
+    /// Twirl Units hover above the ground, based on their current distance 
     /// from the floor. They will attempt to hover toward the parent's 
     /// destination and orbit around it.
     /// 
     /// The Hoverball provides upward force. The BottomWeight provides 
-    /// stability (so that the Infantry doesn't constantly flip and spin 
-    /// around).
+    /// stability (which tempers how often the Twirl flips around).
     /// </summary>
     private void Hover()
     {
