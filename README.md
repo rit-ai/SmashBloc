@@ -2,23 +2,23 @@
 
 # SmashBloc (v0.0.1.1)
 
-Breaking into AI concepts can be a tricky thing. Most universities only offer AI courses to upperclassmen, keeping them shuttered behind layers of prereqs. This makes sense—after all, in order to program an effective AI, it's absolutely necessary to have a rigorous understanding of data structures and algorithmic computation.
+Breaking into AI concepts without formal education on the subject can be tricky, and most universities shutter AI-related courses behind layers of prerequisites. After all, in order to program an effective AI, it's absolutely necessary to have a rigorous understanding of data structures and algorithmic computation.
 
 ...Or is it?
 
-SmashBloc is a real-time strategy (RTS) programmed in Unity that provides much of the groundwork for constructing an AI that can either control a unit, or control a player. It is a template to which relatively inexperienced developers can add functionality without needing to understand the systems that make the game tick.
+SmashBloc is a real-time strategy game programmed in Unity that provides much of the groundwork for constructing an AI that can either control a unit, or control a player. Programming an AI is challenging enough, after all, without needing to build a game around it. While the SmashBloc team works on developing the interactive systems, you're free to experiment and implement your own intelligent agents.
 
 ## Prerequisites
 
-SmashBloc is written in Unity and thus requires Unity to run. Get Unity [here](https://unity3d.com/).
+SmashBloc is made with Unity, so the Unity editor is required in order to join development. Get Unity [here](https://unity3d.com/).
+
+An executable build is coming soon!
 
 ## Getting Started
 
-Clone or download the repo and open the SmashBloc folder as a Unity project.
+Clone the repo and open the SmashBloc folder in the Unity editor as an existing project.
 
-At this point you should be able to run up the game in the editor and run it using the Play button at the top.
-
-Currently no executable build or installer exists.
+At this point you should be able to run it in the editor by clicking the Play button at the top.
 
 ## Contributing
 
@@ -39,4 +39,4 @@ This project is licensed under the [MIT License](Docs/LICENSE.md).
 
 ## Acknowledgments
 
-This was a project built from the ground up by a group of students that were brought together by the Artificial Intelligence club at RIT. Check out our [slack](https://ritficialintelligence.slack.com/messages/general/)!
+This was a project built from the ground up by the Artificial Intelligence club at Rochester Institute of Technology. Check out our [slack](https://ritficialintelligence.slack.com/messages/general/)!
