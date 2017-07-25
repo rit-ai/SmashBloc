@@ -16,7 +16,7 @@ using UnityEngine.UI;
 public sealed class Toolbox : Singleton<Toolbox> {
 
     private const int SMALL_POOL = 10;
-    private const int MEDIUM_POOL = 50;
+    private const int MEDIUM_POOL = 100;
 
     private static ObjectPool<Twirl> twirlPool;
     private static ObjectPool<City> cityPool;
@@ -30,6 +30,9 @@ public sealed class Toolbox : Singleton<Toolbox> {
     private static MobileUnit tankPrefab;
 
     private static RTS_Terrain terrain;
+
+    GameObject cityPoolWrapper;
+    GameObject twirlPoolWrapper;
 
     // Public accessors and private variables to ensure that the contents of 
     // the variables will never change
@@ -95,6 +98,9 @@ public sealed class Toolbox : Singleton<Toolbox> {
         uiObserver = gameObject.AddComponent<UIObserver>();
         gameObserver = gameObject.AddComponent<GameObserver>();
 
+        twirlPoolWrapper = new GameObject("Twirl Pool");
+        cityPoolWrapper = new GameObject("City Pool");
+
         twirlPool = new ObjectPool<Twirl>(MakeTwirl, MEDIUM_POOL);
         cityPool = new ObjectPool<City>(MakeCity, SMALL_POOL);
 
@@ -114,7 +120,7 @@ public sealed class Toolbox : Singleton<Toolbox> {
     /// </summary>
     private Twirl MakeTwirl()
     {
-        Twirl newTwirl = Instantiate(TwirlPrefab as Twirl);
+        Twirl newTwirl = Instantiate(TwirlPrefab as Twirl, twirlPoolWrapper.transform);
         newTwirl.gameObject.SetActive(false);
         newTwirl.gameObject.AddComponent<TwirlPhysics>();
         newTwirl.AI = newTwirl.gameObject.AddComponent<MobileAI_Basic>();
@@ -129,12 +135,11 @@ public sealed class Toolbox : Singleton<Toolbox> {
     /// </summary>
     private City MakeCity()
     {
-        City city = Instantiate(CityPrefab);
+        City city = Instantiate(CityPrefab, cityPoolWrapper.transform);
         city.gameObject.SetActive(false);
         city.Init();
 
         return city;
     }
-
 }
 

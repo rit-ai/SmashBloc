@@ -57,4 +57,12 @@ public sealed class ObjectPool<T> {
         pool.Enqueue(toReturn);
     }
 
+    /// <summary>
+    /// Returns a refernece to the contents of the pool.
+    /// </summary>
+    public Queue<T> Contents
+    {
+        get { return pool; }
+    }
+
 }

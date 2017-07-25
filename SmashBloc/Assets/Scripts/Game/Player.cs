@@ -15,7 +15,7 @@ public class Player : MonoBehaviour {
 
     // Private Constants
     private const float PASS_INFO_RATE = 1f;
-    private const int MAX_UNITS = 20;
+    private const int MAX_UNITS = 100;
 
     // Private fields
 

@@ -137,7 +137,7 @@ public abstract class MobileUnit : Unit
         Unit unit = collision.gameObject.GetComponent<Unit>();
         if (unit != null && !(unit.Team.Equals(team)))
         {
-            base.TakeDamage(UnityEngine.Random.Range(10f, 20f), unit);
+            base.UpdateHealth(-UnityEngine.Random.Range(10f, 20f), unit);
         }
     }
 

@@ -17,7 +17,7 @@ public class TwirlPhysics : MobilePhysics {
 
     // Thresholds for unit convergence and separation
     private const float MAX_DISTANCE_FROM = 400f; // "sight range"
-    private const float MIN_DISTANCE_FROM_SQR = 80f;
+    private const float MIN_DISTANCE_FROM_SQR = 64f;
     // Height above ground at which float force is applied
     private const float MAX_FLOAT_THRESHOLD = 20f;
     // Distance from destination at which deceleration begins (squared)
@@ -26,7 +26,7 @@ public class TwirlPhysics : MobilePhysics {
     private const float MAX_VECTOR_FORCE = 200f;
     private const float UP_FORCE = 100f;
     // Default steering force strength
-    private const float STEER = 100f;
+    private const float SPEED = 200f;
     // Adjusts the intensity of steering forces
     private const float GUIDANCE_FACTOR = 1f;
     private const float CONVERGE_FACTOR = 0.25f;
@@ -55,6 +55,9 @@ public class TwirlPhysics : MobilePhysics {
         m_Rigidbody = m_Parent.GetComponent<Rigidbody>();
         m_Hoverball = m_Parent.m_Hoverball;
         m_BottomWeight = m_Parent.m_BottomWeight;
+
+        m_Rigidbody.useGravity = true;
+        m_BottomWeight.useGravity = true;
     }
 
     /// <summary>
@@ -62,9 +65,12 @@ public class TwirlPhysics : MobilePhysics {
     /// </summary>
     protected override void Navigate()
     {
-        Hover();
-        Guide();
-        Flock();
+        // Only perform more complex behaviors if we're close to the ground
+        if (Hover())
+        {
+            Guide();
+            Flock();
+        }
     }
 
     /// <summary>
@@ -75,10 +81,17 @@ public class TwirlPhysics : MobilePhysics {
     /// The Hoverball provides upward force. The BottomWeight provides 
     /// stability (which tempers how often the Twirl flips around).
     /// </summary>
-    private void Hover()
+    /// <returns>True if the Twirl is close enough to a surface to hover.
+    /// </returns>
+    private bool Hover()
     {
         // The farther it is from the floor, the less upward force is applied.
         RaycastHit hit;
+
+        // Add downward force to the bottom weight and resist changes in motion
+        Vector3 downForce = Vector3.down * m_BottomWeight.mass;
+        m_BottomWeight.AddForce(downForce, ForceMode.Acceleration);
+
         // If the unit is too far from the floor, don't apply any force to the
         // hoverball
         if (Physics.Raycast(m_Hoverball.transform.position, Vector3.down, out hit, MAX_FLOAT_THRESHOLD, Toolbox.Terrain.ignoreAllButTerrain))
@@ -92,12 +105,10 @@ public class TwirlPhysics : MobilePhysics {
             desire = Vector3.ClampMagnitude(desire, MAX_VECTOR_FORCE);
             // Apply force
             m_Hoverball.AddForce(desire, ForceMode.Acceleration);
+            return true;
         }
 
-        
-        // Add downward force to the bottom weight and resist changes in motion
-        Vector3 downForce = Vector3.down * Mathf.Abs(Physics.gravity.y) * m_BottomWeight.mass;
-        m_BottomWeight.AddForce(downForce, ForceMode.Acceleration);
+        return false;
     }
 
     /// <summary>
@@ -113,7 +124,7 @@ public class TwirlPhysics : MobilePhysics {
         // Get rid of the Y factor so that the hover stays the same
         desire.y = 0;
         // Normalize and adjust the vector to use max speed by default
-        desire = desire.normalized * STEER * GUIDANCE_FACTOR;
+        desire = desire.normalized * SPEED * GUIDANCE_FACTOR;
         // Lower that speed depending on its distance from the destination
         desire *= Decelerate(desireMagnitude / DECELERATION_THRESHOLD_SQRD);
         // Steering = desire - velocity
@@ -165,9 +176,9 @@ public class TwirlPhysics : MobilePhysics {
         diverge = Diverge(withinMinDistance).normalized;
         align = Align(withinSight).normalized;
 
-        converge = Vector3.ClampMagnitude(converge * STEER * CONVERGE_FACTOR, MAX_VECTOR_FORCE);
-        diverge = Vector3.ClampMagnitude(diverge * STEER * DIVERGE_FACTOR, MAX_VECTOR_FORCE);
-        align = Vector3.ClampMagnitude(align * STEER * ALIGNMENT_FACTOR, MAX_VECTOR_FORCE);
+        converge = Vector3.ClampMagnitude(converge * SPEED * CONVERGE_FACTOR, MAX_VECTOR_FORCE);
+        diverge = Vector3.ClampMagnitude(diverge * SPEED * DIVERGE_FACTOR, MAX_VECTOR_FORCE);
+        align = Vector3.ClampMagnitude(align * SPEED * ALIGNMENT_FACTOR, MAX_VECTOR_FORCE);
 
         m_Rigidbody.AddForce(converge, ForceMode.Acceleration);
         m_Rigidbody.AddForce(diverge, ForceMode.Acceleration);
