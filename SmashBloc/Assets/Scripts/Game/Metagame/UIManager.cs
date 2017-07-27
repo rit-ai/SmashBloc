@@ -30,6 +30,7 @@ public class UIManager : MonoBehaviour, IObservable {
     // MENU
     public Canvas m_PauseMenu;
     public Button m_ResetButton;
+    public Button m_OptionsButton;
     // HEADER
     public Dropdown m_UnitSelect;
     public Text m_CurrentGoldAmount;
@@ -55,6 +56,7 @@ public class UIManager : MonoBehaviour, IObservable {
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
     private Vector3 menuSpawnPos;
+    private bool inOptionsMenu = false;
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
@@ -65,12 +67,42 @@ public class UIManager : MonoBehaviour, IObservable {
     }
 
     /// <summary>
-    /// Toggles whether or not the pause menu is visible.
+    /// Toggles whether or not the pause menu is visible. And will toggle back
+    /// to a root menu, if in sub-menu
     /// </summary>
-    public void TogglePauseMenu()
+    public void ToggleMenu()
     {
-        m_PauseMenu.enabled = !(m_PauseMenu.enabled);
-        m_PauseMenu.transform.SetAsLastSibling();
+        if(inOptionsMenu)
+        {
+            ToggleOptionsMenu();
+        }
+        else
+        {
+            m_PauseMenu.enabled = !(m_PauseMenu.enabled);
+            m_PauseMenu.transform.SetAsLastSibling();
+        }
+        
+    }
+
+    /// <summary>
+    /// Toggles whether or not the buttons related to the options menu are
+    /// visible. Will also notify observers of current menu state
+    /// </summary>
+    public void ToggleOptionsMenu()
+    {
+        // Toggling buttons on/off and the inOptionsMenu boolean
+        inOptionsMenu = !inOptionsMenu;
+        m_ResetButton.gameObject.SetActive(!m_ResetButton.gameObject.activeSelf);
+        m_OptionsButton.gameObject.SetActive(!m_OptionsButton.gameObject.activeSelf);
+        // Notifies all observers of the current menu state
+        if (!inOptionsMenu)
+        {
+            NotifyAll(Invocation.IN_MAINMENU);
+        }
+        else
+        {
+            NotifyAll(Invocation.IN_SUBMENU);
+        }
     }
 
     /// <summary>
@@ -78,7 +110,8 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void TogglePauseText()
     {
-        m_PauseText.enabled = !(m_PauseText.enabled);
+        m_ResetButton.enabled = !(m_ResetButton);
+        m_ResetButton.enabled = !(m_ResetButton.enabled);
     }
 
     /// <summary>
@@ -260,6 +293,7 @@ public class UIManager : MonoBehaviour, IObservable {
         // Handlers for pressing a button on a menu
         m_CityMenuSpawnButton.onClick.AddListener(delegate { SpawnUnit(); });
         m_ResetButton.onClick.AddListener(delegate { ResetButtonPressed(); });
+        m_OptionsButton.onClick.AddListener(delegate { OptionsButtonPressed(); });
     }
 
     // Initialize whenever this object loads
@@ -306,10 +340,18 @@ public class UIManager : MonoBehaviour, IObservable {
     }
 
     /// <summary>
-    /// Updates the city menu based on the dynamic status of the city, if a
-    /// city is being displayed.
+    /// Calls ToggleOptionsMenu()
     /// </summary>
-    private void UpdateCityMenu()
+    private void OptionsButtonPressed()
+    {
+        ToggleOptionsMenu();
+    }
+
+/// <summary>
+/// Updates the city menu based on the dynamic status of the city, if a
+/// city is being displayed.
+/// </summary>
+private void UpdateCityMenu()
     {
         if (!m_CityMenu.enabled) { return; }
 
@@ -362,12 +404,15 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void CloseAll()
     {
-        m_TargetRing.gameObject.SetActive(false);
-        m_PauseText.enabled = false;
-        m_PauseMenu.enabled = false;
-        m_UnitMenu.enabled = false;
-        m_CityMenu.enabled = false;
-        m_Message.enabled = false;
+        if(Time.timeScale != 0)
+        {
+            m_TargetRing.gameObject.SetActive(false);
+            m_PauseText.enabled = false;
+            m_PauseMenu.enabled = false;
+            m_UnitMenu.enabled = false;
+            m_CityMenu.enabled = false;
+            m_Message.enabled = false;
+        }
     }
 
     /// <summary>

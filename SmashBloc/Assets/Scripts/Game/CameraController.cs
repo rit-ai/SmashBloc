@@ -242,6 +242,7 @@ public class CameraController : MonoBehaviour, IObservable {
         }
     }
 
+
     /// <summary>
     /// Stores the mouse position variable.
     /// </summary>

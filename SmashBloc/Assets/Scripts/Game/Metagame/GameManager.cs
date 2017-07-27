@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour, IObservable {
 
     private int activeTeams;
     private bool waitingOnAnimation = false;
+    public bool inSubMenu = false;
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
@@ -48,12 +49,24 @@ public class GameManager : MonoBehaviour, IObservable {
     }
 
     /// <summary>
+    /// Getter/Setter for inSubMenu
+    /// </summary>
+    public bool InSubMenu
+    {
+        get { return inSubMenu; }
+        set { inSubMenu = value; }
+    }
+
+    /// <summary>
     /// Pauses or unpauses the game, depending on the current timescale.
     /// </summary>
     public void TogglePause()
     {
-        // Set to 1 if 0, and 0 if 1.
-        Time.timeScale = (Time.timeScale == 0) ? 1 : 0;
+        if(!inSubMenu)
+        {
+            // Set to 1 if 0, and 0 if 1.
+            Time.timeScale = (Time.timeScale == 0) ? 1 : 0;
+        }
     }
 
     /// <summary>

@@ -49,6 +49,12 @@ public class GameObserver : MonoBehaviour, IObserver {
             case Invocation.RESET_GAME:
                 manager.ResetGame();
                 break;
+            case Invocation.IN_SUBMENU:
+                manager.InSubMenu = true;
+                break;
+            case Invocation.IN_MAINMENU:
+                manager.InSubMenu = false;
+                break;
             // Store selected units (just one)
             case Invocation.ONE_SELECTED:
                 Debug.Assert(entity is Unit);

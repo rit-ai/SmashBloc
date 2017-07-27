@@ -39,6 +39,22 @@ public enum Invocation {
     /// </summary>
     TOGGLE_PAUSE,
 
+    /// <summary>
+    /// Expresses that the user has entered a menu off of a main menu and
+    /// a "back" button will not return them to the game
+    /// 
+    /// Entity: CameraController
+    /// </summary>
+    IN_SUBMENU,
+
+    /// <summary>
+    /// Expresses that the user has returned to the main menu, so if the user
+    /// hits the "back" button, the user shall be able to return to the game
+    /// 
+    /// Entity: CameraController
+    /// </summary>
+    IN_MAINMENU,
+
     /*****************/
     // Game Observer //
     /*****************/
