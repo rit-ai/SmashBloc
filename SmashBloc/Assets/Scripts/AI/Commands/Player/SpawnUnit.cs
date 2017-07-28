@@ -8,14 +8,12 @@ using UnityEngine;
  * This command tells a Player to attempt to spawn a specific type of unit at
  * a specific city.
  * **/
-public class SpawnUnitCommand : PlayerCommand {
-
-    public static string IDENTITY = "SpawnUnitCommand";
+public class SpawnUnit : PlayerCommand {
 
     string toSpawnName;
     City toSpawnAt;
 
-    public SpawnUnitCommand(string toSpawnName, City toSpawnAt)
+    public SpawnUnit(string toSpawnName, City toSpawnAt)
     {
         this.toSpawnName = toSpawnName;
         this.toSpawnAt = toSpawnAt;

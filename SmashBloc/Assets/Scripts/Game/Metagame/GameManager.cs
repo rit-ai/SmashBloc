@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour, IObservable {
     // The first created player, which will always be the main player.
     public static Player PLAYER;
 
+    [HideInInspector]
+    public bool playContinuous; // restart game once it's over
+
     private const string CITY_SPAWN_TAG = "CitySpawn";
     private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
     private const int MAX_MONEY = 999; // richness ceiling
@@ -37,7 +40,6 @@ public class GameManager : MonoBehaviour, IObservable {
     private List<IObserver> observers;
 
     private int activeTeams;
-    private bool waitingOnAnimation = false;
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
@@ -161,6 +163,12 @@ public class GameManager : MonoBehaviour, IObservable {
             Player.MakePlayer(true, teams[1])
         };
 
+        // TODO better enemy finding
+        List<Team> enemy0 = new List<Team> { teams[0] };
+        List<Team> enemy1 = new List<Team> { teams[1] };
+        teams[0].enemies = enemy1;
+        teams[1].enemies = enemy0;
+
         PLAYER = players[0];
     }
 
@@ -175,6 +183,12 @@ public class GameManager : MonoBehaviour, IObservable {
         };
 
         DistributeCities();
+
+        // Activate all the teams
+        foreach (Team t in teams)
+        {
+            t.Activate();
+        }
 
         // Set main camera to be behind the player's first city
         m_CameraController.CenterCameraBehindPosition(PLAYER.Team.cities[0].transform.position);
@@ -230,9 +244,15 @@ public class GameManager : MonoBehaviour, IObservable {
         // Stop IEnumerators
         StopCoroutine(IncrementGold());
 
-        waitingOnAnimation = true; // wait for ending animation
+        // waitingOnAnimation = true; // TODO wait for ending animation
         NotifyAll(Invocation.GAME_ENDING);
-        yield return new WaitUntil(() => waitingOnAnimation == false);
+        yield return new WaitForSeconds(3f);
+        if (playContinuous)
+        {
+            NotifyAll(Invocation.RESET_GAME);
+            ResetGame();
+            yield break;
+        }
         NotifyAll(Invocation.PAUSE_AND_LOCK);
     }
 
@@ -286,4 +306,6 @@ public class GameManager : MonoBehaviour, IObservable {
 
         }
     }
+
+    public enum GameState { STARTING, PLAYING, ENDING }
 }

@@ -20,6 +20,8 @@ public class Team {
     public List<MobileUnit> mobiles;
     // The cities owned by the team.
     public List<City> cities;
+    // This team's enemies.
+    public List<Team> enemies;
 
     private bool active = true;
     /// <summary>
@@ -32,15 +34,17 @@ public class Team {
         members = new List<Player>();
         mobiles = new List<MobileUnit>();
         cities = new List<City>();
+        enemies = new List<Team>();
     }
 
-    public Team(string title, Color color, List<Player> members, List<MobileUnit> mobiles, List<City> cities)
+    public Team(string title, Color color, List<Player> members, List<MobileUnit> mobiles, List<City> cities, List<Team> enemies)
     {
         this.title = title;
         this.color = color;
         this.members = members;
         this.mobiles = mobiles;
         this.cities = cities;
+        this.enemies = enemies;
     }
 
 

@@ -17,6 +17,9 @@ public class Player : MonoBehaviour {
     private const float PASS_INFO_RATE = 1f;
     private const int MAX_UNITS = 100;
 
+    [HideInInspector]
+    public bool started = false;
+
     // Private fields
 
     // The AI that controls this Player, if any
@@ -43,9 +46,8 @@ public class Player : MonoBehaviour {
             player.Brain = obj.AddComponent<PlayerAI_Basic>();
             player.Brain.Body = player;
         }
-        player.Team = team;
+        player.team = team;
         team.members.Add(player);
-        player.Activate();
         return player;
     }
 
@@ -69,7 +71,7 @@ public class Player : MonoBehaviour {
     /// <summary>
     /// Stops coroutines associated with this Player.
     /// </summary>
-    public virtual void Deactivate()
+    public void Deactivate()
     {
         goldAmount = 0;
         if (brain != null)
@@ -165,10 +167,13 @@ public class Player : MonoBehaviour {
     /// <returns></returns>
     private IEnumerator PassInfo()
     {
-        info.team = team;
-        info.goldAmount = goldAmount;
-        brain.UpdateInfo(info);
-        yield return new WaitForSeconds(PASS_INFO_RATE);
+        while (true)
+        {
+            info.team = team;
+            info.goldAmount = goldAmount;
+            brain.UpdateInfo(info);
+            yield return new WaitForSeconds(PASS_INFO_RATE);
+        }
     }
 
 }

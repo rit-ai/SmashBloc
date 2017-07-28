@@ -34,7 +34,6 @@ public class Twirl : MobileUnit {
         // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
-        destDeviationRadius = DEST_DEVIATION_RADIUS;
         maxHealth = MAXHEALTH;
         damage = DAMAGE;
         sightRange = SIGHT_RANGE;

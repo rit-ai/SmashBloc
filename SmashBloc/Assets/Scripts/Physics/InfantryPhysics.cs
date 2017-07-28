@@ -187,7 +187,7 @@ public class TwirlPhysics : MobilePhysics {
 
     /// <summary>
     /// Returns a vector representing the direction of the general center of 
-    /// the group.
+    /// the colliders in goToward.
     /// </summary>
     private Vector3 Converge(List<Collider> goToward)
     {
@@ -202,8 +202,8 @@ public class TwirlPhysics : MobilePhysics {
     }
 
     /// <summary>
-    /// Returns a  vector in the general direction away from units that are too 
-    /// close.
+    /// Returns a  vector in the general direction away from the colliders in 
+    /// goAwayFrom.
     /// </summary>
     private Vector3 Diverge(List<Collider> goAwayFrom)
     {
@@ -219,7 +219,7 @@ public class TwirlPhysics : MobilePhysics {
 
     /// <summary>
     /// Returns a vector that is the normalized average of the velocity vectors
-    /// of all neighboring units.
+    /// of all colliders in alignWith.
     /// </summary>
     private Vector3 Align(List<Collider> alignWith)
     {
