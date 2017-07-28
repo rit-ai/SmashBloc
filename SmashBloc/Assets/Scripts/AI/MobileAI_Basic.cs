@@ -17,13 +17,8 @@ using UnityEngine;
 public sealed class MobileAI_Basic : MobileAI
 {
 
-    protected override void Start()
+    protected override ICommand Decide()
     {
-        base.Start();
-    }
-
-    protected override void Decide()
-    {
-        
+        return null;
     }
 }

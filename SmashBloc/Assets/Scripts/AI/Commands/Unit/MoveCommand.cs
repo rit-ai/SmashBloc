@@ -12,11 +12,21 @@ using UnityEngine;
  * **/
 public class MoveCommand : MobileCommand
 {
-    private Vector3 dest;
+    private const float DEFAULT_DEVIATION_RADIUS = 20f;
 
-    public MoveCommand(Vector3 dest)
+    private Vector3 dest;
+    private float deviationRadius;
+
+    public MoveCommand(Vector3 dest, float deviationRadius = DEFAULT_DEVIATION_RADIUS)
     {
         this.dest = dest;
+        this.deviationRadius = deviationRadius;
+    }
+
+    public MoveCommand(float x, float z, float deviationRadius = DEFAULT_DEVIATION_RADIUS)
+    {
+        dest = new Vector3(x, 0f, z);
+        this.deviationRadius = deviationRadius;
     }
 
     /// <summary>
@@ -25,7 +35,7 @@ public class MoveCommand : MobileCommand
     /// </summary>
     public override void Execute()
     {
-        Vector2 offset = UnityEngine.Random.insideUnitCircle * body.DestDeviationRadius;
+        Vector2 offset = UnityEngine.Random.insideUnitCircle * deviationRadius;
         Vector3 newDest = new Vector3(dest.x + offset.x, dest.y, dest.z + offset.y);
         body.Destination = newDest;
     }

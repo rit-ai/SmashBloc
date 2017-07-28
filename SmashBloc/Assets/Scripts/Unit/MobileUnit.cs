@@ -19,7 +19,6 @@ public abstract class MobileUnit : Unit
     protected Vector3 newPos;
     protected Vector3 destination;
     protected Vector3 storedDestination = default(Vector3);
-    protected float destDeviationRadius;
     protected float damage;
     protected float sightRange;
     protected float attackRange;
@@ -64,39 +63,43 @@ public abstract class MobileUnit : Unit
     protected IEnumerator PassInfo()
     {
         // Add all units within line of sight to the unitsInSightRange list.
-        Unit current;
-        List<Unit> enemiesInSight = new List<Unit>();
-        List<Unit> alliesInSight = new List<Unit>();
-        List<Unit> enemiesInAttackRange = new List<Unit>();
-        List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButMobiles));
-        foreach (Collider c in collidersInSight)
+        while (true)
         {
-            current = c.gameObject.GetComponent<Unit>();
-            // Only be aggressive to units on the other team.
-            if (current.Team != team)
+            Unit current;
+            List<Unit> enemiesInSight = new List<Unit>();
+            List<Unit> alliesInSight = new List<Unit>();
+            List<Unit> enemiesInAttackRange = new List<Unit>();
+            List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButMobiles));
+            foreach (Collider c in collidersInSight)
             {
-                // If they're close enough to attack, add them to the second list.
-                if (c.transform.position.magnitude - transform.position.magnitude < attackRange)
-                    enemiesInAttackRange.Add(current);
-                enemiesInSight.Add(current);
+                current = c.gameObject.GetComponent<Unit>();
+                // Only be aggressive to units on the other team.
+                if (current.Team != team)
+                {
+                    // If they're close enough to attack, add them to the second list.
+                    if (c.transform.position.magnitude - transform.position.magnitude < attackRange)
+                        enemiesInAttackRange.Add(current);
+                    enemiesInSight.Add(current);
+                }
+                else
+                {
+                    alliesInSight.Add(current);
+                }
             }
-            else
-            {
-                alliesInSight.Add(current);
-            }
+
+            // Build the info object.
+            info.team = team;
+            info.healthPercentage = health / maxHealth;
+            info.damage = damage;
+
+            info.enemiesInSight = enemiesInSight;
+            info.alliesInSight = alliesInSight;
+            info.enemiesInAttackRange = enemiesInAttackRange;
+
+            ai.UpdateInfo(info);
+            yield return new WaitForSeconds(PASS_INFO_RATE);
         }
 
-        // Build the info object.
-        info.team = team;
-        info.healthPercentage = health / maxHealth;
-        info.damage = damage;
-
-        info.enemiesInSight = enemiesInSight;
-        info.alliesInSight = alliesInSight;
-        info.enemiesInAttackRange = enemiesInAttackRange;
-
-        ai.UpdateInfo(info);
-        yield return new WaitForSeconds(PASS_INFO_RATE);
     }
 
     /// <summary>
@@ -137,7 +140,7 @@ public abstract class MobileUnit : Unit
         Unit unit = collision.gameObject.GetComponent<Unit>();
         if (unit != null && !(unit.Team.Equals(team)))
         {
-            base.TakeDamage(UnityEngine.Random.Range(10f, 20f), unit);
+            base.UpdateHealth(-UnityEngine.Random.Range(10f, 20f), unit);
         }
     }
 
@@ -157,15 +160,6 @@ public abstract class MobileUnit : Unit
     {
         get { return ai; }
         set { ai = value; }
-    }
-
-    /// <summary>
-    /// Units will deviate from any assigned movement by an amount based on 
-    /// this radius. Set to 0 to disable.
-    /// </summary>
-    public float DestDeviationRadius
-    {
-        get { return destDeviationRadius; }
     }
 
     /// <summary>

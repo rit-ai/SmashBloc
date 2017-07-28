@@ -16,12 +16,11 @@ using UnityEngine;
 public class PlayerInfo {
 
     public Team team;
-
     public int goldAmount;
 
     public PlayerInfo() { }
 
-    public PlayerInfo(Team team, int goldAmount)
+    public PlayerInfo(Team team, int goldAmount = 0)
     {
         this.team = team;
         this.goldAmount = goldAmount;

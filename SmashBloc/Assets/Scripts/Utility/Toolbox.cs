@@ -15,8 +15,11 @@ using UnityEngine.UI;
  * **/
 public sealed class Toolbox : Singleton<Toolbox> {
 
+    [Tooltip("Causes the game to reset automatically when it ends.")]
+    public bool playContinuous;
+
     private const int SMALL_POOL = 10;
-    private const int MEDIUM_POOL = 50;
+    private const int MEDIUM_POOL = 100;
 
     private static ObjectPool<Twirl> twirlPool;
     private static ObjectPool<City> cityPool;
@@ -30,6 +33,9 @@ public sealed class Toolbox : Singleton<Toolbox> {
     private static MobileUnit tankPrefab;
 
     private static RTS_Terrain terrain;
+
+    GameObject cityPoolWrapper;
+    GameObject twirlPoolWrapper;
 
     // Public accessors and private variables to ensure that the contents of 
     // the variables will never change
@@ -79,27 +85,37 @@ public sealed class Toolbox : Singleton<Toolbox> {
     private Toolbox() { }
 
     /// <summary>
-    /// TODO make UI Manager find or build all of its public variables.
+    /// TODO? make UI Manager find or build all of its public variables.
     /// 
     /// Order in this function is EXTREMELY important.
     /// </summary>
     private void Awake()
     {
+        // First there was the land...
+        terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
+
+        // ...and from the land came the prefabs...
         cityPrefab = Resources.Load<City>("Prefabs/Units/" + City.IDENTITY);
         twirlPrefab = Resources.Load<Twirl>("Prefabs/Units/" + Twirl.IDENTITY);
         tankPrefab = Resources.Load<Boomy>("Prefabs/Units/" + Boomy.IDENTITY);
 
+        // ...and from the prefabs came those that managed them...
         uiManager = FindObjectOfType<UIManager>();
         gameManager = gameObject.AddComponent<GameManager>();
 
+        // ...and from the managers came those that observed them...
         uiObserver = gameObject.AddComponent<UIObserver>();
         gameObserver = gameObject.AddComponent<GameObserver>();
 
+        // ...and the observers grouped the prefabs into wrappers...
+        twirlPoolWrapper = new GameObject("Twirl Pool");
+        cityPoolWrapper = new GameObject("City Pool");
+
+        // ...and the observers said that the prefabs would always be plenty...
         twirlPool = new ObjectPool<Twirl>(MakeTwirl, MEDIUM_POOL);
         cityPool = new ObjectPool<City>(MakeCity, SMALL_POOL);
 
-        terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
-
+        // ...and all of that is me.
         Debug.Assert(CityPrefab);
         Debug.Assert(TwirlPrefab);
         Debug.Assert(TankPrefab);
@@ -107,6 +123,13 @@ public sealed class Toolbox : Singleton<Toolbox> {
         Debug.Assert(uiManager);
         Debug.Assert(uiObserver);
         Debug.Assert(gameObserver);
+        
+        // Toolbox.
+    }
+
+    private void Start()
+    {
+        gameManager.playContinuous = playContinuous;
     }
 
     /// <summary>
@@ -114,7 +137,7 @@ public sealed class Toolbox : Singleton<Toolbox> {
     /// </summary>
     private Twirl MakeTwirl()
     {
-        Twirl newTwirl = Instantiate(TwirlPrefab as Twirl);
+        Twirl newTwirl = Instantiate(TwirlPrefab as Twirl, twirlPoolWrapper.transform);
         newTwirl.gameObject.SetActive(false);
         newTwirl.gameObject.AddComponent<TwirlPhysics>();
         newTwirl.AI = newTwirl.gameObject.AddComponent<MobileAI_Basic>();
@@ -129,12 +152,11 @@ public sealed class Toolbox : Singleton<Toolbox> {
     /// </summary>
     private City MakeCity()
     {
-        City city = Instantiate(CityPrefab);
+        City city = Instantiate(CityPrefab, cityPoolWrapper.transform);
         city.gameObject.SetActive(false);
         city.Init();
 
         return city;
     }
-
 }
 

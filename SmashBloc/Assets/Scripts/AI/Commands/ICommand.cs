@@ -17,10 +17,6 @@ using UnityEngine;
  * the above example, a FleeCommand would probably take in an array 
  * representation of enemies to flee from, as well as a distance of how far to
  * run by default.
- * 
- * Commands can overwrite each other. Once a Unit is far enough away from 
- * enemies such that it can no longer see any, the Brain could pass its Body an
- * IdleCommand, which would cause the Body to stop running.
  * **/
 public interface ICommand {
 
@@ -29,10 +25,6 @@ public interface ICommand {
     /// Body. In the above example, it would likely contain logic to calculate
     /// the direction in which to flee and correspondingly alter the Unit's
     /// current destination.
-    /// 
-    /// It is best practice to keep logic-heavy code in Execute in case the 
-    /// Command Queue is cleared, in which case any logic-heavy code performed
-    /// before execution is rendered useless.
     /// </summary>
     void Execute();
 
