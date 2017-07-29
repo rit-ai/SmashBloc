@@ -117,14 +117,14 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     public void ResetGame()
     {
-        StopAllCoroutines();
-
         // Destroy all teams
         foreach (Team t in teams)
         {
             t.Deactivate();
             t.Activate();
         }
+
+        StopAllCoroutines();
 
         activeTeams = teams.Count;
 
@@ -253,6 +253,7 @@ public class GameManager : MonoBehaviour, IObservable {
             ResetGame();
             yield break;
         }
+        TogglePause();
         NotifyAll(Invocation.PAUSE_AND_LOCK);
     }
 

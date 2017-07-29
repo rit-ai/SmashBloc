@@ -135,4 +135,31 @@ public class Utils : MonoBehaviour {
         throw new KeyNotFoundException("Bad value passed to UnitToPrefab()");
     }
 
+    public static IEnumerator AnimateHover(Transform hoverer, float hover, float time = 0f)
+    {
+        float temp; // for swapping
+        float localTime = time;
+        float max = -hover;
+        float min = hover;
+        float hoverOffset;
+
+        while (true)
+        {
+            hoverOffset = Mathf.Lerp(min, max, localTime);
+            hoverer.transform.position = new Vector3(hoverer.transform.position.x, hoverer.transform.position.y + hoverOffset, hoverer.transform.position.z);
+
+            localTime += Time.deltaTime;
+
+            // Swap min and max to reverse direction
+            if (localTime > 1f)
+            {
+                temp = max;
+                max = min;
+                min = temp;
+                localTime -= 1f;
+            }
+
+            yield return 0f;
+        }
+    }
 }

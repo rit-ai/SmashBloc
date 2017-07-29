@@ -200,13 +200,13 @@ public class UIManager : MonoBehaviour, IObservable {
         if (m_Message.enabled) { yield break; }
 
         const int FRAMES_TO_LINGER = 60;
-        const float MOVE_DISTANCE_LARGE = 15f;
-        const float MOVE_DISTANCE_SMALL = 2f;
+        const float MOVE_DISTANCE_SMALL = 30f;
         const float MIN_DISTANCE_SQR = 30000f;
         Color textColor = new Color(1f, 1f, 1f, 0f); // white, but invisible
         Vector3 textPosition = m_Message.transform.position;
-        textPosition.x = 0;
         Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2);
+        float MOVE_DISTANCE_LARGE = Screen.width / 2;
+        textPosition.x = 0;
 
         yield return null;
 
@@ -219,8 +219,8 @@ public class UIManager : MonoBehaviour, IObservable {
         // right and raise the alpha
         while ((m_Message.transform.position - screenCenter).sqrMagnitude > MIN_DISTANCE_SQR)
         {
-            textColor.a += 0.10f;
-            textPosition.x += MOVE_DISTANCE_LARGE;
+            textColor.a += 4.5f * Time.deltaTime;
+            textPosition.x += MOVE_DISTANCE_LARGE * Time.deltaTime;
             m_Message.color = textColor;
             m_Message.transform.position = textPosition;
             yield return null;
@@ -229,7 +229,7 @@ public class UIManager : MonoBehaviour, IObservable {
         // Let it linger for FRAMES_TO_LINGER frames
         for (int x = 0; x < FRAMES_TO_LINGER; x++)
         {
-            textPosition.x += MOVE_DISTANCE_SMALL;
+            textPosition.x += MOVE_DISTANCE_SMALL * Time.deltaTime;
             m_Message.transform.position = textPosition;
             yield return null;
         }
@@ -237,8 +237,8 @@ public class UIManager : MonoBehaviour, IObservable {
         // Until text is offscreen, move to the right and fade out
         while (m_Message.transform.position.x < Screen.width * 1.5)
         {
-            textColor.a -= 0.05f;
-            textPosition.x += MOVE_DISTANCE_LARGE;
+            textColor.a -= 4.5f * Time.deltaTime;
+            textPosition.x += MOVE_DISTANCE_LARGE * Time.deltaTime;
             m_Message.color = textColor;
             m_Message.transform.position = textPosition;
             yield return null;

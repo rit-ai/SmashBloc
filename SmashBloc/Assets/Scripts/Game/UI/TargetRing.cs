@@ -25,7 +25,6 @@ public class TargetRing : MonoBehaviour {
 
     private Transform ring;
     private Transform conerig;
-    private float hoverOffset;
     private bool reset; // have we changed our position?
 
     // Use this for initialization
@@ -55,7 +54,7 @@ public class TargetRing : MonoBehaviour {
     /// <summary>
     /// Updates the position without changing our xz.
     /// </summary>
-    private void UpdatePosition(Transform hoverer)
+    private void UpdatePosition(Transform hoverer, float hoverOffset)
     {
         hoverer.transform.position = new Vector3(hoverer.transform.position.x, hoverer.transform.position.y + hoverOffset, hoverer.transform.position.z);
     }
@@ -84,8 +83,7 @@ public class TargetRing : MonoBehaviour {
                 reset = false;
             }
 
-            hoverOffset = Mathf.Lerp(min, max, localTime);
-            UpdatePosition(hoverer);
+            UpdatePosition(hoverer, Mathf.Lerp(min, max, localTime));
 
             localTime += Time.deltaTime;
 

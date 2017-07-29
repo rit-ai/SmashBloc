@@ -76,6 +76,7 @@ public class Player : MonoBehaviour {
         goldAmount = 0;
         if (brain != null)
         {
+            brain.gameObject.SetActive(false);
             StopCoroutine(PassInfo());
         }
     }

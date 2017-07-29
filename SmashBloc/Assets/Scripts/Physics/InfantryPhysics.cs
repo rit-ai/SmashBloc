@@ -22,8 +22,6 @@ public class TwirlPhysics : MobilePhysics {
     private const float MAX_FLOAT_THRESHOLD = 20f;
     // Distance from destination at which deceleration begins (squared)
     private const float DECELERATION_THRESHOLD_SQRD = 1000f;
-    // Max force that can be applied to a rigidbody
-    private const float MAX_VECTOR_FORCE = 200f;
     private const float UP_FORCE = 100f;
     // Default steering force strength
     private const float SPEED = 200f;
@@ -141,7 +139,8 @@ public class TwirlPhysics : MobilePhysics {
     /// <summary>
     /// Hoverballs will try to stay within a certain radius of each other, but 
     /// also outside a certain radius of each other, and also generally go in
-    /// the same direction as others.
+    /// the same direction as others. They will try to avoid colliding with 
+    /// units on the opposite team.
     /// </summary>
     /// <returns>A normalized Vector3 that accounts for both convergent, 
     /// divergent and alignment forces.</returns>

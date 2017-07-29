@@ -19,7 +19,8 @@ public class Twirl : MobileUnit {
     // Private constants
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
-    private const float ASCENSION_HEIGHT = 1000f;
+    private const float ASCENSION_HEIGHT = 500f;
+    private const float ASCENSION_DURATION = 2f;
     // Default values
     private const float DEST_DEVIATION_RADIUS = 50f;
     private const float MAXHEALTH = 100f;
@@ -97,15 +98,15 @@ public class Twirl : MobileUnit {
     {
         GetComponent<Rigidbody>().isKinematic = true;
         Color fadeOut = m_Surface.material.color;
-        float y = transform.position.y;
         float dest = transform.position.y + ASCENSION_HEIGHT;
-        for (float x = y; x < dest; x++)
+        float ascension_rate = ASCENSION_HEIGHT / ASCENSION_DURATION;
+        while (transform.position.y < dest)
         {
             newPos = transform.position;
-            newPos.y += 10;
+            newPos.y += ascension_rate * Time.deltaTime;
             transform.position = newPos;
 
-            fadeOut.a -= 0.3f;
+            fadeOut.a -= 3f;
             m_Surface.material.color = fadeOut;
             yield return 0f;
         }
