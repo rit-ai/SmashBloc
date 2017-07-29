@@ -21,8 +21,6 @@ using UnityEngine;
 public class GameManager : MonoBehaviour, IObservable {
 
     // Public constants
-    // The first created player, which will always be the main player.
-    public static Player PLAYER;
 
     [HideInInspector]
     public bool playContinuous; // restart game once it's over
@@ -71,7 +69,7 @@ public class GameManager : MonoBehaviour, IObservable {
         if (selectedUnits == null) { return; }
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Team playerTeam = PLAYER.Team;
+        Team playerTeam = Toolbox.PLAYER.Team;
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
             // Set the destination of all the units
@@ -117,7 +115,9 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     public void ResetGame()
     {
-        // Destroy all teams
+        // DEACTIVATION
+
+        // Deactivate all teams
         foreach (Team t in teams)
         {
             t.Deactivate();
@@ -126,50 +126,24 @@ public class GameManager : MonoBehaviour, IObservable {
 
         StopAllCoroutines();
 
-        activeTeams = teams.Count;
+        NotifyAll(Invocation.CLOSE_ALL);
 
-        Start();
-    }
+        // REACTIVATION
 
-    /// <summary>
-    /// EXTREMELY IMPORTANT INITAILIZATION METHOD.
-    /// 
-    /// This is one of the first initialization methods to occur in the game. 
-    /// Since Game Manager forwards its state to many other classes, ensuring 
-    /// said state is valid and accurate is very important to avoid crashes.
-    /// 
-    /// When editing this method, take care to validate you additions with 
-    /// Debug.Assert().
-    /// </summary>
-    private void Awake()
-    {
-        m_CameraController = Camera.main.GetComponent<CameraController>();
-        citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
+        DistributeCities();
 
-        Debug.Assert(m_CameraController != null);
-        Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
-
-        teams = new List<Team>
+        // Activate all the teams
+        foreach (Team t in teams)
         {
-            new Team("Dylante", Color.cyan),
-            new Team("AI Team", Color.red)
-        };
+            t.Activate();
+        }
 
         activeTeams = teams.Count;
 
-        players = new List<Player>
-        {
-            Player.MakePlayer(false, teams[0]),
-            Player.MakePlayer(true, teams[1])
-        };
+        // Set main camera to be behind the player's first city
+        m_CameraController.CenterCameraBehindPosition(Toolbox.PLAYER.Team.cities[0].transform.position);
 
-        // TODO better enemy finding
-        List<Team> enemy0 = new List<Team> { teams[0] };
-        List<Team> enemy1 = new List<Team> { teams[1] };
-        teams[0].enemies = enemy1;
-        teams[1].enemies = enemy0;
-
-        PLAYER = players[0];
+        StartCoroutine(GameLoop());
     }
 
     /// <summary>
@@ -177,6 +151,16 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private void Start()
     {
+        m_CameraController = Camera.main.GetComponent<CameraController>();
+        citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
+
+        Debug.Assert(m_CameraController != null);
+        Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
+
+        teams = Toolbox.GameSetup.Teams;
+        players = Toolbox.GameSetup.Players;
+        activeTeams = teams.Count;
+
         observers = new List<IObserver>
         {
             Toolbox.UIObserver
@@ -191,7 +175,7 @@ public class GameManager : MonoBehaviour, IObservable {
         }
 
         // Set main camera to be behind the player's first city
-        m_CameraController.CenterCameraBehindPosition(PLAYER.Team.cities[0].transform.position);
+        m_CameraController.CenterCameraBehindPosition(Toolbox.PLAYER.Team.cities[0].transform.position);
 
         StartCoroutine(GameLoop());
 

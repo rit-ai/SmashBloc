@@ -62,8 +62,10 @@ public class Player : MonoBehaviour {
 
     // Use this for initialization
     public virtual void Activate () {
+        gameObject.SetActive(true);
         if (brain != null)
         {
+            brain.gameObject.SetActive(true);
             StartCoroutine(PassInfo());
         }
     }
@@ -79,6 +81,7 @@ public class Player : MonoBehaviour {
             brain.gameObject.SetActive(false);
             StopCoroutine(PassInfo());
         }
+        gameObject.SetActive(false);
     }
 
     /// <summary>

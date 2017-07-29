@@ -21,17 +21,17 @@ public sealed class PlayerAI_Basic : PlayerAI {
     private City target;
     private int cooldown = 0;
 
-    private void Start()
-    {
-        target = info.team.enemies[0].cities[0];
-    }
-
     /// <summary>
     /// This AI attacks on a cooldown, since we want it to be able to spawn 
     /// units in the meantime between deciding whether or not to attack.
     /// </summary>
     protected override ICommand Decide()
     {
+        if (target == null)
+        {
+            target = info.team.enemies[0].cities[0];
+        }
+
         if (cooldown <= 0 && info.team.mobiles.Count >= ARMY_SIZE && target != null)
         {
             // Take all the mobiles and tell them to move to an enemy city.
@@ -41,7 +41,10 @@ public sealed class PlayerAI_Basic : PlayerAI {
         }
 
         cooldown--;
-        return new SpawnUnit(Twirl.IDENTITY, info.team.cities[0]);
+        if (info.team.cities.Count > 0)
+            return new SpawnUnit(Twirl.IDENTITY, info.team.cities[0]);
+
+        return null;
     }
 
 }

@@ -97,7 +97,7 @@ public class UIManager : MonoBehaviour, IObservable {
                 toSpawn = Boomy.IDENTITY;
                 break;
         }
-        GameManager.PLAYER.SetUnitToSpawn(toSpawn);
+        Toolbox.PLAYER.SetUnitToSpawn(toSpawn);
     }
 
     /// <summary>
@@ -105,8 +105,8 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void SpawnUnit()
     {
-        GameManager.PLAYER.SetCityToSpawnAt(cityCurrentlyDisplayed);
-        GameManager.PLAYER.SpawnUnit();
+        Toolbox.PLAYER.SetCityToSpawnAt(cityCurrentlyDisplayed);
+        Toolbox.PLAYER.SpawnUnit();
     }
 
     /// <summary>
@@ -344,7 +344,8 @@ public class UIManager : MonoBehaviour, IObservable {
         Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
-            m_TargetRing.UpdatePosition(hit.point);
+            // TODO prevent target ring from sinking into the ground
+            m_TargetRing.transform.position = new Vector3(hit.point.x, hit.point.y + 3f, hit.point.z);
             m_TargetRing.gameObject.SetActive(true);
         }
     }
@@ -387,7 +388,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     private void UpdateGoldAmountText()
     {
-        int gold = GameManager.PLAYER.Gold;
+        int gold = Toolbox.PLAYER.Gold;
         string goldText = gold.ToString();
         m_CurrentGoldAmount.text = goldText;
     }
@@ -397,7 +398,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     private void UpdateUnitAmountText()
     {
-        int units = GameManager.PLAYER.Team.mobiles.Count;
+        int units = Toolbox.PLAYER.Team.mobiles.Count;
         string unitText = units.ToString();
         m_CurrentUnitAmount.text = unitText;
     }

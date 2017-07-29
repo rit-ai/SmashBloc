@@ -43,8 +43,6 @@ public abstract class AbstractAI : MonoBehaviour {
     /// Attempts to execute the current command. Does nothing if currentCommand
     /// is null, as that implies the body hasn't been given orders.
     /// </summary>
-    /// TODO? make it so that the AI won't execute the same command many times
-    /// in a row
     protected virtual void Behave(ICommand command)
     {
         if (command != null)

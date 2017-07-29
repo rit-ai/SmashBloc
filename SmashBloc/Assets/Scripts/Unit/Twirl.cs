@@ -54,6 +54,7 @@ public class Twirl : MobileUnit {
     {
         throw new NotImplementedException();
 
+        /*
         float timeLeft = maxAimTime;
         // Twirl cannot navigate to a destination and aim at the same time, 
         // so the destination is temporarily stored.
@@ -71,7 +72,7 @@ public class Twirl : MobileUnit {
 
         destination = storedDestination;
         storedDestination = default(Vector3);
-
+        */
     }
 
     /// <summary>

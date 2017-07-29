@@ -29,6 +29,9 @@ public class City : Unit
     private const float REGENERATION_RATE = CAPTURED_HEALTH / 5f;
     // Regeneration is delayed after taking damage
     private const float REGENERATION_DELAY = 2f;
+    // Enemy units will suffer recoil upon contact with a City
+    private const float BLOWBACK_FORCE = 30f;
+    private const float BLOWBACK_RADIUS = 10f;
     private const int COST = 500;
     private const int MIN_INCOME_LEVEL = 1;
     private const int DEFAULT_INCOME_LEVEL = 8;
@@ -104,6 +107,9 @@ public class City : Unit
         Unit unit = collision.gameObject.GetComponent<Unit>();
         if (unit != null && !(unit.Team.Equals(team)))
         {
+            Rigidbody body = collision.gameObject.GetComponent<Rigidbody>();
+            // Add audiovisuals here
+            body.AddExplosionForce(BLOWBACK_FORCE, transform.position - body.transform.position, BLOWBACK_RADIUS);
             UpdateHealth(-UnityEngine.Random.Range(10f, 20f), unit);
         }
     }

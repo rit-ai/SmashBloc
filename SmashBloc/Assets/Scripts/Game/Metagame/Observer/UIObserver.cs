@@ -25,7 +25,7 @@ public class UIObserver : MonoBehaviour, IObserver {
 
         Debug.Assert(manager);
 
-        PLAYER_TEAM = GameManager.PLAYER.Team;
+        PLAYER_TEAM = Toolbox.PLAYER.Team;
     }
 
     /// <summary>
