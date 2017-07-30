@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour, IObservable {
 
     private int activeTeams;
     private bool waitingOnAnimation = false;
-    public bool inSubMenu = false;
+    private bool inSubMenu = false;
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {

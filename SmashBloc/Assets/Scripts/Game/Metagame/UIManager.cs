@@ -31,6 +31,7 @@ public class UIManager : MonoBehaviour, IObservable {
     public Canvas m_PauseMenu;
     public Button m_ResetButton;
     public Button m_OptionsButton;
+    public Toggle m_OptionsMenuDevModeToggle;
     // HEADER
     public Dropdown m_UnitSelect;
     public Text m_CurrentGoldAmount;
@@ -94,6 +95,7 @@ public class UIManager : MonoBehaviour, IObservable {
         inOptionsMenu = !inOptionsMenu;
         m_ResetButton.gameObject.SetActive(!m_ResetButton.gameObject.activeSelf);
         m_OptionsButton.gameObject.SetActive(!m_OptionsButton.gameObject.activeSelf);
+        m_OptionsMenuDevModeToggle.gameObject.SetActive(!m_OptionsMenuDevModeToggle.gameObject.activeSelf);
         // Notifies all observers of the current menu state
         if (!inOptionsMenu)
         {
