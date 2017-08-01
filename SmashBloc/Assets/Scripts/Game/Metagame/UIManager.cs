@@ -115,7 +115,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// enabled depending on whether or not the player owns that unit.
     /// </summary>
     /// <param name="unit">The unit whose info is to be displayed.</param>
-    public void DisplayUnitInfo(MobileUnit unit, bool enableCommand)
+    public void DisplayUnitInfo(MobileUnit unit)
     {
         // Only allow one highlighting ring
         if (unitCurrentlyDisplayed != null && unitCurrentlyDisplayed != unit)
@@ -130,7 +130,7 @@ public class UIManager : MonoBehaviour, IObservable {
         m_UnitMenu.transform.position = menuSpawnPos;
 
         // Handle unit name input field
-        m_UnitMenuNameInput.enabled = enabled;
+        m_UnitMenuNameInput.enabled = unit.Team == Toolbox.PLAYER.Team;
         m_UnitMenuNameInput.placeholder.GetComponent<Text>().text = unit.UnitName;
 
         // Handle health slider
@@ -148,7 +148,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// whether or not the player owns that unit. 
     /// </summary>
     /// <param name="city">The city to display.</param>
-    public void DisplayCityInfo(City city, bool enabled)
+    public void DisplayCityInfo(City city)
     {
         // Only allow one highlighting ring
         if (cityCurrentlyDisplayed != null && cityCurrentlyDisplayed != city)
@@ -160,11 +160,11 @@ public class UIManager : MonoBehaviour, IObservable {
         m_CityMenu.transform.position = menuSpawnPos;
 
         // Handle city name input field
-        m_CityMenuNameInput.enabled = enabled;
+        m_CityMenuNameInput.enabled = city.Team == Toolbox.PLAYER.Team;
         m_CityMenuNameInput.placeholder.GetComponent<Text>().text = city.UnitName;
 
         // Handle spawn button
-        m_CityMenuSpawnButton.enabled = enabled;
+        m_CityMenuSpawnButton.enabled = city.Team == Toolbox.PLAYER.Team;
 
         // Handle sliders
         m_CityMenuHealth.maxValue = City.MAX_HEALTH;

@@ -101,10 +101,21 @@ public sealed class Toolbox : Singleton<Toolbox> {
     /// </summary>
     private void Awake()
     {
-        // First there was the land...
+        // First came the Game...
         gameSetup = GetComponent<GameSetup>();
+        if (gameSetup.Locked)
+        {
+            // If the game is locked, make a dummy player & team
+            player = Player.MakePlayer(false, new Team());
+        }
+        else
+        {
+            // Else they're the first player
+            player = gameSetup.Players[0];
+        }
+
+        // ...and from the game came the land...
         terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
-        player = gameSetup.Players[0];
 
         // ...and from the land came the prefabs...
         cityPrefab = Resources.Load<City>("Prefabs/Units/" + City.IDENTITY);

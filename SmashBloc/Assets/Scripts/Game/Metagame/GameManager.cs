@@ -140,8 +140,9 @@ public class GameManager : MonoBehaviour, IObservable {
 
         activeTeams = teams.Count;
 
-        // Set main camera to be behind the player's first city
-        m_CameraController.CenterCameraBehindPosition(Toolbox.PLAYER.Team.cities[0].transform.position);
+        // Set main camera to be behind the first city
+        // TODO make this more exact
+        m_CameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
 
         StartCoroutine(GameLoop());
     }
@@ -174,8 +175,9 @@ public class GameManager : MonoBehaviour, IObservable {
             t.Activate();
         }
 
-        // Set main camera to be behind the player's first city
-        m_CameraController.CenterCameraBehindPosition(Toolbox.PLAYER.Team.cities[0].transform.position);
+        // Set main camera to be behind a city, preferrably the player's
+        // Somewhat inexact, TODO make sure it finds the first city every time
+        m_CameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
 
         StartCoroutine(GameLoop());
 
@@ -255,14 +257,26 @@ public class GameManager : MonoBehaviour, IObservable {
         Debug.Assert(citySpawnPoints.Length >= NUM_AI_PLAYERS + 1);
 
         City city;
-        for (int x = 0; ((x < citySpawnPoints.Length) && (x < NUM_AI_PLAYERS + 1)); x++)
+        int currTeam = 0;
+        int currCity = 0;
+
+        // Don't distrubute cities if there aren't any teams
+        if (teams.Count < 1) { Debug.Log("Did you forget to set the number of teams?");  return; }
+
+        // Run until we run out of spawn points or we run out of players
+        while (currCity < citySpawnPoints.Length && currCity < NUM_AI_PLAYERS + 1)
         {
+            // Grab a city from the city pool and initialize it
             city = Toolbox.CityPool.Rent();
-            city.Team = teams[x];
-            city.transform.position = citySpawnPoints[x].transform.position;
-            teams[x].cities.Add(city);
+            city.Team = teams[currTeam];
+            teams[currTeam].cities.Add(city);
+            city.transform.position = citySpawnPoints[currCity].transform.position;
             city.gameObject.SetActive(true);
             city.Activate();
+            // Increment and wrap around the list of teams
+            currTeam = ++currTeam % teams.Count;
+            // Increment the city spawn counter
+            currCity++;
         }
     }
 
