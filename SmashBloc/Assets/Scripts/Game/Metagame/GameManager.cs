@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 /*
  * @author Paul Galatic
@@ -58,13 +59,11 @@ public class GameManager : MonoBehaviour, IObservable {
 
     /// <summary>
     /// Sets the new destination for the unit, if the unit is of the player's
-    /// team. New destinations take the form of MoveCommands, which means that 
-    /// the unit will deviate from its destination based on its 
-    /// destDeviationRadius value.
+    /// team. Should only be called via a user's actions.
     /// </summary>
     /// <param name="terrain">The terrain, which was right clicked such to 
     /// invoke this method.</param>
-    public void SetNewDestination(HashSet<MobileUnit> selectedUnits, RTS_Terrain terrain)
+    public void SetNewDestination(List<MobileUnit> selectedUnits, RTS_Terrain terrain)
     {
         if (selectedUnits == null) { return; }
         RaycastHit hit;
@@ -72,16 +71,9 @@ public class GameManager : MonoBehaviour, IObservable {
         Team playerTeam = Toolbox.PLAYER.Team;
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
-            // Set the destination of all the units
-            MoveCommand move = new MoveCommand(hit.point);
-            foreach (MobileUnit u in selectedUnits)
-            {
-                if (u.Team == playerTeam)
-                {
-                    move.Body = u;
-                    move.Execute();
-                }
-            }
+            // Set the destination of all the selected units the player owns
+            List<MobileUnit> validUnits = selectedUnits.Where(unit => unit.Team == Toolbox.PLAYER.Team).ToList();
+            new SendMobilesToLoc(validUnits, hit.point).Act();
         }
     }
 
@@ -121,7 +113,6 @@ public class GameManager : MonoBehaviour, IObservable {
         foreach (Team t in teams)
         {
             t.Deactivate();
-            t.Activate();
         }
 
         StopAllCoroutines();

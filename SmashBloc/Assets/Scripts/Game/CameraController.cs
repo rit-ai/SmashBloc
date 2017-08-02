@@ -45,7 +45,7 @@ public class CameraController : MonoBehaviour, IObservable {
     private Camera m_Camera;
     private Transform m_CameraRig;
     private List<IObserver> m_Observers;
-    private HashSet<MobileUnit> m_SelectedUnits;
+    private List<MobileUnit> m_SelectedUnits;
     private State m_CurrentState;
     private Vector3 m_MousePos;
     private Rect m_ScreenBorderInverse;
@@ -71,7 +71,7 @@ public class CameraController : MonoBehaviour, IObservable {
             Toolbox.GameObserver,
             Toolbox.UIObserver
         };
-        m_SelectedUnits = new HashSet<MobileUnit>();
+        m_SelectedUnits = new List<MobileUnit>();
 
         // Rectangle that contains everything EXCEPT the screen border
         m_ScreenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);

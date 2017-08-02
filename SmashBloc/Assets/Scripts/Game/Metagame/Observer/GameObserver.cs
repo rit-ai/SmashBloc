@@ -18,7 +18,7 @@ using Microsoft;
 public class GameObserver : MonoBehaviour, IObserver {
     // Private fields
     // static because there are multiple GameObservers
-    private static HashSet<MobileUnit> selectedUnits;
+    private static List<MobileUnit> selectedUnits;
     private static GameManager manager;
 
     /// <summary>
@@ -27,7 +27,7 @@ public class GameObserver : MonoBehaviour, IObserver {
     private void Awake()
     {
         manager = Toolbox.GameManager;
-        selectedUnits = new HashSet<MobileUnit>(); // error-proofing
+        selectedUnits = new List<MobileUnit>(); // error-proofing
     }
 
     /// <summary>
@@ -51,14 +51,14 @@ public class GameObserver : MonoBehaviour, IObserver {
                 break;
             // Store selected units (just one)
             case Invocation.ONE_SELECTED:
-                Debug.Assert(entity is Unit);
-                selectedUnits = new HashSet<MobileUnit> { entity as MobileUnit };
+                Debug.Assert(entity is MobileUnit);
+                selectedUnits = new List<MobileUnit> { entity as MobileUnit };
                 break;
             // Store selected units (many)
             case Invocation.UNITS_SELECTED:
                 Debug.Assert(data != null);
-                Debug.Assert(data[0] is HashSet<MobileUnit>);
-                selectedUnits = data[0] as HashSet<MobileUnit>;
+                Debug.Assert(data[0] is List<MobileUnit>);
+                selectedUnits = data[0] as List<MobileUnit>;
                 Debug.Assert(selectedUnits != null);
                 break;
             // Clear stored units

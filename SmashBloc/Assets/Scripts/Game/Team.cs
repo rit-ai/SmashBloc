@@ -67,6 +67,7 @@ public class Team {
         foreach (MobileUnit m in mobiles)
         {
             m.ForceKill();
+            m.Deactivate();
         };
         foreach (City c in cities)
         {
