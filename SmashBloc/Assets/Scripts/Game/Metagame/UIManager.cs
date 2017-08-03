@@ -342,7 +342,7 @@ public class UIManager : MonoBehaviour, IObservable {
     {
         RaycastHit hit;
         Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrain.ignoreAllButTerrain))
         {
             // TODO prevent target ring from sinking into the ground
             m_TargetRing.transform.position = new Vector3(hit.point.x, hit.point.y + 3f, hit.point.z);

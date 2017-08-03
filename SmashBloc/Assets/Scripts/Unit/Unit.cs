@@ -79,6 +79,11 @@ public abstract class Unit : MonoBehaviour, IObservable {
         m_Surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
     }
 
+    public virtual void Deactivate()
+    {
+        gameObject.SetActive(false);
+    }
+
     /// <summary>
     /// Highlights the unit.
     /// </summary>

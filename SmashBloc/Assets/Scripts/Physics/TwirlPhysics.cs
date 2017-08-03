@@ -16,8 +16,8 @@ public class TwirlPhysics : MobilePhysics {
     // constructor and ComponentUpdate().
 
     // Thresholds for unit convergence and separation
-    private const float MAX_DISTANCE_FROM = 4000f; // "sight range"
-    private const float MIN_DISTANCE_FROM_SQR = 1000f;
+    private const float MAX_DISTANCE_FROM = 400f; // "sight range"
+    private const float MIN_DISTANCE_FROM = 100f;
     // Height above ground at which float force is applied
     private const float MAX_FLOAT_THRESHOLD = 20f;
     // Distance from destination at which deceleration begins (squared)
@@ -27,10 +27,10 @@ public class TwirlPhysics : MobilePhysics {
     private const float SPEED = 200f;
     // Adjusts the intensity of steering forces
     private const float GUIDANCE_FACTOR = 1f;
-    private const float CONVERGE_FACTOR = 0.5f;
-    private const float DIVERGE_FACTOR = 1f;
-    private const float ALIGNMENT_FACTOR = 0.5f;
-
+    private const float CONVERGE_FACTOR = 0.25f;
+    private const float DIVERGE_FACTOR = 100f;
+    // How many colliders to keep track of
+    private const int COLLIDER_MEM = 50;
 
     // Private fields
     private Twirl m_Parent;
@@ -38,12 +38,14 @@ public class TwirlPhysics : MobilePhysics {
     private Rigidbody m_Hoverball;
     private Rigidbody m_BottomWeight;
 
-    private List<Collider> withinSight;
-    private List<Collider> withinMaxDistance;
-    private List<Collider> withinMinDistance;
+    private Collider[] convergeWith;
+    private Collider[] divergeWith;
 
     private Vector3 converge;
     private Vector3 diverge;
+
+    private int convergeCount;
+    private int divergeCount;
 
     private void Start()
     {
@@ -52,6 +54,9 @@ public class TwirlPhysics : MobilePhysics {
         m_Rigidbody = m_Parent.GetComponent<Rigidbody>();
         m_Hoverball = m_Parent.m_Hoverball;
         m_BottomWeight = m_Parent.m_BottomWeight;
+
+        convergeWith = new Collider[COLLIDER_MEM];
+        divergeWith = new Collider[COLLIDER_MEM];
 
         m_Rigidbody.useGravity = true;
         m_BottomWeight.useGravity = true;
@@ -145,30 +150,14 @@ public class TwirlPhysics : MobilePhysics {
     /// divergent and alignment forces.</returns>
     private void Flock()
     {
-        Unit current;
         // Get all units that are within a very small "sight" range.
-        withinSight = new List<Collider>(Physics.OverlapSphere(transform.position, MAX_DISTANCE_FROM, m_Parent.ignoreAllButMobiles));
-        withinMaxDistance = new List<Collider>();
-        withinMinDistance = new List<Collider>();
-        foreach (Collider c in withinSight)
-        {
-            current = c.gameObject.GetComponent<MobileUnit>();
-            // If they're too close, avoid regardless aof who they are
-            if ((current.transform.position - m_Parent.transform.position).sqrMagnitude < MIN_DISTANCE_FROM_SQR)
-            {
-                withinMinDistance.Add(c);
-            }
-            // Otherwise, only align / converge with allies.
-            else if (current.Team == m_Parent.Team)
-            {
-                withinMaxDistance.Add(c);
-            }
-        }
+        convergeCount = Physics.OverlapSphereNonAlloc(transform.position, MAX_DISTANCE_FROM, convergeWith, m_Parent.ignoreAllButMobiles);
+        divergeCount = Physics.OverlapSphereNonAlloc(transform.position, MIN_DISTANCE_FROM, divergeWith, m_Parent.ignoreAllButMobiles);
 
         // Multiply the components of the convergent force by the components of
         // the divergent force and normalize the result.
-        converge = Converge(withinMaxDistance).normalized;
-        diverge = Diverge(withinMinDistance).normalized;
+        converge = Converge(convergeWith, convergeCount).normalized;
+        diverge = Diverge(divergeWith, divergeCount).normalized;
 
         converge = Vector3.ClampMagnitude(converge * SPEED * CONVERGE_FACTOR, MAX_VECTOR_FORCE);
         diverge = Vector3.ClampMagnitude(diverge * SPEED * DIVERGE_FACTOR, MAX_VECTOR_FORCE);
@@ -182,14 +171,13 @@ public class TwirlPhysics : MobilePhysics {
     /// the colliders in goToward, as well as those colliders' general 
     /// direction.
     /// </summary>
-    private Vector3 Converge(List<Collider> goToward)
+    private Vector3 Converge(Collider[] goToward, int count)
     {
-        if (goToward.Count == 0) { return Vector3.zero; }
         Vector3 result = Vector3.zero;
-        foreach (Collider c in goToward)
+        for (int x = 0; x < count; x++)
         {
-            result += c.transform.position;
-            result += c.GetComponent<Rigidbody>().velocity;
+            result += goToward[x].transform.position;
+            result += goToward[x].GetComponent<Rigidbody>().velocity;
         }
         result.y = 0;
         return (m_Parent.transform.position - result);
@@ -199,13 +187,12 @@ public class TwirlPhysics : MobilePhysics {
     /// Returns a  vector in the general direction away from the colliders in 
     /// goAwayFrom.
     /// </summary>
-    private Vector3 Diverge(List<Collider> goAwayFrom)
+    private Vector3 Diverge(Collider[] goAwayFrom, int count)
     {
-        if (goAwayFrom.Count == 0) { return Vector3.zero; }
         Vector3 result = Vector3.zero;
-        foreach (Collider c in goAwayFrom)
+        for (int x = 0; x < count; x++)
         {
-            result -= c.transform.position;
+            result -= goAwayFrom[x].transform.position;
         }
         result.y = 0;
         return (m_Parent.transform.position - result);

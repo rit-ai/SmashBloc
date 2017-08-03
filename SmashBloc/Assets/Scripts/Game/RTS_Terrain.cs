@@ -53,6 +53,7 @@ public class RTS_Terrain : MonoBehaviour, IObservable
     /// </summary>
     public void OnRightMouseDown()
     {
+        Debug.Log("yes");
         NotifyAll(Invocation.TARGET_RING);
         NotifyAll(Invocation.DESTINATION_SET);
     }

@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour, IObservable {
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Team playerTeam = Toolbox.PLAYER.Team;
-        if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrain.ignoreAllButTerrain))
         {
             // Set the destination of all the selected units the player owns
             List<MobileUnit> validUnits = selectedUnits.Where(unit => unit.Team == Toolbox.PLAYER.Team).ToList();
@@ -109,8 +109,13 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     public void ResetGame()
     {
-        Shutdown();
+        StopAllCoroutines();
         NotifyAll(Invocation.CLOSE_ALL);
+
+        foreach (Team t in teams)
+        {
+            t.Deactivate();
+        }
 
         // REACTIVATION
 
@@ -211,7 +216,7 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private IEnumerator RoundEnding()
     {
-        Shutdown();
+        StopAllCoroutines();
 
         // waitingOnAnimation = true; // TODO wait for ending animation
         NotifyAll(Invocation.GAME_ENDING);
@@ -227,20 +232,6 @@ public class GameManager : MonoBehaviour, IObservable {
         {
             TogglePause();
             NotifyAll(Invocation.PAUSE_AND_LOCK);
-        }
-    }
-
-    /// <summary>
-    /// Shuts the game down.
-    /// </summary>
-    private void Shutdown()
-    {
-        // Stop IEnumerators
-        StopAllCoroutines();
-        // Deactivate all teams
-        foreach (Team t in teams)
-        {
-            t.Deactivate();
         }
     }
 

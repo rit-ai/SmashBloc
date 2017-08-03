@@ -19,7 +19,7 @@ public class Twirl : MobileUnit {
     // Private constants
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
-    private const float ASCENSION_HEIGHT = 5000f;
+    private const float ASCENSION_HEIGHT = 800f;
     private const float ASCENSION_DURATION = 20f;
     // Default values
     private const float DEST_DEVIATION_RADIUS = 50f;
@@ -75,6 +75,12 @@ public class Twirl : MobileUnit {
         */
     }
 
+    public override void Deactivate()
+    {
+        base.Deactivate();
+        Toolbox.TwirlPool.Return(this);
+    }
+
     /// <summary>
     /// Returns identity of the unit, for disambiguation purposes.
     /// </summary>
@@ -92,31 +98,14 @@ public class Twirl : MobileUnit {
     }
 
     /// <summary>
-    /// In this animation, the Twirl unit sails into the air before being
-    /// destroyed. Particle effects are TODO.
+    /// Effects are TODO.
     /// </summary>
     protected override IEnumerator DeathAnimation()
     {
-        Vector3 newPos;
-        Color fadeOut = m_Surface.material.color;
-        float dest = transform.position.y + ASCENSION_HEIGHT;
-        float ascension_rate = ASCENSION_HEIGHT / ASCENSION_DURATION;
-        while (transform.position.y < dest)
-        {
-            newPos = transform.position;
-            newPos.y += ascension_rate * Time.deltaTime;
-            transform.position = newPos;
-
-            fadeOut.a *= (1 - Time.deltaTime);
-            Debug.Log(fadeOut.a);
-            m_Surface.material.color = fadeOut;
-            yield return new WaitForEndOfFrame();
-        }
-
-        gameObject.SetActive(false);
-        Toolbox.TwirlPool.Return(this);
+        Deactivate();
 
         yield return null;
     }
+
 
 }

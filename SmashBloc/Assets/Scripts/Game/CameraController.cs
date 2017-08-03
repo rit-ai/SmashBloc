@@ -29,13 +29,13 @@ public class CameraController : MonoBehaviour, IObservable {
     public KeyCode m_MoveCameraRight;
 
     // Private constants
-    private readonly Vector3 DEFAULT_CAMERA_LOC = new Vector3(0, 250, 0);
+    private readonly Vector3 DEFAULT_CAMERA_LOC = new Vector3(0f, 400f, 0f);
     private readonly Vector3 SCREEN_CENTER = new Vector3(Screen.width / 2, Screen.height / 2, 0f);
     private readonly Color BOX_INTERIOR_COLOR = new Color(0.74f, 0.71f, 0.27f, 0.5f);
     private readonly Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
     private const string CAMERA_RIG_TAG = "CameraRig";
     private const float CAMERA_BEHIND_OFFSET = 500f;
-    private const float MAX_CAMERA_SIZE = 250f;
+    private const float MAX_CAMERA_SIZE = 300f;
     private const float MIN_CAMERA_SIZE = 50f;
     private const float SCROLLSPEED = 50f;
     private const float BORDER_SIZE = 10f;

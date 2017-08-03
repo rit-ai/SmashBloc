@@ -42,9 +42,10 @@ public abstract class MobileUnit : Unit
         base.Activate();
     }
 
-    public void Deactivate()
+    public override void Deactivate()
     {
-        // StopAllCoroutines(); TODO this currently stops the death animation
+        base.Deactivate();
+        team.mobiles.Remove(this);
     }
 
     /// <summary>

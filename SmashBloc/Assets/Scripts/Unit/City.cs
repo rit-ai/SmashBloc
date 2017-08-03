@@ -49,9 +49,14 @@ public class City : Unit
 
         StartCoroutine(Regenerate());
 
-
         base.Activate();
+    }
 
+    public override void Deactivate()
+    {
+        base.Deactivate();
+        team.cities.Remove(this);
+        Toolbox.CityPool.Return(this);
     }
 
     /// <summary>

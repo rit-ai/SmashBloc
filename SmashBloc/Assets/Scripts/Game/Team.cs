@@ -64,23 +64,19 @@ public class Team {
     /// </summary>
     public void Deactivate()
     {
-        foreach (MobileUnit m in mobiles)
+        // Using while loops because Deactivate iteratively shrinks the list
+        while (mobiles.Count > 0)
         {
-            m.ForceKill();
-            m.Deactivate();
-        };
-        foreach (City c in cities)
+            mobiles[0].Deactivate();
+        }
+        while (cities.Count > 0)
         {
-            c.gameObject.SetActive(false);
-            Toolbox.CityPool.Return(c);
+            cities[0].Deactivate();
         }
         foreach (Player p in members)
         {
             p.Deactivate();
         }
-
-        mobiles.Clear();
-        cities.Clear();
 
         active = false;
 
