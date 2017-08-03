@@ -29,7 +29,7 @@ public sealed class PlayerAI_Basic : PlayerAI {
     {
         if (info == null) { }
 
-        if (target == null)
+        if (target == null && info.team.enemies.Count > 0)
         {
             target = info.team.enemies[0].cities[0];
         }

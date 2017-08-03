@@ -19,8 +19,8 @@ public class Twirl : MobileUnit {
     // Private constants
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
-    private const float ASCENSION_HEIGHT = 500f;
-    private const float ASCENSION_DURATION = 2f;
+    private const float ASCENSION_HEIGHT = 5000f;
+    private const float ASCENSION_DURATION = 20f;
     // Default values
     private const float DEST_DEVIATION_RADIUS = 50f;
     private const float MAXHEALTH = 100f;
@@ -97,7 +97,7 @@ public class Twirl : MobileUnit {
     /// </summary>
     protected override IEnumerator DeathAnimation()
     {
-        GetComponent<Rigidbody>().isKinematic = true;
+        Vector3 newPos;
         Color fadeOut = m_Surface.material.color;
         float dest = transform.position.y + ASCENSION_HEIGHT;
         float ascension_rate = ASCENSION_HEIGHT / ASCENSION_DURATION;
@@ -107,11 +107,13 @@ public class Twirl : MobileUnit {
             newPos.y += ascension_rate * Time.deltaTime;
             transform.position = newPos;
 
-            fadeOut.a -= 3f;
+            fadeOut.a *= (1 - Time.deltaTime);
+            Debug.Log(fadeOut.a);
             m_Surface.material.color = fadeOut;
-            yield return 0f;
+            yield return new WaitForEndOfFrame();
         }
 
+        gameObject.SetActive(false);
         Toolbox.TwirlPool.Return(this);
 
         yield return null;

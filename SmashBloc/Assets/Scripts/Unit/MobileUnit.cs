@@ -16,7 +16,6 @@ public abstract class MobileUnit : Unit
     public LayerMask ignoreAllButMobiles;
 
     protected MobileAI brain;
-    protected Vector3 newPos;
     protected Vector3 movingTo; // the exact position we're moving to
     protected Vector3 pointOfInterest; // the location of where we want to go
     protected float damage;
@@ -45,7 +44,7 @@ public abstract class MobileUnit : Unit
 
     public void Deactivate()
     {
-        StopAllCoroutines();
+        // StopAllCoroutines(); TODO this currently stops the death animation
     }
 
     /// <summary>
@@ -131,8 +130,6 @@ public abstract class MobileUnit : Unit
             m_Surface.material.color = fadeOut;
             yield return 0f;
         }
-
-        yield return null;
     }
 
     /// <summary>

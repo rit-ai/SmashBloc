@@ -20,6 +20,8 @@ public sealed class Toolbox : Singleton<Toolbox> {
 
     [Tooltip("Causes the game to reset automatically when it ends.")]
     public bool playContinuous;
+    [Tooltip("Causes the game to pause when it ends.")]
+    public bool pauseOnFinish;
 
     private const int SMALL_POOL = 10;
     private const int MEDIUM_POOL = 100;

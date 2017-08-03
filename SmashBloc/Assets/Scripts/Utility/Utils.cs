@@ -145,14 +145,14 @@ public class Utils : MonoBehaviour {
     {
         float temp; // for swapping
         float localTime = time;
-        float max = -hover;
-        float min = hover;
+        float max = -hover * 60;
+        float min = hover * 60;
         float hoverOffset;
 
         while (true)
         {
             hoverOffset = Mathf.Lerp(min, max, localTime);
-            hoverer.transform.position = new Vector3(hoverer.transform.position.x, hoverer.transform.position.y + hoverOffset, hoverer.transform.position.z);
+            hoverer.transform.position = new Vector3(hoverer.transform.position.x, hoverer.transform.position.y + hoverOffset * Time.deltaTime, hoverer.transform.position.z);
 
             localTime += Time.deltaTime;
 

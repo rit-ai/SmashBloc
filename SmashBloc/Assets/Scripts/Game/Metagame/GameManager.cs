@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour, IObservable {
 
     [HideInInspector]
     public bool playContinuous; // restart game once it's over
+    [HideInInspector]
+    public bool pauseOnFinish; // pause game when it's over
 
     private const string CITY_SPAWN_TAG = "CitySpawn";
     private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
@@ -107,16 +109,7 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     public void ResetGame()
     {
-        // DEACTIVATION
-
-        // Deactivate all teams
-        foreach (Team t in teams)
-        {
-            t.Deactivate();
-        }
-
-        StopAllCoroutines();
-
+        Shutdown();
         NotifyAll(Invocation.CLOSE_ALL);
 
         // REACTIVATION
@@ -218,8 +211,7 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private IEnumerator RoundEnding()
     {
-        // Stop IEnumerators
-        StopCoroutine(IncrementGold());
+        Shutdown();
 
         // waitingOnAnimation = true; // TODO wait for ending animation
         NotifyAll(Invocation.GAME_ENDING);
@@ -230,8 +222,26 @@ public class GameManager : MonoBehaviour, IObservable {
             ResetGame();
             yield break;
         }
-        TogglePause();
-        NotifyAll(Invocation.PAUSE_AND_LOCK);
+
+        if (pauseOnFinish)
+        {
+            TogglePause();
+            NotifyAll(Invocation.PAUSE_AND_LOCK);
+        }
+    }
+
+    /// <summary>
+    /// Shuts the game down.
+    /// </summary>
+    private void Shutdown()
+    {
+        // Stop IEnumerators
+        StopAllCoroutines();
+        // Deactivate all teams
+        foreach (Team t in teams)
+        {
+            t.Deactivate();
+        }
     }
 
     /// <summary>

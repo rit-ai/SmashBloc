@@ -35,7 +35,7 @@ public class CameraController : MonoBehaviour, IObservable {
     private readonly Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
     private const string CAMERA_RIG_TAG = "CameraRig";
     private const float CAMERA_BEHIND_OFFSET = 500f;
-    private const float MAX_CAMERA_SIZE = 300f;
+    private const float MAX_CAMERA_SIZE = 250f;
     private const float MIN_CAMERA_SIZE = 50f;
     private const float SCROLLSPEED = 50f;
     private const float BORDER_SIZE = 10f;
