@@ -59,17 +59,6 @@ public abstract class Unit : MonoBehaviour, IObservable {
     }
 
     /// <summary>
-    /// Logic handler for when the unit is individually selected, including
-    /// notifying proper menu observers.
-    /// </summary>
-    private void OnMouseDown()
-    {
-        Highlight();
-        NotifyAll(Invocation.ONE_SELECTED);
-        NotifyAll(Invocation.UNIT_MENU);
-    }
-
-    /// <summary>
     /// Sets up Observers and other state common between Units.
     /// </summary>
     public virtual void Init()

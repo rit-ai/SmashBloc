@@ -13,7 +13,7 @@ using UnityEngine;
  * This is a class, as opposed to a struct, because it must be nullable in 
  * order to play nice with the AI heirarchy.
  * **/
-public class MobileUnitInfo {
+public class MobileInfo {
     // The team of the unit.
     public Team team;
     // The relative amount of health the unit currently possesses.
@@ -21,7 +21,9 @@ public class MobileUnitInfo {
     // The amount of damage the unit's weapon does.
     public float damage;
     // The current destination of the unit.
-    public Vector3 destination;
+    public Vector3 movingTo;
+    // The unit's current position of interest.
+    public Vector3 pointOfInterest;
 
     // Any enemies that are in the Unit's sight range.
     public List<Unit> enemiesInSight;
@@ -31,14 +33,14 @@ public class MobileUnitInfo {
     public List<Unit> enemiesInAttackRange;
 
     // Empty constructor in case we want to assign values piecemeal
-    public MobileUnitInfo() { }
+    public MobileInfo() { }
 
-    public MobileUnitInfo(Team team, float healthPercentage, float damage, Vector3 destination, List<Unit> enemiesInSight, List<Unit> alliesInSight, List<Unit> enemiesInAttackRange)
+    public MobileInfo(Team team, float healthPercentage, float damage, Vector3 movingTo, List<Unit> enemiesInSight, List<Unit> alliesInSight, List<Unit> enemiesInAttackRange)
     {
         this.team = team;
         this.healthPercentage = healthPercentage;
         this.damage = damage;
-        this.destination = destination;
+        this.movingTo = movingTo;
 
         this.enemiesInSight = enemiesInSight;
         this.alliesInSight = alliesInSight;

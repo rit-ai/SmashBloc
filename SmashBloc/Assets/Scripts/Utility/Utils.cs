@@ -13,8 +13,8 @@ using UnityEngine;
  * down.
  * 
  * Some methods, like MouseIsOverUI(), are worthwhile in that they increase 
- * overall code readability. However, functions like IdentityToPrefab() should 
- * be phased out. TODO
+ * overall code readability. However, functions like IdentityToGameObject() 
+ * should be phased out.
  * **/
 public class Utils : MonoBehaviour {
 
@@ -135,4 +135,37 @@ public class Utils : MonoBehaviour {
         throw new KeyNotFoundException("Bad value passed to UnitToPrefab()");
     }
 
+    /// <summary>
+    /// Animates a transform so that it hovers.
+    /// </summary>
+    /// <param name="hover">The magnitude of the hover.</param>
+    /// <param name="time">A temporal offset (so that the hovers are out of 
+    /// sync.</param>
+    public static IEnumerator AnimateHover(Transform hoverer, float hover, float time = 0f)
+    {
+        float temp; // for swapping
+        float localTime = time;
+        float max = -hover;
+        float min = hover;
+        float hoverOffset;
+
+        while (true)
+        {
+            hoverOffset = Mathf.Lerp(min, max, localTime);
+            hoverer.transform.position = new Vector3(hoverer.transform.position.x, hoverer.transform.position.y + hoverOffset, hoverer.transform.position.z);
+
+            localTime += Time.deltaTime;
+
+            // Swap min and max to reverse direction
+            if (localTime > 1f)
+            {
+                temp = max;
+                max = min;
+                min = temp;
+                localTime -= 1f;
+            }
+
+            yield return 0f;
+        }
+    }
 }

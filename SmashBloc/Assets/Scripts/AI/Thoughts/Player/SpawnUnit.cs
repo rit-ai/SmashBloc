@@ -8,7 +8,7 @@ using UnityEngine;
  * This command tells a Player to attempt to spawn a specific type of unit at
  * a specific city.
  * **/
-public class SpawnUnit : PlayerCommand {
+public class SpawnUnit : PlayerThought {
 
     string toSpawnName;
     City toSpawnAt;
@@ -19,7 +19,7 @@ public class SpawnUnit : PlayerCommand {
         this.toSpawnAt = toSpawnAt;
     }
 
-    public override void Execute()
+    public override void Act()
     {
         if (toSpawnAt.Team != body.Team) { return; }
 

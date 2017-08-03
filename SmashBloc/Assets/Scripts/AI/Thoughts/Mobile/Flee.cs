@@ -9,7 +9,7 @@ using UnityEngine;
  * Tells the Mobile to run away from a group of GameObjects, usually enemy 
  * Units, and also provides a default distance to run away.
  * **/
-public class FleeCommand : MobileCommand
+public class FleeCommand : MobileThought
 {
     private List<GameObject> fleeFrom;
     private float distanceToFlee;
@@ -24,7 +24,7 @@ public class FleeCommand : MobileCommand
     /// Calculates the direction to run away from and instructs the Body to 
     /// move toward that point.
     /// </summary>
-    public override void Execute()
+    public override void Act()
     {
         Vector3 direction = Vector3.zero;
 

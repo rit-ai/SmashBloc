@@ -15,10 +15,10 @@ public abstract class MobileUnit : Unit
 {
     public LayerMask ignoreAllButMobiles;
 
-    protected MobileAI ai;
+    protected MobileAI brain;
     protected Vector3 newPos;
-    protected Vector3 destination;
-    protected Vector3 storedDestination = default(Vector3);
+    protected Vector3 movingTo; // the exact position we're moving to
+    protected Vector3 pointOfInterest; // the location of where we want to go
     protected float damage;
     protected float sightRange;
     protected float attackRange;
@@ -27,25 +27,26 @@ public abstract class MobileUnit : Unit
     private const float PASS_INFO_RATE = 1f;
 
     // Private fields
-    private MobileUnitInfo info;
+    private MobileInfo info;
 
     // Set initial state for when a MobileUnit is created
     public override void Activate()
     {
-        // Units, by default, hover a a short distance around their spawn pos
-        MoveCommand idle = new MoveCommand(transform.position)
-        {
-            Body = this
-        };
-        idle.Execute();
+        // Units wait near their spawn position until given orders
+        pointOfInterest = transform.position;
 
         // Pass info to the AI component every second
-        info = new MobileUnitInfo();
+        info = new MobileInfo();
         StartCoroutine(PassInfo());
 
+        brain.Activate();
         base.Activate();
     }
 
+    public void Deactivate()
+    {
+        StopAllCoroutines();
+    }
 
     /// <summary>
     /// Causes the unit's health to become zero.
@@ -79,6 +80,7 @@ public abstract class MobileUnit : Unit
                     // If they're close enough to attack, add them to the second list.
                     if (c.transform.position.magnitude - transform.position.magnitude < attackRange)
                         enemiesInAttackRange.Add(current);
+
                     enemiesInSight.Add(current);
                 }
                 else
@@ -96,7 +98,10 @@ public abstract class MobileUnit : Unit
             info.alliesInSight = alliesInSight;
             info.enemiesInAttackRange = enemiesInAttackRange;
 
-            ai.UpdateInfo(info);
+            info.movingTo = movingTo;
+            info.pointOfInterest = pointOfInterest;
+
+            brain.Info = info;
             yield return new WaitForSeconds(PASS_INFO_RATE);
         }
 
@@ -127,8 +132,6 @@ public abstract class MobileUnit : Unit
             yield return 0f;
         }
 
-
-
         yield return null;
     }
 
@@ -158,8 +161,8 @@ public abstract class MobileUnit : Unit
     /// </summary>
     public MobileAI AI
     {
-        get { return ai; }
-        set { ai = value; }
+        get { return brain; }
+        set { brain = value; }
     }
 
     /// <summary>
@@ -167,19 +170,16 @@ public abstract class MobileUnit : Unit
     /// </summary>
     public Vector3 Destination
     {
-        get { return destination; }
+        get { return movingTo; }
         set {
-            // Don't change the destination if we're currently waiting to fire
-            if (storedDestination != default(Vector3)) {
-                value.y = 0;
-                storedDestination = value;
-            }
-            else
-            {
-                value.y = 0;
-                destination = value;
-            }
+            value.y = 0;
+            movingTo = value;
         }
+    }
+
+    public Vector3 PointOfInterest
+    {
+        set { pointOfInterest = value; }
     }
 
     /// <summary>
@@ -197,4 +197,16 @@ public abstract class MobileUnit : Unit
     {
         get { return attackRange; }
     }
+
+    /// <summary>
+    /// Logic handler for when the unit is individually selected, including
+    /// notifying proper menu observers.
+    /// </summary>
+    private void OnMouseDown()
+    {
+        Highlight();
+        NotifyAll(Invocation.ONE_SELECTED);
+        NotifyAll(Invocation.UNIT_MENU);
+    }
+
 }

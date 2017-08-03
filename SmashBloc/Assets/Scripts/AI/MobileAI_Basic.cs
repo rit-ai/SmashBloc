@@ -17,8 +17,8 @@ using UnityEngine;
 public sealed class MobileAI_Basic : MobileAI
 {
 
-    protected override ICommand Decide()
+    protected override IThought Think()
     {
-        return null;
+        return new Move(info.pointOfInterest);
     }
 }

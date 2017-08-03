@@ -12,7 +12,6 @@ public class UIObserver : MonoBehaviour, IObserver {
     // Private constant fields
     // We keep a reference to the UI Manager to tell it what we want it to show
     private static UIManager manager;
-    private static Team PLAYER_TEAM;
     private static string START_GAME_TEXT = "BEGIN!";
     private static string END_GAME_TEXT = "FINISH!";
 
@@ -24,8 +23,6 @@ public class UIObserver : MonoBehaviour, IObserver {
         manager = Toolbox.UIManager;
 
         Debug.Assert(manager);
-
-        PLAYER_TEAM = GameManager.PLAYER.Team;
     }
 
     /// <summary>
@@ -37,7 +34,6 @@ public class UIObserver : MonoBehaviour, IObserver {
     /// <param name="data">Optional misc data.</param>
     public void OnNotify(object entity, Invocation invoke, params object[] data)
     {
-        bool enabled = false;
         switch (invoke)
         {
             // Plays the starting animation text
@@ -59,14 +55,12 @@ public class UIObserver : MonoBehaviour, IObserver {
             // Display unit info
             case Invocation.UNIT_MENU:
                 Debug.Assert(entity is MobileUnit); // don't pass bad objects
-                enabled = (((MobileUnit)entity).Team == PLAYER_TEAM);
-                manager.DisplayUnitInfo((MobileUnit)entity, enabled);
+                manager.DisplayUnitInfo((MobileUnit)entity);
                 break;
             // Display city info
             case Invocation.CITY_MENU:
                 Debug.Assert(entity is City); // don't pass bad objects
-                enabled = (((City)entity).Team == PLAYER_TEAM);
-                manager.DisplayCityInfo((City)entity, enabled);
+                manager.DisplayCityInfo((City)entity);
                 break;
             // Moves and renders the target ring
             case Invocation.TARGET_RING:

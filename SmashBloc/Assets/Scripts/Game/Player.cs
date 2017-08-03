@@ -62,9 +62,11 @@ public class Player : MonoBehaviour {
 
     // Use this for initialization
     public virtual void Activate () {
+        gameObject.SetActive(true);
         if (brain != null)
         {
             StartCoroutine(PassInfo());
+            brain.Activate();
         }
     }
 
@@ -74,10 +76,13 @@ public class Player : MonoBehaviour {
     public void Deactivate()
     {
         goldAmount = 0;
+
         if (brain != null)
         {
+            brain.Deactivate();
             StopCoroutine(PassInfo());
         }
+        gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -171,7 +176,7 @@ public class Player : MonoBehaviour {
         {
             info.team = team;
             info.goldAmount = goldAmount;
-            brain.UpdateInfo(info);
+            brain.Info = info;
             yield return new WaitForSeconds(PASS_INFO_RATE);
         }
     }

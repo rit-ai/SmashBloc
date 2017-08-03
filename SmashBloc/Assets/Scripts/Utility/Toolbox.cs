@@ -15,6 +15,9 @@ using UnityEngine.UI;
  * **/
 public sealed class Toolbox : Singleton<Toolbox> {
 
+    // The first created player, which will always be the main player.
+    public static Player player;
+
     [Tooltip("Causes the game to reset automatically when it ends.")]
     public bool playContinuous;
 
@@ -27,6 +30,7 @@ public sealed class Toolbox : Singleton<Toolbox> {
     private static GameManager gameManager;
     private static UIObserver uiObserver;
     private static GameObserver gameObserver;
+    private static GameSetup gameSetup;
 
     private static City cityPrefab;
     private static MobileUnit twirlPrefab;
@@ -63,6 +67,10 @@ public sealed class Toolbox : Singleton<Toolbox> {
     {
         get { return gameObserver; }
     }
+    public static GameSetup GameSetup
+    {
+        get { return gameSetup; }
+    }
     public static City CityPrefab
     {
         get { return cityPrefab; }
@@ -79,19 +87,34 @@ public sealed class Toolbox : Singleton<Toolbox> {
     {
         get { return terrain; }
     }
+    public static Player PLAYER
+    {
+        get { return player; }
+    }
 
     // A private constructor makes sure that this object will never be 
     // accidentally created in code
     private Toolbox() { }
 
     /// <summary>
-    /// TODO? make UI Manager find or build all of its public variables.
-    /// 
     /// Order in this function is EXTREMELY important.
     /// </summary>
     private void Awake()
     {
-        // First there was the land...
+        // First came the Game...
+        gameSetup = GetComponent<GameSetup>();
+        if (gameSetup.Locked)
+        {
+            // If the game is locked, make a dummy player & team
+            player = Player.MakePlayer(false, new Team());
+        }
+        else
+        {
+            // Else they're the first player
+            player = gameSetup.Players[0];
+        }
+
+        // ...and from the game came the land...
         terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
 
         // ...and from the land came the prefabs...
@@ -99,11 +122,11 @@ public sealed class Toolbox : Singleton<Toolbox> {
         twirlPrefab = Resources.Load<Twirl>("Prefabs/Units/" + Twirl.IDENTITY);
         tankPrefab = Resources.Load<Boomy>("Prefabs/Units/" + Boomy.IDENTITY);
 
-        // ...and from the prefabs came those that managed them...
+        // ...and from the land came those that managed it...
         uiManager = FindObjectOfType<UIManager>();
         gameManager = gameObject.AddComponent<GameManager>();
 
-        // ...and from the managers came those that observed them...
+        // ...and from the land came those that observed it...
         uiObserver = gameObject.AddComponent<UIObserver>();
         gameObserver = gameObject.AddComponent<GameObserver>();
 

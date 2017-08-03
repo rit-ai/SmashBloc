@@ -97,7 +97,7 @@ public class UIManager : MonoBehaviour, IObservable {
                 toSpawn = Boomy.IDENTITY;
                 break;
         }
-        GameManager.PLAYER.SetUnitToSpawn(toSpawn);
+        Toolbox.PLAYER.SetUnitToSpawn(toSpawn);
     }
 
     /// <summary>
@@ -105,8 +105,8 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void SpawnUnit()
     {
-        GameManager.PLAYER.SetCityToSpawnAt(cityCurrentlyDisplayed);
-        GameManager.PLAYER.SpawnUnit();
+        Toolbox.PLAYER.SetCityToSpawnAt(cityCurrentlyDisplayed);
+        Toolbox.PLAYER.SpawnUnit();
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// enabled depending on whether or not the player owns that unit.
     /// </summary>
     /// <param name="unit">The unit whose info is to be displayed.</param>
-    public void DisplayUnitInfo(MobileUnit unit, bool enableCommand)
+    public void DisplayUnitInfo(MobileUnit unit)
     {
         // Only allow one highlighting ring
         if (unitCurrentlyDisplayed != null && unitCurrentlyDisplayed != unit)
@@ -130,7 +130,7 @@ public class UIManager : MonoBehaviour, IObservable {
         m_UnitMenu.transform.position = menuSpawnPos;
 
         // Handle unit name input field
-        m_UnitMenuNameInput.enabled = enabled;
+        m_UnitMenuNameInput.enabled = unit.Team == Toolbox.PLAYER.Team;
         m_UnitMenuNameInput.placeholder.GetComponent<Text>().text = unit.UnitName;
 
         // Handle health slider
@@ -148,7 +148,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// whether or not the player owns that unit. 
     /// </summary>
     /// <param name="city">The city to display.</param>
-    public void DisplayCityInfo(City city, bool enabled)
+    public void DisplayCityInfo(City city)
     {
         // Only allow one highlighting ring
         if (cityCurrentlyDisplayed != null && cityCurrentlyDisplayed != city)
@@ -160,11 +160,11 @@ public class UIManager : MonoBehaviour, IObservable {
         m_CityMenu.transform.position = menuSpawnPos;
 
         // Handle city name input field
-        m_CityMenuNameInput.enabled = enabled;
+        m_CityMenuNameInput.enabled = city.Team == Toolbox.PLAYER.Team;
         m_CityMenuNameInput.placeholder.GetComponent<Text>().text = city.UnitName;
 
         // Handle spawn button
-        m_CityMenuSpawnButton.enabled = enabled;
+        m_CityMenuSpawnButton.enabled = city.Team == Toolbox.PLAYER.Team;
 
         // Handle sliders
         m_CityMenuHealth.maxValue = City.MAX_HEALTH;
@@ -200,13 +200,13 @@ public class UIManager : MonoBehaviour, IObservable {
         if (m_Message.enabled) { yield break; }
 
         const int FRAMES_TO_LINGER = 60;
-        const float MOVE_DISTANCE_LARGE = 15f;
-        const float MOVE_DISTANCE_SMALL = 2f;
+        const float MOVE_DISTANCE_SMALL = 30f;
         const float MIN_DISTANCE_SQR = 30000f;
         Color textColor = new Color(1f, 1f, 1f, 0f); // white, but invisible
         Vector3 textPosition = m_Message.transform.position;
-        textPosition.x = 0;
         Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2);
+        float MOVE_DISTANCE_LARGE = Screen.width / 2;
+        textPosition.x = 0;
 
         yield return null;
 
@@ -219,8 +219,8 @@ public class UIManager : MonoBehaviour, IObservable {
         // right and raise the alpha
         while ((m_Message.transform.position - screenCenter).sqrMagnitude > MIN_DISTANCE_SQR)
         {
-            textColor.a += 0.10f;
-            textPosition.x += MOVE_DISTANCE_LARGE;
+            textColor.a += 4.5f * Time.deltaTime;
+            textPosition.x += MOVE_DISTANCE_LARGE * Time.deltaTime;
             m_Message.color = textColor;
             m_Message.transform.position = textPosition;
             yield return null;
@@ -229,7 +229,7 @@ public class UIManager : MonoBehaviour, IObservable {
         // Let it linger for FRAMES_TO_LINGER frames
         for (int x = 0; x < FRAMES_TO_LINGER; x++)
         {
-            textPosition.x += MOVE_DISTANCE_SMALL;
+            textPosition.x += MOVE_DISTANCE_SMALL * Time.deltaTime;
             m_Message.transform.position = textPosition;
             yield return null;
         }
@@ -237,8 +237,8 @@ public class UIManager : MonoBehaviour, IObservable {
         // Until text is offscreen, move to the right and fade out
         while (m_Message.transform.position.x < Screen.width * 1.5)
         {
-            textColor.a -= 0.05f;
-            textPosition.x += MOVE_DISTANCE_LARGE;
+            textColor.a -= 4.5f * Time.deltaTime;
+            textPosition.x += MOVE_DISTANCE_LARGE * Time.deltaTime;
             m_Message.color = textColor;
             m_Message.transform.position = textPosition;
             yield return null;
@@ -344,7 +344,8 @@ public class UIManager : MonoBehaviour, IObservable {
         Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
         {
-            m_TargetRing.UpdatePosition(hit.point);
+            // TODO prevent target ring from sinking into the ground
+            m_TargetRing.transform.position = new Vector3(hit.point.x, hit.point.y + 3f, hit.point.z);
             m_TargetRing.gameObject.SetActive(true);
         }
     }
@@ -387,7 +388,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     private void UpdateGoldAmountText()
     {
-        int gold = GameManager.PLAYER.Gold;
+        int gold = Toolbox.PLAYER.Gold;
         string goldText = gold.ToString();
         m_CurrentGoldAmount.text = goldText;
     }
@@ -397,7 +398,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     private void UpdateUnitAmountText()
     {
-        int units = GameManager.PLAYER.Team.mobiles.Count;
+        int units = Toolbox.PLAYER.Team.mobiles.Count;
         string unitText = units.ToString();
         m_CurrentUnitAmount.text = unitText;
     }

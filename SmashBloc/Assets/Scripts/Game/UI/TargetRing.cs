@@ -25,99 +25,22 @@ public class TargetRing : MonoBehaviour {
 
     private Transform ring;
     private Transform conerig;
-    private float hoverOffset;
-    private bool reset; // have we changed our position?
 
     // Use this for initialization
-    void Start () {
+    private void Start () {
         ring = GetComponent<Transform>();
         conerig = transform.GetChild(0).GetComponent<Transform>();
 
         spinRate = Mathf.Clamp(spinRate, 0f, 2f);
         coneHoverDelay = Mathf.Clamp(coneHoverDelay, 0f, 1f);
 
-        StartCoroutine(AnimateHover(ring, hoverDistance));
-        StartCoroutine(AnimateHover(conerig, hoverDistance / 2f, coneHoverDelay));
-        StartCoroutine(AnimateConeRotation(conerig));
+        StartCoroutine(Utils.AnimateHover(ring, hoverDistance));
+        StartCoroutine(Utils.AnimateHover(conerig, hoverDistance / 2f, coneHoverDelay));
     }
 
-    /// <summary>
-    /// Updates the position of the target ring and resets its animation.
-    /// </summary>
-    /// <param name="position">The new position to move to, likely with a 
-    /// different xz than the current one.</param>
-    public void UpdatePosition(Vector3 position)
+    private void Update()
     {
-        transform.position = new Vector3(position.x, position.y + ABOVE_GROUND_OFFSET, position.z);
-        reset = true;
-    }
-
-    /// <summary>
-    /// Updates the position without changing our xz.
-    /// </summary>
-    private void UpdatePosition(Transform hoverer)
-    {
-        hoverer.transform.position = new Vector3(hoverer.transform.position.x, hoverer.transform.position.y + hoverOffset, hoverer.transform.position.z);
-    }
-
-    /// <summary>
-    /// Causes the hoverer to float up and down.
-    /// </summary>
-    /// <param name="hoverer">The transform to update.</param>
-    /// <param name="hover">The distance to hover.</param>
-    /// <param name="time">A temporal offset to the animation cycle.</param>
-    private IEnumerator AnimateHover(Transform hoverer, float hover, float time = 0f)
-    {
-        float temp; // for swapping
-        float localTime = time;
-        float max = -hover;
-        float min = hover;
-
-        while (true)
-        {
-            // If we've changed position, reset the animation
-            if (reset)
-            {
-                max = -hover;
-                min = hover;
-                localTime = time;
-                reset = false;
-            }
-
-            hoverOffset = Mathf.Lerp(min, max, localTime);
-            UpdatePosition(hoverer);
-
-            localTime += Time.deltaTime;
-
-            // Swap min and max to reverse direction
-            if (localTime > 1f)
-            {
-                temp = max;
-                max = min;
-                min = temp;
-                localTime -= 1f;
-            }
-
-            yield return 0f;
-        }
-
+        conerig.transform.Rotate(0f, 0f, Time.deltaTime * spinRate * 100f);
     }
     
-    /// <summary>
-    /// Causes the rig to rotate slowly about its Z axis.
-    /// </summary>
-    private IEnumerator AnimateConeRotation(Transform rig)
-    {
-        const float BOOST = 100f; // very small z values can be lost
-        float z = 0f;
-
-
-        while (true)
-        {
-            z = Time.deltaTime * spinRate * BOOST;
-            rig.transform.Rotate(0f, 0f, z);
-
-            yield return 0f;
-        }
-    }
 }

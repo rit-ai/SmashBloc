@@ -6,13 +6,13 @@ using UnityEngine;
  * @author Paul Galatic
  * 
  * This abstract class is designed to contain state and denote methods common
- * between all Commands a Unit AI can receive.
+ * between all thoughts a Unit AI can have.
  * **/
-public abstract class MobileCommand : ICommand {
+public abstract class MobileThought : IThought {
 
     protected MobileUnit body;
 
     public MobileUnit Body { set { body = value; } }
 
-    public abstract void Execute();
+    public abstract void Act();
 }

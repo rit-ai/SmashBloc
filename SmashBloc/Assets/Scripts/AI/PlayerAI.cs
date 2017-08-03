@@ -19,44 +19,55 @@ using UnityEngine;
 public abstract class PlayerAI : AbstractAI {
 
     // Player AIs control Players. However, the AIs aren't allowed to reference
-    // their Players themselves—they can only do so through Commands.
-    private new Player body;
+    // their Players themselves—they can only do so through thoughts.
+    private Player body;
+
     // This is the most recent information the AI has from its body.
     protected PlayerInfo info;
 
     public Player Body { set { body = value; } }
 
+    // It's the Body's responsibility to keep this value updated, but it won't
+    // be sampled more frequently than INFO_SAMPLING_RATE.
+    public PlayerInfo Info { set { info = value; } }
+
     /// <summary>
-    /// Allows the body to send updated information to the brain, then 
-    /// immediately uses that information to execute a command.
+    /// Periodically makes a decision based on current known info.
     /// </summary>
-    /// <param name="info">Updated information about the Player's status, 
-    /// contained in a PlayerInfo class.</param>
-    public sealed override void UpdateInfo(object info)
+    protected sealed override IEnumerator Thinking(float SAMPLING_RATE)
     {
-        if (!(info is PlayerInfo))
+        IThought thought;
+
+        while (true)
         {
-            throw new ArgumentException("Attempted to call UpdateState with wrong Info type.", "info");
+            // Wait until info exists in case senses are delayed
+            if (info == null) { yield return new WaitForSeconds(SAMPLING_RATE); }
+            // Use sensory info to determine a course of action
+            thought = Think();
+            // Beware of impure thoughts
+            if (thought != null && thought is PlayerThought)
+            {
+                // If the thought is pure, act on it
+                ((PlayerThought)thought).Body = body;
+                thought.Act();
+                priorThought = thought;
+                thought = null;
+            }
+            else
+            {
+                Debug.Log("WARN: PlayerAI has impure thoughts.");
+            }
+
+            // Be careful not to think too much
+            yield return new WaitForSeconds(SAMPLING_RATE);
         }
-        this.info = (info as PlayerInfo);
-        Behave(Decide());
+
     }
 
     /// <summary>
-    /// Sets the current command for execution.
+    /// The responsibility of this function is to evaluate the current info and 
+    /// return a Thought intended to advance the Player's goals.
     /// </summary>
-    protected override sealed void Behave(ICommand command)
-    {
-        if (command == null) { return; }
-
-        if (!(command is PlayerCommand))
-        {
-            throw new ArgumentException("Wrong command type.");
-        }
-        
-        ((PlayerCommand)command).Body = body;
-        base.Behave(command);
-    }
-
+    protected abstract override IThought Think();
 
 }

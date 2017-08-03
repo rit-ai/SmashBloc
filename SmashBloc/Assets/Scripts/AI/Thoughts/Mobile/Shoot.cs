@@ -10,7 +10,7 @@ using UnityEngine;
  * accurate, but as Units stop while they take aim, they will also be more 
  * vulnerable to enemy fire.
  * **/
-public class ShootCommand : MobileCommand
+public class ShootCommand : MobileThought
 {
 
     Unit target;
@@ -22,7 +22,7 @@ public class ShootCommand : MobileCommand
         this.maxAimTime = maxAimTime;
     }
 
-    public override void Execute()
+    public override void Act()
     {
         body.Shoot(target, maxAimTime);
     }
