@@ -19,7 +19,8 @@ public class City : Unit
     public const int MAX_INCOME_LEVEL = 8;
 
     // Public fields
-    public Transform m_SpawnPoint;
+    public Transform spawnPoint;
+    public SpawnRingRig spawnRingRig;
 
     // Private constants
     private const string DEFAULT_NAME = "Dylanto";
@@ -37,7 +38,6 @@ public class City : Unit
     private const int DEFAULT_INCOME_LEVEL = 8;
 
     // Private fields
-    private List<IObserver> m_Observers;
     private int incomeLevel;
     private bool delayRegen = true;
 
@@ -75,7 +75,7 @@ public class City : Unit
     /// </summary>
     public Transform SpawnPoint
     {
-        get { return m_SpawnPoint; }
+        get { return spawnPoint; }
     }
 
     /// <summary>
@@ -128,9 +128,19 @@ public class City : Unit
     /// <param name="capturer">The capturer of the city.</param>
     protected override void OnDeath(Unit capturer)
     {
-        m_Surface.material.color = capturer.Team.color;
+        ChangeColor(capturer.Team.color);
         UpdateHealth(CAPTURED_HEALTH - health, capturer);
         NotifyAll(Invocation.CITY_CAPTURED, capturer.Team);
+    }
+
+    /// <summary>
+    /// Changes the city's color.
+    /// </summary>
+    /// <param name="color"></param>
+    private void ChangeColor(Color color)
+    {
+        surface.material.color = color;
+        spawnRingRig.UpdateColor(color);
     }
 
     /// <summary>

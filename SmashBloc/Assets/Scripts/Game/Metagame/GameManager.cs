@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour, IObservable {
     private const int MAX_MONEY = 999; // richness ceiling
     private const int NUM_AI_PLAYERS = 1;
 
-    private CameraController m_CameraController;
+    private CameraController cameraController;
     private GameObject[] citySpawnPoints;
 
     private List<Team> teams;
@@ -131,7 +131,7 @@ public class GameManager : MonoBehaviour, IObservable {
 
         // Set main camera to be behind the first city
         // TODO make this more exact
-        m_CameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
+        cameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
 
         StartCoroutine(GameLoop());
     }
@@ -141,10 +141,10 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private void Start()
     {
-        m_CameraController = Camera.main.GetComponent<CameraController>();
+        cameraController = Camera.main.GetComponent<CameraController>();
         citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
 
-        Debug.Assert(m_CameraController != null);
+        Debug.Assert(cameraController != null);
         Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
 
         teams = Toolbox.GameSetup.Teams;
@@ -166,7 +166,7 @@ public class GameManager : MonoBehaviour, IObservable {
 
         // Set main camera to be behind a city, preferrably the player's
         // Somewhat inexact, TODO make sure it finds the first city every time
-        m_CameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
+        cameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
 
         StartCoroutine(GameLoop());
 

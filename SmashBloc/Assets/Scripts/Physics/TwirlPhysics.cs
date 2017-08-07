@@ -33,10 +33,10 @@ public class TwirlPhysics : MobilePhysics {
     private const int COLLIDER_MEM = 50;
 
     // Private fields
-    private Twirl m_Parent;
-    private Rigidbody m_Rigidbody;
-    private Rigidbody m_Hoverball;
-    private Rigidbody m_BottomWeight;
+    private Twirl parent;
+    private Rigidbody body;
+    private Rigidbody hoverBall;
+    private Rigidbody bottomWeight;
 
     private Collider[] convergeWith;
     private Collider[] divergeWith;
@@ -50,16 +50,16 @@ public class TwirlPhysics : MobilePhysics {
     private void Start()
     {
         // Private fields
-        m_Parent = GetComponent<Twirl>();
-        m_Rigidbody = m_Parent.GetComponent<Rigidbody>();
-        m_Hoverball = m_Parent.m_Hoverball;
-        m_BottomWeight = m_Parent.m_BottomWeight;
+        parent = GetComponent<Twirl>();
+        body = parent.GetComponent<Rigidbody>();
+        hoverBall = parent.hoverBall;
+        bottomWeight = parent.bottomWeight;
 
         convergeWith = new Collider[COLLIDER_MEM];
         divergeWith = new Collider[COLLIDER_MEM];
 
-        m_Rigidbody.useGravity = true;
-        m_BottomWeight.useGravity = true;
+        body.useGravity = true;
+        bottomWeight.useGravity = true;
     }
 
     /// <summary>
@@ -91,22 +91,22 @@ public class TwirlPhysics : MobilePhysics {
         RaycastHit hit;
 
         // Add downward force to the bottom weight and resist changes in motion
-        Vector3 downForce = Vector3.down * m_BottomWeight.mass;
-        m_BottomWeight.AddForce(downForce, ForceMode.Acceleration);
+        Vector3 downForce = Vector3.down * bottomWeight.mass;
+        bottomWeight.AddForce(downForce, ForceMode.Acceleration);
 
         // If the unit is too far from the floor, don't apply any force to the
         // hoverball
-        if (Physics.Raycast(m_Hoverball.transform.position, Vector3.down, out hit, MAX_FLOAT_THRESHOLD, Toolbox.Terrain.ignoreAllButTerrain))
+        if (Physics.Raycast(hoverBall.transform.position, Vector3.down, out hit, MAX_FLOAT_THRESHOLD, Toolbox.Terrain.ignoreAllButTerrain))
         {
             // Get the destination height
             Vector3 destination = Vector3.up * MAX_FLOAT_THRESHOLD * Mathf.Abs(Physics.gravity.y);
             // Adjust UP by the masses of the hoverball and parent rigidbody
-            Vector3 desire = Vector3.up * (destination.y - m_Rigidbody.velocity.y * UP_FORCE);
-            desire -= m_Hoverball.velocity;
+            Vector3 desire = Vector3.up * (destination.y - body.velocity.y * UP_FORCE);
+            desire -= hoverBall.velocity;
             // Cap the amount of force (to prevent strange launches)
             desire = Vector3.ClampMagnitude(desire, MAX_VECTOR_FORCE);
             // Apply force
-            m_Hoverball.AddForce(desire, ForceMode.Acceleration);
+            hoverBall.AddForce(desire, ForceMode.Acceleration);
             return true;
         }
 
@@ -120,7 +120,7 @@ public class TwirlPhysics : MobilePhysics {
     private void Guide()
     {
         // Get the vector representing the desired trajectory
-        Vector3 desire = m_Parent.Destination - m_Parent.transform.position;
+        Vector3 desire = parent.Destination - parent.transform.position;
         // Store the magnitude for later use
         float desireMagnitude = desire.sqrMagnitude;
         // Get rid of the Y factor so that the hover stays the same
@@ -130,14 +130,14 @@ public class TwirlPhysics : MobilePhysics {
         // Lower that speed depending on its distance from the destination
         desire *= Decelerate(desireMagnitude / DECELERATION_THRESHOLD_SQRD);
         // Steering = desire - velocity
-        Vector3 velocity = m_Rigidbody.velocity;
+        Vector3 velocity = body.velocity;
         velocity.y = 0;
         desire -= velocity;
         // Cap the amount of force (to prevent strange launches)
         desire = Vector3.ClampMagnitude(desire, MAX_VECTOR_FORCE);
         // Reduce the amount of force if not hovering
         // Add the force
-        m_Hoverball.AddForce(desire, ForceMode.Acceleration);
+        hoverBall.AddForce(desire, ForceMode.Acceleration);
     }
 
     /// <summary>
@@ -151,8 +151,8 @@ public class TwirlPhysics : MobilePhysics {
     private void Flock()
     {
         // Get all units that are within a very small "sight" range.
-        convergeCount = Physics.OverlapSphereNonAlloc(transform.position, MAX_DISTANCE_FROM, convergeWith, m_Parent.ignoreAllButMobiles);
-        divergeCount = Physics.OverlapSphereNonAlloc(transform.position, MIN_DISTANCE_FROM, divergeWith, m_Parent.ignoreAllButMobiles);
+        convergeCount = Physics.OverlapSphereNonAlloc(transform.position, MAX_DISTANCE_FROM, convergeWith, parent.ignoreAllButMobiles);
+        divergeCount = Physics.OverlapSphereNonAlloc(transform.position, MIN_DISTANCE_FROM, divergeWith, parent.ignoreAllButMobiles);
 
         // Multiply the components of the convergent force by the components of
         // the divergent force and normalize the result.
@@ -162,8 +162,8 @@ public class TwirlPhysics : MobilePhysics {
         converge = Vector3.ClampMagnitude(converge * SPEED * CONVERGE_FACTOR, MAX_VECTOR_FORCE);
         diverge = Vector3.ClampMagnitude(diverge * SPEED * DIVERGE_FACTOR, MAX_VECTOR_FORCE);
 
-        m_Rigidbody.AddForce(converge, ForceMode.Acceleration);
-        m_Rigidbody.AddForce(diverge, ForceMode.Acceleration);
+        body.AddForce(converge, ForceMode.Acceleration);
+        body.AddForce(diverge, ForceMode.Acceleration);
     }
 
     /// <summary>
@@ -180,7 +180,7 @@ public class TwirlPhysics : MobilePhysics {
             result += goToward[x].GetComponent<Rigidbody>().velocity;
         }
         result.y = 0;
-        return (m_Parent.transform.position - result);
+        return (parent.transform.position - result);
     }
 
     /// <summary>
@@ -195,7 +195,7 @@ public class TwirlPhysics : MobilePhysics {
             result -= goAwayFrom[x].transform.position;
         }
         result.y = 0;
-        return (m_Parent.transform.position - result);
+        return (parent.transform.position - result);
     }
 
     /// <summary>

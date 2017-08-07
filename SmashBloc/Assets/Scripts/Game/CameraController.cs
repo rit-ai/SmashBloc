@@ -20,13 +20,14 @@ public class CameraController : MonoBehaviour, IObservable {
     public static KeyCode DESELECT_KEY;
 
     // Public fields
-    public KeyCode m_Pause;
-    public KeyCode m_PauseMenu;
+    public KeyCode pause;
+    public KeyCode escMenu;
+    public KeyCode deselect;
     // vv "Arrow Keys" vv
-    public KeyCode m_MoveCameraForward;
-    public KeyCode m_MoveCameraLeft;
-    public KeyCode m_MoveCameraBack;
-    public KeyCode m_MoveCameraRight;
+    public KeyCode moveForward;
+    public KeyCode moveLeft;
+    public KeyCode moveBack;
+    public KeyCode moveRight;
 
     // Private constants
     private readonly Vector3 DEFAULT_CAMERA_LOC = new Vector3(0f, 400f, 0f);
@@ -42,13 +43,13 @@ public class CameraController : MonoBehaviour, IObservable {
     private const float SPEED = 3f;
 
     // Private fields
-    private Camera m_Camera;
-    private Transform m_CameraRig;
-    private List<IObserver> m_Observers;
-    private List<MobileUnit> m_SelectedUnits;
-    private State m_CurrentState;
-    private Vector3 m_MousePos;
-    private Rect m_ScreenBorderInverse;
+    private Camera cam;
+    private Transform camRig;
+    private List<IObserver> observers;
+    private List<MobileUnit> selectedUnits;
+    private State state;
+    private Vector3 mousePos;
+    private Rect screenBorderInverse;
 
     private Vector3 direction;
     private bool arrowMoving = false;
@@ -56,27 +57,24 @@ public class CameraController : MonoBehaviour, IObservable {
     // These critical variables must be assigned before anything else
     private void Awake()
     {
-        m_Camera = Camera.main;
-        m_CameraRig = GameObject.FindGameObjectWithTag(CAMERA_RIG_TAG).transform;
+        cam = Camera.main;
+        camRig = GameObject.FindGameObjectWithTag(CAMERA_RIG_TAG).transform;
     }
 
     // Use this for initialization
     void Start () {
-        // Handle public constants
-        DESELECT_KEY = KeyCode.LeftShift; // TODO make custom binds
-
         // Handle private fields
-        m_Observers = new List<IObserver>
+        observers = new List<IObserver>
         {
             Toolbox.GameObserver,
             Toolbox.UIObserver
         };
-        m_SelectedUnits = new List<MobileUnit>();
+        selectedUnits = new List<MobileUnit>();
 
         // Rectangle that contains everything EXCEPT the screen border
-        m_ScreenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
+        screenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
 
-        m_CurrentState = new SelectedState(this);
+        state = new SelectedState(this);
     }
 
     /// <summary>
@@ -84,19 +82,19 @@ public class CameraController : MonoBehaviour, IObservable {
     /// </summary>
     void OnGUI()
     {
-        Rect rect = Utils.GetScreenRect(m_MousePos, Input.mousePosition);
+        Rect rect = Utils.GetScreenRect(mousePos, Input.mousePosition);
         Utils.DrawScreenRect(rect, BOX_INTERIOR_COLOR);
         Utils.DrawScreenRectBorder(rect, 2, BOX_BORDER_COLOR);
     }
 
     void Update () {
-        m_CurrentState.StateUpdate();
+        state.StateUpdate();
         CheckForInput();
     }
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
-        foreach (IObserver o in m_Observers)
+        foreach (IObserver o in observers)
         {
             o.OnNotify(this, invoke, data);
         }
@@ -112,7 +110,7 @@ public class CameraController : MonoBehaviour, IObservable {
     public void CenterCameraBehindPosition(Vector3 target)
     {
         // Reset camera to center of map
-        m_CameraRig.transform.position = DEFAULT_CAMERA_LOC;
+        camRig.transform.position = DEFAULT_CAMERA_LOC;
         // Get rotation looking away from target
         Quaternion rotation = Quaternion.LookRotation(-target);
         rotation.x = 0; rotation.z = 0; // We don't care about these values
@@ -123,7 +121,7 @@ public class CameraController : MonoBehaviour, IObservable {
         position *= CAMERA_BEHIND_OFFSET;
         position.y = DEFAULT_CAMERA_LOC.y; // ignore y component of dest
 
-        m_CameraRig.transform.SetPositionAndRotation(position, rotation);
+        camRig.transform.SetPositionAndRotation(position, rotation);
     }
 
     /// <summary>
@@ -143,11 +141,11 @@ public class CameraController : MonoBehaviour, IObservable {
     /// </summary>
     private void Scroll() { 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
-        float size = m_Camera.orthographicSize;
+        float size = cam.orthographicSize;
         size -= scroll * SCROLLSPEED;
         size = Mathf.Max(size, MIN_CAMERA_SIZE);
         size = Mathf.Min(size, MAX_CAMERA_SIZE);
-        m_Camera.orthographicSize = size;
+        cam.orthographicSize = size;
     }
 
     /// <summary>
@@ -158,25 +156,25 @@ public class CameraController : MonoBehaviour, IObservable {
         arrowMoving = false;
         direction = Vector3.zero;
 
-        if (Input.GetKey(m_MoveCameraForward))
+        if (Input.GetKey(moveForward))
         {
             direction += Vector3.forward;
             arrowMoving = true;
         }
 
-        if (Input.GetKey(m_MoveCameraLeft))
+        if (Input.GetKey(moveLeft))
         {
             direction += Vector3.left;
             arrowMoving = true;
         }
 
-        if (Input.GetKey(m_MoveCameraRight))
+        if (Input.GetKey(moveRight))
         {
             direction += Vector3.right;
             arrowMoving = true;
         }
 
-        if (Input.GetKey(m_MoveCameraBack))
+        if (Input.GetKey(moveBack))
         {
             direction += Vector3.back;
             arrowMoving = true;
@@ -197,9 +195,9 @@ public class CameraController : MonoBehaviour, IObservable {
         if (arrowMoving) { return; }
 
         // Is the mouse at the edge of the screen?
-        if (!m_ScreenBorderInverse.Contains(m_MousePos))
+        if (!screenBorderInverse.Contains(mousePos))
         {
-            direction = SCREEN_CENTER - m_MousePos;
+            direction = SCREEN_CENTER - mousePos;
             direction.x = -direction.x;
             direction.z = -direction.y;
             MoveCamera(direction);
@@ -217,7 +215,7 @@ public class CameraController : MonoBehaviour, IObservable {
         direction.y = 0f;
         direction.Normalize();
         direction *= SPEED;
-        m_CameraRig.transform.Translate(direction, Space.Self);
+        camRig.transform.Translate(direction, Space.Self);
     }
 
     /// <summary>
@@ -225,7 +223,7 @@ public class CameraController : MonoBehaviour, IObservable {
     /// </summary>
     private void Pause()
     {
-        if (Input.GetKeyDown(m_Pause))
+        if (Input.GetKeyDown(pause))
         {
             NotifyAll(Invocation.TOGGLE_PAUSE);
         }
@@ -236,7 +234,7 @@ public class CameraController : MonoBehaviour, IObservable {
     /// </summary>
     private void PauseMenu()
     {
-        if (Input.GetKeyDown(m_PauseMenu))
+        if (Input.GetKeyDown(escMenu))
         {
             NotifyAll(Invocation.PAUSE_AND_LOCK);
         }
@@ -248,7 +246,7 @@ public class CameraController : MonoBehaviour, IObservable {
     /// <param name="newPos"></param>
     private void StoreMousePos(Vector3 newPos)
     {
-        m_MousePos = newPos;
+        mousePos = newPos;
     }
 
     /// <summary>
@@ -304,7 +302,7 @@ public class CameraController : MonoBehaviour, IObservable {
                     if (hit.collider.CompareTag(RTS_Terrain.TERRAIN_TAG))
                     {
                         // Start drawing.
-                        m_CameraController.m_CurrentState = new DrawingState(m_CameraController);
+                        m_CameraController.state = new DrawingState(m_CameraController);
                         return;
                     }
 
@@ -334,7 +332,7 @@ public class CameraController : MonoBehaviour, IObservable {
         public DrawingState(CameraController controller)
         {
             m_CameraController = controller;
-            m_Camera = controller.m_Camera;
+            m_Camera = controller.cam;
         }
 
         /// <summary>
@@ -346,8 +344,8 @@ public class CameraController : MonoBehaviour, IObservable {
             // When mouse button is up, switch back to drawing state.
             if (Input.GetMouseButtonUp(0))
             {
-                m_CameraController.NotifyAll(Invocation.UNITS_SELECTED, m_CameraController.m_SelectedUnits);
-                m_CameraController.m_CurrentState = new SelectedState(m_CameraController);
+                m_CameraController.NotifyAll(Invocation.UNITS_SELECTED, m_CameraController.selectedUnits);
+                m_CameraController.state = new SelectedState(m_CameraController);
                 return;
             }
 
@@ -367,12 +365,12 @@ public class CameraController : MonoBehaviour, IObservable {
                 if (IsWithinSelectionBounds(s))
                 {
                     s.Highlight();
-                    m_CameraController.m_SelectedUnits.Add(s);
+                    m_CameraController.selectedUnits.Add(s);
                 }
                 else
                 {
                     s.RemoveHighlight();
-                    m_CameraController.m_SelectedUnits.Remove(s);
+                    m_CameraController.selectedUnits.Remove(s);
                 }
             }
         }
@@ -380,7 +378,7 @@ public class CameraController : MonoBehaviour, IObservable {
         // Checks to see if a given object is within the area being selected
         private bool IsWithinSelectionBounds(MobileUnit unit)
         {
-            Bounds viewportBounds = Utils.GetViewportBounds(m_Camera, m_CameraController.m_MousePos, Input.mousePosition);
+            Bounds viewportBounds = Utils.GetViewportBounds(m_Camera, m_CameraController.mousePos, Input.mousePosition);
             return viewportBounds.Contains(m_Camera.WorldToViewportPoint(unit.transform.position));
         }
     }

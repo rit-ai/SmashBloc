@@ -13,8 +13,8 @@ public class Twirl : MobileUnit {
     public const int COST = 50;
 
     // Public fields
-    public Rigidbody m_Hoverball;
-    public Rigidbody m_BottomWeight;
+    public Rigidbody hoverBall;
+    public Rigidbody bottomWeight;
 
     // Private constants
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;

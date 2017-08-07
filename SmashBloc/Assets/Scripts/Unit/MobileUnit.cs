@@ -44,8 +44,8 @@ public abstract class MobileUnit : Unit
 
     public override void Deactivate()
     {
-        base.Deactivate();
         team.mobiles.Remove(this);
+        base.Deactivate();
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ public abstract class MobileUnit : Unit
     /// </summary>
     protected override void OnDeath(Unit killer)
     {
-        StartCoroutine(DeathAnimation());
+        if (gameObject.activeSelf) { StartCoroutine(DeathAnimation()); }
     }
 
     /// <summary>
@@ -122,13 +122,13 @@ public abstract class MobileUnit : Unit
     /// </summary>
     protected virtual IEnumerator DeathAnimation()
     {
-        Color fadeOut = m_Surface.material.color;
+        Color fadeOut = surface.material.color;
 
         GetComponent<Rigidbody>().mass *= 100;
         for (float x = 1; x > 0; x -= 0.01f)
         {
             fadeOut.a = x;
-            m_Surface.material.color = fadeOut;
+            surface.material.color = fadeOut;
             yield return 0f;
         }
     }

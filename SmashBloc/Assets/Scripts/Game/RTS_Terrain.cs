@@ -19,11 +19,11 @@ public class RTS_Terrain : MonoBehaviour, IObservable
     public LayerMask ignoreAllButTerrain;
 
     // Private fields
-    private List<IObserver> m_Observers;
+    private List<IObserver> observers;
 
     public void Start()
     {
-        m_Observers = new List<IObserver>
+        observers = new List<IObserver>
         {
             Toolbox.GameObserver,
             Toolbox.UIObserver
@@ -32,7 +32,7 @@ public class RTS_Terrain : MonoBehaviour, IObservable
 
     public void NotifyAll(Invocation invocation, params object[] data)
     {
-        foreach (IObserver o in m_Observers)
+        foreach (IObserver o in observers)
         {
             o.OnNotify(this, invocation, data);
         }
@@ -53,7 +53,6 @@ public class RTS_Terrain : MonoBehaviour, IObservable
     /// </summary>
     public void OnRightMouseDown()
     {
-        Debug.Log("yes");
         NotifyAll(Invocation.TARGET_RING);
         NotifyAll(Invocation.DESTINATION_SET);
     }

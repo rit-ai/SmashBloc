@@ -21,7 +21,10 @@ public class GameSetup : MonoBehaviour {
     private List<Player> players;
     private bool locked; // Are the controls locked?
 
-    private void Awake()
+    /// <summary>
+    /// This should be called by Toolbox at the start of the level.
+    /// </summary>
+    public void Init()
     {
         // Make sure that there is at least one team (for stability)
         players = new List<Player>();

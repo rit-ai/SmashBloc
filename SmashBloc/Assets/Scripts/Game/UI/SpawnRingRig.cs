@@ -12,6 +12,15 @@ public class SpawnRingRig : MonoBehaviour {
     [Tooltip("The rate at which the spawn ring rotates around a City.")]
     public float spinRate;
 
+    /// <summary>
+    /// Updates the color of the rings, usually for when a city is captured.
+    /// </summary>
+    public void UpdateColor(Color color)
+    {
+        outerRing.GetComponent<MeshRenderer>().material.color = color;
+        innerRing.GetComponent<MeshRenderer>().material.color = color;
+    }
+
 	void Start () {
         StartCoroutine(Utils.AnimateHover(outerRing, hoverHeight));
         StartCoroutine(Utils.AnimateHover(innerRing, hoverHeight / 2f, 0.5f));

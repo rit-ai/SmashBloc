@@ -40,33 +40,40 @@ public class UIObserver : MonoBehaviour, IObserver {
             case Invocation.GAME_STARTING:
                 StartCoroutine(manager.AnimateText(START_GAME_TEXT));
                 break;
+
             // Plays the ending animation text
             case Invocation.GAME_ENDING:
                 StartCoroutine(manager.AnimateText(END_GAME_TEXT));
                 break;
+
             // Opens the pause menu
             case Invocation.PAUSE_AND_LOCK:
                 manager.TogglePauseMenu();
                 goto case Invocation.TOGGLE_PAUSE;
+
             // Toggles the pause text
             case Invocation.TOGGLE_PAUSE:
                 manager.TogglePauseText();
                 break;
+
             // Display unit info
             case Invocation.UNIT_MENU:
                 Debug.Assert(entity is MobileUnit); // don't pass bad objects
                 manager.DisplayUnitInfo((MobileUnit)entity);
                 break;
+
             // Display city info
             case Invocation.CITY_MENU:
                 Debug.Assert(entity is City); // don't pass bad objects
                 manager.DisplayCityInfo((City)entity);
                 break;
+
             // Moves and renders the target ring
             case Invocation.TARGET_RING:
                 Debug.Assert(entity is RTS_Terrain);
                 manager.DisplayTargetRing((RTS_Terrain)entity);
                 break;
+
             // Hides all menus and selection elements
             case Invocation.CLOSE_ALL:
                 foreach (Unit u in Utils.AllUnits())

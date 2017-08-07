@@ -20,8 +20,8 @@ using UnityEngine.UI;
 public abstract class Unit : MonoBehaviour, IObservable {
 
     // public fields
-    public MeshRenderer m_HighlightInner;
-    public MeshRenderer m_HighlightOuter;
+    public MeshRenderer highlightInner;
+    public MeshRenderer highlightOuter;
 
     // protected fields related to unit management
     protected List<IObserver> observers;
@@ -41,7 +41,7 @@ public abstract class Unit : MonoBehaviour, IObservable {
     protected Collider collision;
 
     // protected fields related to graphics
-    protected MeshRenderer m_Surface;
+    protected MeshRenderer surface;
 
     // protected fields related to behavior
     protected Team team;
@@ -75,12 +75,13 @@ public abstract class Unit : MonoBehaviour, IObservable {
     {
         health = maxHealth;
         unitName = Identity();
-        m_Surface = GetComponent<MeshRenderer>();
-        m_Surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
+        surface = GetComponent<MeshRenderer>();
+        surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
     }
 
     public virtual void Deactivate()
     {
+        RemoveHighlight();
         gameObject.SetActive(false);
     }
 
@@ -89,8 +90,8 @@ public abstract class Unit : MonoBehaviour, IObservable {
     /// </summary>
     public void Highlight()
     {
-        m_HighlightInner.enabled = true;
-        m_HighlightOuter.enabled = true;
+        highlightInner.enabled = true;
+        highlightOuter.enabled = true;
     }
 
     /// <summary>
@@ -98,8 +99,8 @@ public abstract class Unit : MonoBehaviour, IObservable {
     /// </summary>
     public void RemoveHighlight()
     {
-        m_HighlightInner.enabled = false;
-        m_HighlightOuter.enabled = false;
+        highlightInner.enabled = false;
+        highlightOuter.enabled = false;
     }
 
     /// <summary>
@@ -119,7 +120,7 @@ public abstract class Unit : MonoBehaviour, IObservable {
     {
 
         health += change;
-        m_Surface.material.color = Color.Lerp(Color.black, team.color, health / MaxHealth);
+        surface.material.color = Color.Lerp(Color.black, team.color, health / MaxHealth);
         if (health <= 0) { OnDeath(source); }
     }
 

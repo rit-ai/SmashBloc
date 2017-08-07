@@ -45,15 +45,18 @@ public class GameObserver : MonoBehaviour, IObserver {
             case Invocation.TOGGLE_PAUSE:
                 manager.TogglePause();
                 break;
+
             // Reset the game
             case Invocation.RESET_GAME:
                 manager.ResetGame();
                 break;
+
             // Store selected units (just one)
             case Invocation.ONE_SELECTED:
                 Debug.Assert(entity is MobileUnit);
                 selectedUnits = new List<MobileUnit> { entity as MobileUnit };
                 break;
+
             // Store selected units (many)
             case Invocation.UNITS_SELECTED:
                 Debug.Assert(data != null);
@@ -61,15 +64,18 @@ public class GameObserver : MonoBehaviour, IObserver {
                 selectedUnits = data[0] as List<MobileUnit>;
                 Debug.Assert(selectedUnits != null);
                 break;
+
             // Clear stored units
             case Invocation.UNITS_DESELECTED:
                 selectedUnits.Clear();
                 break;
+
             // Set new destination based on mouse position over terrain
             case Invocation.DESTINATION_SET:
                 Debug.Assert(entity is RTS_Terrain);
                 manager.SetNewDestination(selectedUnits, (RTS_Terrain)entity);
                 break;
+
             case Invocation.CITY_CAPTURED:
                 Debug.Assert(entity is City);
                 Debug.Assert(data != null);

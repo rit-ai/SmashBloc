@@ -25,29 +25,29 @@ public class UIManager : MonoBehaviour, IObservable {
 
     // Public fields
     // GENERAL
-    public Camera m_Camera;
-    public Canvas m_PauseText;
+    public Camera cam;
+    public Canvas pauseText;
     // MENU
-    public Canvas m_PauseMenu;
-    public Button m_ResetButton;
+    public Canvas pauseMenu;
+    public Button resetButton;
     // HEADER
-    public Dropdown m_UnitSelect;
-    public Text m_CurrentGoldAmount;
-    public Text m_CurrentUnitAmount;
+    public Dropdown unitSelect;
+    public Text currentGoldAmount;
+    public Text currentUnitAmount;
     // STARTING AND ENDING GAME
-    public Text m_Message;
+    public Text message;
     // UNIT MENU
-    public Canvas m_UnitMenu;
-    public InputField m_UnitMenuNameInput;
-    public Slider m_UnitMenuHealth;
+    public Canvas unitMenu;
+    public InputField unitMenuName;
+    public Slider unitMenuHealth;
     // CITY MENU
-    public Canvas m_CityMenu;
-    public InputField m_CityMenuNameInput;
-    public Slider m_CityMenuHealth;
-    public Slider m_CityMenuIncome;
-    public Button m_CityMenuSpawnButton;
+    public Canvas cityMenu;
+    public InputField cityMenuName;
+    public Slider cityMenuHealth;
+    public Slider cityMenuIncome;
+    public Button cityMenuSpawn;
     // MISC UI
-    public TargetRing m_TargetRing;
+    public TargetRing targetRing;
 
     // Private fields
     private List<IObserver> observers;
@@ -69,8 +69,8 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void TogglePauseMenu()
     {
-        m_PauseMenu.enabled = !(m_PauseMenu.enabled);
-        m_PauseMenu.transform.SetAsLastSibling();
+        pauseMenu.enabled = !(pauseMenu.enabled);
+        pauseMenu.transform.SetAsLastSibling();
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void TogglePauseText()
     {
-        m_PauseText.enabled = !(m_PauseText.enabled);
+        pauseText.enabled = !(pauseText.enabled);
     }
 
     /// <summary>
@@ -88,7 +88,7 @@ public class UIManager : MonoBehaviour, IObservable {
     public void SetUnitToSpawn()
     {
         string toSpawn;
-        switch (m_UnitSelect.value)
+        switch (unitSelect.value)
         {
             case 0:
                 toSpawn = Twirl.IDENTITY;
@@ -97,7 +97,9 @@ public class UIManager : MonoBehaviour, IObservable {
                 toSpawn = Boomy.IDENTITY;
                 break;
         }
+
         Toolbox.PLAYER.SetUnitToSpawn(toSpawn);
+
     }
 
     /// <summary>
@@ -127,19 +129,19 @@ public class UIManager : MonoBehaviour, IObservable {
         //int cost = unitCurrentlyDisplayed.Cost;
 
         // Set position to wherever menus are supposed to appear
-        m_UnitMenu.transform.position = menuSpawnPos;
+        unitMenu.transform.position = menuSpawnPos;
 
         // Handle unit name input field
-        m_UnitMenuNameInput.enabled = unit.Team == Toolbox.PLAYER.Team;
-        m_UnitMenuNameInput.placeholder.GetComponent<Text>().text = unit.UnitName;
+        unitMenuName.enabled = unit.Team == Toolbox.PLAYER.Team;
+        unitMenuName.placeholder.GetComponent<Text>().text = unit.UnitName;
 
         // Handle health slider
-        m_UnitMenuHealth.maxValue = unit.MaxHealth;
-        m_UnitMenuHealth.value = unit.Health;
+        unitMenuHealth.maxValue = unit.MaxHealth;
+        unitMenuHealth.value = unit.Health;
 
         // Once processing is finished, bring to front and enable display
-        m_UnitMenu.transform.SetAsLastSibling();
-        m_UnitMenu.enabled = true;
+        unitMenu.transform.SetAsLastSibling();
+        unitMenu.enabled = true;
     }
 
     /// <summary>
@@ -157,24 +159,24 @@ public class UIManager : MonoBehaviour, IObservable {
         cityCurrentlyDisplayed = city;
 
         // Set position to wherever menus are supposed to appear
-        m_CityMenu.transform.position = menuSpawnPos;
+        cityMenu.transform.position = menuSpawnPos;
 
         // Handle city name input field
-        m_CityMenuNameInput.enabled = city.Team == Toolbox.PLAYER.Team;
-        m_CityMenuNameInput.placeholder.GetComponent<Text>().text = city.UnitName;
+        cityMenuName.enabled = city.Team == Toolbox.PLAYER.Team;
+        cityMenuName.placeholder.GetComponent<Text>().text = city.UnitName;
 
         // Handle spawn button
-        m_CityMenuSpawnButton.enabled = city.Team == Toolbox.PLAYER.Team;
+        cityMenuSpawn.enabled = city.Team == Toolbox.PLAYER.Team;
 
         // Handle sliders
-        m_CityMenuHealth.maxValue = City.MAX_HEALTH;
-        m_CityMenuHealth.value = city.Health;
-        m_CityMenuIncome.maxValue = City.MAX_INCOME_LEVEL;
-        m_CityMenuIncome.value = city.IncomeLevel;
+        cityMenuHealth.maxValue = City.MAX_HEALTH;
+        cityMenuHealth.value = city.Health;
+        cityMenuIncome.maxValue = City.MAX_INCOME_LEVEL;
+        cityMenuIncome.value = city.IncomeLevel;
 
         // Once processing is finished, bring to front and enable display
-        m_CityMenu.transform.SetAsLastSibling();
-        m_CityMenu.enabled = true;
+        cityMenu.transform.SetAsLastSibling();
+        cityMenu.enabled = true;
     }
 
     /// <summary>
@@ -183,10 +185,10 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void UpdateUnitMenu()
     {
-        if (!m_UnitMenu.enabled) { return; }
+        if (!unitMenu.enabled) { return; }
 
         // Handle health slider
-        m_UnitMenuHealth.value = unitCurrentlyDisplayed.Health;
+        unitMenuHealth.value = unitCurrentlyDisplayed.Health;
     }
 
     /// <summary>
@@ -197,32 +199,32 @@ public class UIManager : MonoBehaviour, IObservable {
     public IEnumerator AnimateText(string text)
     {
         // Don't animate if we're already animating something
-        if (m_Message.enabled) { yield break; }
+        if (message.enabled) { yield break; }
 
         const int FRAMES_TO_LINGER = 60;
         const float MOVE_DISTANCE_SMALL = 30f;
         const float MIN_DISTANCE_SQR = 30000f;
         Color textColor = new Color(1f, 1f, 1f, 0f); // white, but invisible
-        Vector3 textPosition = m_Message.transform.position;
+        Vector3 textPosition = message.transform.position;
         Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2);
         float MOVE_DISTANCE_LARGE = Screen.width / 2;
         textPosition.x = 0;
 
         yield return null;
 
-        m_Message.text = text;
-        m_Message.color = textColor;
-        m_Message.transform.position = textPosition;
-        m_Message.enabled = true;
+        message.text = text;
+        message.color = textColor;
+        message.transform.position = textPosition;
+        message.enabled = true;
 
         // Until the text is near the center of the screen, move it to the 
         // right and raise the alpha
-        while ((m_Message.transform.position - screenCenter).sqrMagnitude > MIN_DISTANCE_SQR)
+        while ((message.transform.position - screenCenter).sqrMagnitude > MIN_DISTANCE_SQR)
         {
             textColor.a += 4.5f * Time.deltaTime;
             textPosition.x += MOVE_DISTANCE_LARGE * Time.deltaTime;
-            m_Message.color = textColor;
-            m_Message.transform.position = textPosition;
+            message.color = textColor;
+            message.transform.position = textPosition;
             yield return null;
         }
 
@@ -230,21 +232,21 @@ public class UIManager : MonoBehaviour, IObservable {
         for (int x = 0; x < FRAMES_TO_LINGER; x++)
         {
             textPosition.x += MOVE_DISTANCE_SMALL * Time.deltaTime;
-            m_Message.transform.position = textPosition;
+            message.transform.position = textPosition;
             yield return null;
         }
 
         // Until text is offscreen, move to the right and fade out
-        while (m_Message.transform.position.x < Screen.width * 1.5)
+        while (message.transform.position.x < Screen.width * 1.5)
         {
             textColor.a -= 4.5f * Time.deltaTime;
             textPosition.x += MOVE_DISTANCE_LARGE * Time.deltaTime;
-            m_Message.color = textColor;
-            m_Message.transform.position = textPosition;
+            message.color = textColor;
+            message.transform.position = textPosition;
             yield return null;
         }
 
-        m_Message.enabled = false;
+        message.enabled = false;
         NotifyAll(Invocation.ANIMATION_FINISHED);
     }
 
@@ -253,13 +255,13 @@ public class UIManager : MonoBehaviour, IObservable {
     {
         // Set UI handlers
         // Handlers for changing a dropdown value
-        m_UnitSelect.onValueChanged.AddListener(delegate { SetUnitToSpawn(); });
+        unitSelect.onValueChanged.AddListener(delegate { SetUnitToSpawn(); });
         // Handlers for finishing changing a name field
-        m_UnitMenuNameInput.onEndEdit.AddListener(delegate { UpdateUnitName(); });
-        m_UnitMenuNameInput.onEndEdit.AddListener(delegate { UpdateCityName(); });
+        unitMenuName.onEndEdit.AddListener(delegate { UpdateUnitName(); });
+        unitMenuName.onEndEdit.AddListener(delegate { UpdateCityName(); });
         // Handlers for pressing a button on a menu
-        m_CityMenuSpawnButton.onClick.AddListener(delegate { SpawnUnit(); });
-        m_ResetButton.onClick.AddListener(delegate { ResetButtonPressed(); });
+        cityMenuSpawn.onClick.AddListener(delegate { SpawnUnit(); });
+        resetButton.onClick.AddListener(delegate { ResetButtonPressed(); });
     }
 
     // Initialize whenever this object loads
@@ -274,10 +276,10 @@ public class UIManager : MonoBehaviour, IObservable {
         CloseAll();
 
         // Instantiate misc UI
-        m_TargetRing = Instantiate(m_TargetRing);
+        targetRing = Instantiate(targetRing);
 
         // Handle private fields
-        menuSpawnPos = m_UnitMenu.transform.position;
+        menuSpawnPos = unitMenu.transform.position;
 
         // Initialization
         SetUnitToSpawn();
@@ -311,11 +313,11 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     private void UpdateCityMenu()
     {
-        if (!m_CityMenu.enabled) { return; }
+        if (!cityMenu.enabled) { return; }
 
         // Handle sliders
-        m_CityMenuHealth.value = cityCurrentlyDisplayed.Health;
-        m_CityMenuIncome.value = cityCurrentlyDisplayed.IncomeLevel;
+        cityMenuHealth.value = cityCurrentlyDisplayed.Health;
+        cityMenuIncome.value = cityCurrentlyDisplayed.IncomeLevel;
     }
 
     /// <summary>
@@ -323,7 +325,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void UpdateUnitName()
     {
-        unitCurrentlyDisplayed.SetCustomName(m_UnitMenuNameInput.text);
+        unitCurrentlyDisplayed.SetCustomName(unitMenuName.text);
     }
 
     /// <summary>
@@ -331,7 +333,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void UpdateCityName()
     {
-        cityCurrentlyDisplayed.SetCustomName(m_CityMenuNameInput.text);
+        cityCurrentlyDisplayed.SetCustomName(cityMenuName.text);
     }
 
     /// <summary>
@@ -341,12 +343,12 @@ public class UIManager : MonoBehaviour, IObservable {
     public void DisplayTargetRing(RTS_Terrain terrain)
     {
         RaycastHit hit;
-        Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrain.ignoreAllButTerrain))
         {
             // TODO prevent target ring from sinking into the ground
-            m_TargetRing.transform.position = new Vector3(hit.point.x, hit.point.y + 3f, hit.point.z);
-            m_TargetRing.gameObject.SetActive(true);
+            targetRing.transform.position = new Vector3(hit.point.x, hit.point.y + 3f, hit.point.z);
+            targetRing.gameObject.SetActive(true);
         }
     }
 
@@ -355,7 +357,7 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void HideTargetRing()
     {
-        m_TargetRing.gameObject.SetActive(false);
+        targetRing.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -363,12 +365,12 @@ public class UIManager : MonoBehaviour, IObservable {
     /// </summary>
     public void CloseAll()
     {
-        m_TargetRing.gameObject.SetActive(false);
-        m_PauseText.enabled = false;
-        m_PauseMenu.enabled = false;
-        m_UnitMenu.enabled = false;
-        m_CityMenu.enabled = false;
-        m_Message.enabled = false;
+        targetRing.gameObject.SetActive(false);
+        pauseText.enabled = false;
+        pauseMenu.enabled = false;
+        unitMenu.enabled = false;
+        cityMenu.enabled = false;
+        message.enabled = false;
     }
 
     /// <summary>
@@ -390,7 +392,7 @@ public class UIManager : MonoBehaviour, IObservable {
     {
         int gold = Toolbox.PLAYER.Gold;
         string goldText = gold.ToString();
-        m_CurrentGoldAmount.text = goldText;
+        currentGoldAmount.text = goldText;
     }
 
     /// <summary>
@@ -400,7 +402,7 @@ public class UIManager : MonoBehaviour, IObservable {
     {
         int units = Toolbox.PLAYER.Team.mobiles.Count;
         string unitText = units.ToString();
-        m_CurrentUnitAmount.text = unitText;
+        currentUnitAmount.text = unitText;
     }
 
 

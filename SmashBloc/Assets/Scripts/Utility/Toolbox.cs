@@ -105,6 +105,7 @@ public sealed class Toolbox : Singleton<Toolbox> {
     {
         // First came the Game...
         gameSetup = GetComponent<GameSetup>();
+        gameSetup.Init();
         if (gameSetup.Locked)
         {
             // If the game is locked, make a dummy player & team
@@ -148,7 +149,6 @@ public sealed class Toolbox : Singleton<Toolbox> {
         Debug.Assert(uiManager);
         Debug.Assert(uiObserver);
         Debug.Assert(gameObserver);
-        
         // Toolbox.
     }
 
