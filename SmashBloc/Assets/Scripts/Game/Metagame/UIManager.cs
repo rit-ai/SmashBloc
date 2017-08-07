@@ -32,6 +32,7 @@ public class UIManager : MonoBehaviour, IObservable {
     public Button m_ResetButton;
     public Button m_OptionsButton;
     public Toggle m_OptionsMenuDevModeToggle;
+    public Button m_DevMenuButton;
     // HEADER
     public Dropdown m_UnitSelect;
     public Text m_CurrentGoldAmount;
@@ -317,7 +318,13 @@ public class UIManager : MonoBehaviour, IObservable {
 
         // Initialization
         SetUnitToSpawn();
-	}
+        m_OptionsMenuDevModeToggle.onValueChanged.AddListener((e) =>
+        {
+            DevToggleListener(e);
+        });
+        m_DevMenuButton.gameObject.SetActive(false);
+
+    }
 
     /// <summary>
     /// Update the UI display.
@@ -427,6 +434,16 @@ private void UpdateCityMenu()
         Vector3 newMousePos = Input.mousePosition;
         Vector3 relativePos = newMousePos - oldMousePos;
         menu.transform.position += relativePos;
+    }
+
+    /// <summary>
+    /// Enables or disables the DevMenuButton
+    /// </summary>
+    /// /// <param name="isOn">boolean value that determines if the button 
+    /// should be visible</param>
+    private void DevToggleListener(bool isOn)
+    {
+        m_DevMenuButton.gameObject.SetActive(isOn);
     }
 
     /// <summary>
