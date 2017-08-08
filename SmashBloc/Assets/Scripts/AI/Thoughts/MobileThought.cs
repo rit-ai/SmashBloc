@@ -10,9 +10,23 @@ using UnityEngine;
  * **/
 public abstract class MobileThought : IThought {
 
+    // **         //
+    // * FIELDS * //
+    //         ** //
+
+    /// <summary>
+    /// A MobileThought will always manipulate a MobileUnit object.
+    /// </summary>
     protected MobileUnit body;
 
-    public MobileUnit Body { set { body = value; } }
+    // **          //
+    // * METHODS * //
+    //          ** // 
 
+    /// <summary>
+    /// See IThought.
+    /// </summary>
     public abstract void Act();
+
+    public MobileUnit Body { set { body = value; } }
 }

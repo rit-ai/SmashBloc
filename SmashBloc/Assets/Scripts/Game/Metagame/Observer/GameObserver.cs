@@ -15,20 +15,18 @@ using Microsoft;
  * since they both communicate through GameObserver instead of directly 
  * referencing one another.
  * **/
-public class GameObserver : MonoBehaviour, IObserver {
-    // Private fields
-    // static because there are multiple GameObservers
+public class GameObserver : MonoBehaviour, IObserver
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
+
     private static List<MobileUnit> selectedUnits;
     private static GameManager manager;
 
-    /// <summary>
-    /// Find the Game Manager and store a reference to it.
-    /// </summary>
-    private void Awake()
-    {
-        manager = Toolbox.GameManager;
-        selectedUnits = new List<MobileUnit>(); // error-proofing
-    }
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     /// <summary>
     /// Determines the type of action to perform, based on the invocation.
@@ -75,7 +73,8 @@ public class GameObserver : MonoBehaviour, IObserver {
                 Debug.Assert(entity is RTS_Terrain);
                 manager.SetNewDestination(selectedUnits, (RTS_Terrain)entity);
                 break;
-
+            
+            // Transfer a city when it's captured
             case Invocation.CITY_CAPTURED:
                 Debug.Assert(entity is City);
                 Debug.Assert(data != null);
@@ -83,8 +82,18 @@ public class GameObserver : MonoBehaviour, IObserver {
                 Debug.Assert(data[0] is Team);
                 manager.TransferCity(entity as City, data[0] as Team);
                 break;
+
             // Invocation not found? Must be for someone else. Ignore.
         }
+    }
+
+    /// <summary>
+    /// Find the Game Manager and store a reference to it.
+    /// </summary>
+    private void Start()
+    {
+        manager = Toolbox.GameManager;
+        selectedUnits = new List<MobileUnit>(); // error-proofing
     }
 
 }

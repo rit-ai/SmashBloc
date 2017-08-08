@@ -19,7 +19,7 @@ public class TwirlPhysics : MobilePhysics {
     private const float MAX_DISTANCE_FROM = 400f; // "sight range"
     private const float MIN_DISTANCE_FROM = 100f;
     // Height above ground at which float force is applied
-    private const float MAX_FLOAT_THRESHOLD = 20f;
+    private const float MAX_FLOAT_THRESHOLD = 12f;
     // Distance from destination at which deceleration begins (squared)
     private const float DECELERATION_THRESHOLD_SQRD = 15000f;
     private const float UP_FORCE = 100f;
@@ -119,12 +119,15 @@ public class TwirlPhysics : MobilePhysics {
     /// </summary>
     private void Guide()
     {
-        // Get the vector representing the desired trajectory
-        Vector3 desire = parent.Destination - parent.transform.position;
+        // Get the vector representing the desired trajectory. The Y component
+        // of this vector will always be the target hover height.
+        Vector3 desire = new Vector3(
+                parent.Destination.x - parent.transform.position.x,
+                MAX_FLOAT_THRESHOLD - parent.transform.position.y,
+                parent.Destination.z - parent.transform.position.z
+            );
         // Store the magnitude for later use
         float desireMagnitude = desire.sqrMagnitude;
-        // Get rid of the Y factor so that the hover stays the same
-        desire.y = 0;
         // Normalize and adjust the vector to use max speed by default
         desire = desire.normalized * SPEED * GUIDANCE_FACTOR;
         // Lower that speed depending on its distance from the destination

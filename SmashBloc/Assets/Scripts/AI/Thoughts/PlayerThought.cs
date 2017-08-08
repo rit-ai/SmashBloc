@@ -10,10 +10,24 @@ using UnityEngine;
  * **/
 public abstract class PlayerThought : IThought{
 
+    // **         //
+    // * FIELDS * //
+    //         ** //
+
+    /// <summary>
+    /// A PlayerThought will always manipulate a body of type Player.
+    /// </summary>
     protected Player body;
 
-    public Player Body { set { body = value; } }
+    // **          //
+    // * METHODS * //
+    //          ** // 
 
+    /// <summary>
+    /// See IThought.
+    /// </summary>
     public abstract void Act();
+
+    public Player Body { set { body = value; } }
 
 }

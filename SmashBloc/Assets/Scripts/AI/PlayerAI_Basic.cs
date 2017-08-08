@@ -27,8 +27,6 @@ public sealed class PlayerAI_Basic : PlayerAI {
     /// </summary>
     protected override IThought Think()
     {
-        if (info == null) { }
-
         if (target == null && info.team.enemies.Count > 0)
         {
             target = info.team.enemies[0].cities[0];
@@ -44,7 +42,7 @@ public sealed class PlayerAI_Basic : PlayerAI {
 
         cooldown--;
         if (info.team.cities.Count > 0)
-            return new SpawnUnit(Twirl.IDENTITY, info.team.cities[0]);
+            return new SpawnMobile(Twirl.IDENTITY, info.team.cities[0]);
 
         return null;
     }

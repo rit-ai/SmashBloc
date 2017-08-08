@@ -2,7 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnRingRig : MonoBehaviour {
+/*
+ * @author Paul Galatic
+ * 
+ * This script controls the ring that hovers around City units, consequently 
+ * moving the location where Mobiles spawn.
+ * **/
+public class SpawnRingRig : MonoBehaviour
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
     public Transform outerRing;
     public Transform innerRing;
@@ -11,6 +21,10 @@ public class SpawnRingRig : MonoBehaviour {
     public float hoverHeight;
     [Tooltip("The rate at which the spawn ring rotates around a City.")]
     public float spinRate;
+
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     /// <summary>
     /// Updates the color of the rings, usually for when a city is captured.

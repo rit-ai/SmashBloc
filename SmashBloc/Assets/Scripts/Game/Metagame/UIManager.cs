@@ -4,26 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-/**
+/*
  * @author Paul Galatic
  * 
  * Class designed to handle any UI-specific information that shows up on the
  * main overlay. Should **avoid** logic on what to display or what to pass
  * along if possible.
- */
-public class UIManager : MonoBehaviour, IObservable {
+ * **/
+public class UIManager : MonoBehaviour, IObservable
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
-    // Public constants
     public const string ATTACHED_TO = "Overlay";
 
-    // Private constants
-    private const string CAMERA_NAME = "Main Camera";
-    private const string SPAWNUNITBUTTON_NAME = "SpawnUnitButton";
-    private const string GOLDAMOUNTTEXT_NAME = "GoldAmountText";
-    private const string PLAYER_NAME = "Player";
-    private const float WAIT_TIME = 1f;
-
-    // Public fields
     // GENERAL
     public Camera cam;
     public Canvas pauseText;
@@ -49,12 +44,21 @@ public class UIManager : MonoBehaviour, IObservable {
     // MISC UI
     public TargetRing targetRing;
 
-    // Private fields
+    private const string CAMERA_NAME = "Main Camera";
+    private const string SPAWNUNITBUTTON_NAME = "SpawnUnitButton";
+    private const string GOLDAMOUNTTEXT_NAME = "GoldAmountText";
+    private const string PLAYER_NAME = "Player";
+    private const float WAIT_TIME = 1f;
+
     private List<IObserver> observers;
     private Unit unitCurrentlyDisplayed;
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
     private Vector3 menuSpawnPos;
+
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
@@ -404,6 +408,4 @@ public class UIManager : MonoBehaviour, IObservable {
         string unitText = units.ToString();
         currentUnitAmount.text = unitText;
     }
-
-
 }
