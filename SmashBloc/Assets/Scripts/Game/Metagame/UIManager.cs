@@ -29,14 +29,15 @@ public class UIManager : MonoBehaviour, IObservable {
     public Canvas m_PauseText;
     // MENU
     public Canvas m_PauseMenu;
+    public Canvas m_DevMenu;
     public Button m_ResetButton;
     public Button m_OptionsButton;
     public Toggle m_OptionsMenuDevModeToggle;
-    public Button m_DevMenuButton;
     // HEADER
     public Dropdown m_UnitSelect;
     public Text m_CurrentGoldAmount;
     public Text m_CurrentUnitAmount;
+    public Button m_DevMenuButton;
     // STARTING AND ENDING GAME
     public Text m_Message;
     // UNIT MENU
@@ -297,6 +298,9 @@ public class UIManager : MonoBehaviour, IObservable {
         m_CityMenuSpawnButton.onClick.AddListener(delegate { SpawnUnit(); });
         m_ResetButton.onClick.AddListener(delegate { ResetButtonPressed(); });
         m_OptionsButton.onClick.AddListener(delegate { OptionsButtonPressed(); });
+        m_DevMenuButton.onClick.AddListener(delegate { DevButtonPressed(); });
+        //Handlers for pressing a toggle
+        m_OptionsMenuDevModeToggle.onValueChanged.AddListener((e) => { DevToggleListener(e); });
     }
 
     // Initialize whenever this object loads
@@ -318,10 +322,7 @@ public class UIManager : MonoBehaviour, IObservable {
 
         // Initialization
         SetUnitToSpawn();
-        m_OptionsMenuDevModeToggle.onValueChanged.AddListener((e) =>
-        {
-            DevToggleListener(e);
-        });
+        
         m_DevMenuButton.gameObject.SetActive(false);
 
     }
@@ -356,11 +357,19 @@ public class UIManager : MonoBehaviour, IObservable {
         ToggleOptionsMenu();
     }
 
-/// <summary>
-/// Updates the city menu based on the dynamic status of the city, if a
-/// city is being displayed.
-/// </summary>
-private void UpdateCityMenu()
+    /// <summary>
+    /// Causes the devmenu to show up
+    /// </summary>
+    private void DevButtonPressed()
+    {
+        m_DevMenu.enabled = !(m_DevMenu.enabled);
+    }
+
+    /// <summary>
+    /// Updates the city menu based on the dynamic status of the city, if a
+    /// city is being displayed.
+    /// </summary>
+    private void UpdateCityMenu()
     {
         if (!m_CityMenu.enabled) { return; }
 
@@ -418,6 +427,7 @@ private void UpdateCityMenu()
             m_TargetRing.gameObject.SetActive(false);
             m_PauseText.enabled = false;
             m_PauseMenu.enabled = false;
+            m_DevMenu.enabled = false;
             m_UnitMenu.enabled = false;
             m_CityMenu.enabled = false;
             m_Message.enabled = false;
