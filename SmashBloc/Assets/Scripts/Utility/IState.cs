@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface State {
+public interface IState {
 
     /// <summary>
     /// Handles any work that the implementer must do while in a particular 

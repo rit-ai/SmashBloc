@@ -7,30 +7,30 @@ using UnityEngine;
  * Class designed to handle all state encapsulated in a Player, such as name,
  * current number of units, current amount of gold, et cetera.
  */
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
 
-    // Public constants
+    // **         //
+    // * FIELDS * //
+    //         ** //
+
     public static string TEAM_1 = "Dylante";
     public static string TEAM_2 = "AI_Team";
 
-    // Private Constants
     private const float PASS_INFO_RATE = 1f;
     private const int MAX_UNITS = 100;
 
-    [HideInInspector]
-    public bool started = false;
-
-    // Private fields
-
-    // The AI that controls this Player, if any
     private PlayerAI brain;
-    // Misc state
     private PlayerInfo info;
     private Team team;
     private City toSpawnAt;
     private string toSpawn;
     private int toSpawnCost;
     private int goldAmount;
+
+    // **              //
+    // * CONSTRUCTOR * //
+    //              ** //
 
     /// <summary>
     /// Creates and returns a Player instance.
@@ -51,17 +51,15 @@ public class Player : MonoBehaviour {
         return player;
     }
 
-    /// <summary>
-    /// Initializing the Team first because other functionality relies on it.
-    /// This is bad code practice and should be fixed. FIXME.
-    /// </summary>
-    public virtual void Awake()
-    {
-        info = new PlayerInfo();
-    }
+    // **          //
+    // * METHODS * //
+    //          ** //
 
-    // Use this for initialization
-    public virtual void Activate () {
+    /// <summary>
+    /// Used for activating and deactivating players, usually at the start and 
+    /// end of a round.
+    /// </summary>
+    public void Activate () {
         gameObject.SetActive(true);
         if (brain != null)
         {
@@ -132,12 +130,35 @@ public class Player : MonoBehaviour {
             MobileUnit newUnit = Utils.IdentityToGameObject(toSpawn);
             newUnit.Team = team;
             newUnit.transform.position = toSpawnAt.SpawnPoint.transform.position;
-            newUnit.SetName(newUnit.UnitName + team.mobiles.Count.ToString());
             team.mobiles.Add(newUnit);
             newUnit.gameObject.SetActive(true);
             newUnit.Activate();
         }
     }
+
+    /// <summary>
+    /// Initialization.
+    /// </summary>
+    private void Start()
+    {
+        info = new PlayerInfo();
+    }
+
+    /// <summary>
+    /// Passes PlayerInfo to this Player's brain.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator PassInfo()
+    {
+        while (true)
+        {
+            info.team = team;
+            info.goldAmount = goldAmount;
+            brain.Info = info;
+            yield return new WaitForSeconds(PASS_INFO_RATE);
+        }
+    }
+
 
     /// <summary>
     /// Returns this player's team.
@@ -165,20 +186,4 @@ public class Player : MonoBehaviour {
         get { return goldAmount; }
         set { goldAmount = value; }
     }
-
-    /// <summary>
-    /// Passes PlayerInfo to this Player's brain.
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator PassInfo()
-    {
-        while (true)
-        {
-            info.team = team;
-            info.goldAmount = goldAmount;
-            brain.Info = info;
-            yield return new WaitForSeconds(PASS_INFO_RATE);
-        }
-    }
-
 }

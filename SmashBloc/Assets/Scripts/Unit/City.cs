@@ -12,16 +12,17 @@ using UnityEngine;
  * **/
 public class City : Unit
 {
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
-    // Public constants
+    public Transform spawnPoint;
+    public SpawnRingRig spawnRingRig;
+
     public const string IDENTITY = "CITY";
     public const float MAX_HEALTH = 500f;
     public const int MAX_INCOME_LEVEL = 8;
 
-    // Public fields
-    public Transform m_SpawnPoint;
-
-    // Private constants
     private const string DEFAULT_NAME = "Dylanto";
     // The health a city has just after it's captured
     private const float CAPTURED_HEALTH = 50f;
@@ -36,50 +37,12 @@ public class City : Unit
     private const int MIN_INCOME_LEVEL = 1;
     private const int DEFAULT_INCOME_LEVEL = 8;
 
-    // Private fields
-    private List<IObserver> m_Observers;
     private int incomeLevel;
     private bool delayRegen = true;
 
-    public override void Activate()
-    {
-        maxHealth = MAX_HEALTH;
-        // Default values
-        incomeLevel = DEFAULT_INCOME_LEVEL;
-
-        StartCoroutine(Regenerate());
-
-
-        base.Activate();
-
-    }
-
-    /// <summary>
-    /// Causes the city to lose health. 
-    /// </summary>
-    /// <param name="damage">The amount of damage to take.</param>
-    /// <param name="source">The source of the damage.</param>
-    public override void UpdateHealth(float damage, Unit source)
-    {
-        delayRegen = true;
-        base.UpdateHealth(damage, source);
-    }
-
-    /// <summary>
-    /// Returns the location at which to spawn units.
-    /// </summary>
-    public Transform SpawnPoint
-    {
-        get { return m_SpawnPoint; }
-    }
-
-    /// <summary>
-    /// Gets the Income Level of the city.
-    /// </summary>
-    public int IncomeLevel
-    {
-        get { return incomeLevel; }
-    }
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     /// <summary>
     /// Returns the class name of the unit in the form of a string.
@@ -98,6 +61,41 @@ public class City : Unit
     }
 
     /// <summary>
+    /// Activates the city.
+    /// </summary>
+    public override void Activate()
+    {
+        maxHealth = MAX_HEALTH;
+        // Default values
+        incomeLevel = DEFAULT_INCOME_LEVEL;
+
+        StartCoroutine(Regenerate());
+
+        base.Activate();
+    }
+
+    /// <summary>
+    /// Deactivates the city.
+    /// </summary>
+    public override void Deactivate()
+    {
+        base.Deactivate();
+        team.cities.Remove(this);
+        Toolbox.CityPool.Return(this);
+    }
+
+    /// <summary>
+    /// Causes the city to lose health. 
+    /// </summary>
+    /// <param name="damage">The amount of damage to take.</param>
+    /// <param name="source">The source of the damage.</param>
+    public override void UpdateHealth(float damage, Unit source)
+    {
+        delayRegen = true;
+        base.UpdateHealth(damage, source);
+    }
+
+    /// <summary>
     /// What to do when the unit collides with another unit that's not on the 
     /// same team.
     /// </summary>
@@ -109,7 +107,7 @@ public class City : Unit
         {
             Rigidbody body = collision.gameObject.GetComponent<Rigidbody>();
             // Add audiovisuals here
-            body.AddExplosionForce(BLOWBACK_FORCE, transform.position - body.transform.position, BLOWBACK_RADIUS);
+            body.AddExplosionForce(BLOWBACK_FORCE, transform.position - body.transform.position, BLOWBACK_RADIUS, BLOWBACK_FORCE, ForceMode.Acceleration);
             UpdateHealth(-UnityEngine.Random.Range(10f, 20f), unit);
         }
     }
@@ -123,9 +121,19 @@ public class City : Unit
     /// <param name="capturer">The capturer of the city.</param>
     protected override void OnDeath(Unit capturer)
     {
-        m_Surface.material.color = capturer.Team.color;
+        ChangeColor(capturer.Team.color);
         UpdateHealth(CAPTURED_HEALTH - health, capturer);
         NotifyAll(Invocation.CITY_CAPTURED, capturer.Team);
+    }
+
+    /// <summary>
+    /// Changes the city's color.
+    /// </summary>
+    /// <param name="color"></param>
+    private void ChangeColor(Color color)
+    {
+        surface.material.color = color;
+        spawnRingRig.UpdateColor(color);
     }
 
     /// <summary>
@@ -154,4 +162,21 @@ public class City : Unit
         Highlight();
         NotifyAll(Invocation.CITY_MENU);
     }
+
+    /// <summary>
+    /// Returns the location at which to spawn units.
+    /// </summary>
+    public Transform SpawnPoint
+    {
+        get { return spawnPoint; }
+    }
+
+    /// <summary>
+    /// Gets the Income Level of the city.
+    /// </summary>
+    public int IncomeLevel
+    {
+        get { return incomeLevel; }
+    }
+
 }

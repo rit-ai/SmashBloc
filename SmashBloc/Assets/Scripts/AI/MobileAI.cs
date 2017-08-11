@@ -38,8 +38,6 @@ public abstract class MobileAI : AbstractAI
 
         while (true)
         {
-            // Wait until info exists in case senses are delayed
-            if (info == null) { yield return new WaitForSeconds(SAMPLING_RATE); }
             // Use sensory info to determine a course of action
             thought = Think();
             // Beware of impure thoughts

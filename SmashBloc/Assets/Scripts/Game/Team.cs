@@ -8,14 +8,18 @@ using UnityEngine;
  * A struct that contains all relevant information denoting to which team a
  * unit or city belongs.
  * **/
-public class Team {
+public class Team
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
     // The name of the team.
     public readonly string title;
     // The color, or "uniform," of the team.
     public readonly Color color;
     // The Players that make up the team.
-    public readonly List<Player> members;
+    public List<Player> members;
     // The mobile units owned by the team.
     public List<MobileUnit> mobiles;
     // The cities owned by the team.
@@ -24,6 +28,11 @@ public class Team {
     public List<Team> enemies;
 
     private bool active = true;
+
+    // **              //
+    // * CONSTRUCTOR * //
+    //              ** //
+
     /// <summary>
     /// Constructs a new Team.
     /// </summary>
@@ -37,17 +46,13 @@ public class Team {
         enemies = new List<Team>();
     }
 
-    public Team(string title, Color color, List<Player> members, List<MobileUnit> mobiles, List<City> cities, List<Team> enemies)
-    {
-        this.title = title;
-        this.color = color;
-        this.members = members;
-        this.mobiles = mobiles;
-        this.cities = cities;
-        this.enemies = enemies;
-    }
+    // **          //
+    // * METHODS * //
+    //          ** //
 
-
+    /// <summary>
+    /// Activates the Team and "turns on" all of its members.
+    /// </summary>
     public void Activate()
     {
         foreach (Player p in members)
@@ -64,23 +69,19 @@ public class Team {
     /// </summary>
     public void Deactivate()
     {
-        foreach (MobileUnit m in mobiles)
+        // Using while loops because Deactivate iteratively shrinks the list
+        while (mobiles.Count > 0)
         {
-            m.ForceKill();
-            m.Deactivate();
-        };
-        foreach (City c in cities)
+            mobiles[0].Deactivate();
+        }
+        while (cities.Count > 0)
         {
-            c.gameObject.SetActive(false);
-            Toolbox.CityPool.Return(c);
+            cities[0].Deactivate();
         }
         foreach (Player p in members)
         {
             p.Deactivate();
         }
-
-        mobiles.Clear();
-        cities.Clear();
 
         active = false;
 
@@ -103,8 +104,7 @@ public class Team {
 
     public override bool Equals(object other) {
         if (!(other is Team)) { return false; }
-        Team another = (Team)other;
-        return (title == another.title) && (color == another.color);
+        return (title == ((Team)other).title) && (color == ((Team)other).color);
     }
 
     public override int GetHashCode()

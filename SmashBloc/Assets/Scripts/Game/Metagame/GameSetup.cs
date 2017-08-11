@@ -6,11 +6,16 @@ using UnityEngine;
  * @author Paul Galatic
  * 
  * Sets up a game, giving the designers more flexibility when setting up 
- * scenes. Designed to be attached to Toolbox, and provides state to 
- * GameManager, which initializes the game. This class is merely designed to 
- * establish basic state like Player and Team.
+ * scenes. This class is designed to be attached to Toolbox, as it provides 
+ * state to GameManager, which initializes the game. This class is merely 
+ * designed to coordinate the decisions of the designers and initialize some
+ * basic state.
  * **/
-public class GameSetup : MonoBehaviour {
+public class GameSetup : MonoBehaviour
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
     [Tooltip("Will this game have any human player?")]
     public bool hasPlayer;
@@ -21,7 +26,14 @@ public class GameSetup : MonoBehaviour {
     private List<Player> players;
     private bool locked; // Are the controls locked?
 
-    private void Awake()
+    // **          //
+    // * METHODS * //
+    //          ** //
+
+    /// <summary>
+    /// This should be called by Toolbox at the start of the level.
+    /// </summary>
+    public void Init()
     {
         // Make sure that there is at least one team (for stability)
         players = new List<Player>();

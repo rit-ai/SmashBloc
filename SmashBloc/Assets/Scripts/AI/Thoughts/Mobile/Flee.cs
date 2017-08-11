@@ -11,15 +11,32 @@ using UnityEngine;
  * **/
 public class FleeCommand : MobileThought
 {
+    // **         //
+    // * FIELDS * //
+    //         ** //
+
+    // The default distance to flee.
+    private const float DEFAULT_DISTANCE = 50f;
+
+    // The objects to run away from.
     private List<GameObject> fleeFrom;
+    // The distance to flee.
     private float distanceToFlee;
 
-    public FleeCommand(List<GameObject> fleeFrom, float distanceToFlee)
+    // **              //
+    // * CONSTRUCTOR * //
+    //              ** //
+
+    public FleeCommand(List<GameObject> fleeFrom, float distanceToFlee = DEFAULT_DISTANCE)
     {
         this.fleeFrom = fleeFrom;
         this.distanceToFlee = distanceToFlee;
     }
-    
+
+    // **          //
+    // * METHODS * //
+    //          ** //
+
     /// <summary>
     /// Calculates the direction to run away from and instructs the Body to 
     /// move toward that point.

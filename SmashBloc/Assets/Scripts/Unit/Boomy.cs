@@ -22,18 +22,17 @@ public class Boomy : MobileUnit {
 
     // Methods
     // Use this for initialization
-    protected new void Init () {
+    public override void Build () {
         // Handle constants
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
         // Handle default values
-        unitName = NAME;
         maxHealth = MAXHEALTH;
         damage = DAMAGE;
         attackRange = RANGE;
         // Handle fields
         health = MAXHEALTH;
-        base.Init();
+        base.Build();
     }
 
     /// <summary>

@@ -3,35 +3,42 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Twirl : MobileUnit {
-    // Author: Ben Fairlamb
-    // Author: Paul Galatic
-    // Purpose: Twirly!
+/*
+ * @author Ben Fairlamb
+ * @author Paul Galatic
+ * 
+ * The Twirl is the most basic unit of a Player's arsenal.
+ * **/
+public class Twirl : MobileUnit
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
-    // Public constants
     public const string IDENTITY = "Twirl";
     public const int COST = 50;
 
-    // Public fields
-    public Rigidbody m_Hoverball;
-    public Rigidbody m_BottomWeight;
+    public Rigidbody hoverBall;
+    public Rigidbody bottomWeight;
 
-    // Private constants
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
-    private const float ASCENSION_HEIGHT = 500f;
-    private const float ASCENSION_DURATION = 2f;
-    // Default values
+    private const float ASCENSION_HEIGHT = 800f;
+    private const float ASCENSION_DURATION = 20f;
     private const float DEST_DEVIATION_RADIUS = 50f;
     private const float MAXHEALTH = 100f;
     private const float DAMAGE = 10f;
     private const float SIGHT_RANGE = 500f;
     private const float RANGE = 50f;
 
-    // Methods
+    // **          //
+    // * METHODS * //
+    //          ** //
 
-    // Use this for initialization
-    public new void Init () {
+    /// <summary>
+    /// Used for one-time initialization.
+    /// </summary>
+    public override void Build () {
         // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
@@ -40,7 +47,7 @@ public class Twirl : MobileUnit {
         sightRange = SIGHT_RANGE;
         attackRange = RANGE;
 
-        base.Init();
+        base.Build();
     }
 
     /// <summary>
@@ -75,6 +82,12 @@ public class Twirl : MobileUnit {
         */
     }
 
+    public override void Deactivate()
+    {
+        base.Deactivate();
+        Toolbox.TwirlPool.Return(this);
+    }
+
     /// <summary>
     /// Returns identity of the unit, for disambiguation purposes.
     /// </summary>
@@ -92,29 +105,14 @@ public class Twirl : MobileUnit {
     }
 
     /// <summary>
-    /// In this animation, the Twirl unit sails into the air before being
-    /// destroyed. Particle effects are TODO.
+    /// Effects are TODO. This will likely take the form of an animation.
     /// </summary>
     protected override IEnumerator DeathAnimation()
     {
-        GetComponent<Rigidbody>().isKinematic = true;
-        Color fadeOut = m_Surface.material.color;
-        float dest = transform.position.y + ASCENSION_HEIGHT;
-        float ascension_rate = ASCENSION_HEIGHT / ASCENSION_DURATION;
-        while (transform.position.y < dest)
-        {
-            newPos = transform.position;
-            newPos.y += ascension_rate * Time.deltaTime;
-            transform.position = newPos;
-
-            fadeOut.a -= 3f;
-            m_Surface.material.color = fadeOut;
-            yield return 0f;
-        }
-
-        Toolbox.TwirlPool.Return(this);
+        Deactivate();
 
         yield return null;
     }
+
 
 }

@@ -14,89 +14,50 @@ using UnityEngine;
  * This lets the CameraController focus on its two key responsibilities: the
  * Camera, and the Controls.
  * **/
-public class CameraController : MonoBehaviour, IObservable {
+public class CameraController : MonoBehaviour, IObservable
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
-    // Public constants
-    public static KeyCode DESELECT_KEY;
-
-    // Public fields
-    public KeyCode m_Pause;
-    public KeyCode m_PauseMenu;
+    public KeyCode pause;
+    public KeyCode escMenu;
+    public KeyCode deselect;
     // vv "Arrow Keys" vv
-    public KeyCode m_MoveCameraForward;
-    public KeyCode m_MoveCameraLeft;
-    public KeyCode m_MoveCameraBack;
-    public KeyCode m_MoveCameraRight;
+    public KeyCode moveForward;
+    public KeyCode moveLeft;
+    public KeyCode moveBack;
+    public KeyCode moveRight;
 
-    // Private constants
-    private readonly Vector3 DEFAULT_CAMERA_LOC = new Vector3(0, 250, 0);
-    private readonly Vector3 SCREEN_CENTER = new Vector3(Screen.width / 2, Screen.height / 2, 0f);
+    private readonly Vector3 DEFAULT_CAMERA_LOC = new Vector3(0f, 400f, 0f);
     private readonly Color BOX_INTERIOR_COLOR = new Color(0.74f, 0.71f, 0.27f, 0.5f);
     private readonly Color BOX_BORDER_COLOR = new Color(0.35f, 0.35f, 0.13f);
     private const string CAMERA_RIG_TAG = "CameraRig";
-    private const float CAMERA_BEHIND_OFFSET = 500f;
+    private const float CAMERA_BEHIND_OFFSET = 700f;
     private const float MAX_CAMERA_SIZE = 300f;
     private const float MIN_CAMERA_SIZE = 50f;
     private const float SCROLLSPEED = 50f;
     private const float BORDER_SIZE = 10f;
-    private const float SPEED = 3f;
+    private const float SPEED = 4f;
 
-    // Private fields
-    private Camera m_Camera;
-    private Transform m_CameraRig;
-    private List<IObserver> m_Observers;
-    private List<MobileUnit> m_SelectedUnits;
-    private State m_CurrentState;
-    private Vector3 m_MousePos;
-    private Rect m_ScreenBorderInverse;
-
+    private IState state;
+    private List<IObserver> observers;
+    private List<MobileUnit> selectedUnits;
+    private Camera cam;
+    private Transform camRig;
+    private Rect screenBorderInverse;
+    private Vector3 screenCenter;
+    private Vector3 mousePos;
     private Vector3 direction;
     private bool arrowMoving = false;
 
-    // These critical variables must be assigned before anything else
-    private void Awake()
-    {
-        m_Camera = Camera.main;
-        m_CameraRig = GameObject.FindGameObjectWithTag(CAMERA_RIG_TAG).transform;
-    }
-
-    // Use this for initialization
-    void Start () {
-        // Handle public constants
-        DESELECT_KEY = KeyCode.LeftShift; // TODO make custom binds
-
-        // Handle private fields
-        m_Observers = new List<IObserver>
-        {
-            Toolbox.GameObserver,
-            Toolbox.UIObserver
-        };
-        m_SelectedUnits = new List<MobileUnit>();
-
-        // Rectangle that contains everything EXCEPT the screen border
-        m_ScreenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
-
-        m_CurrentState = new SelectedState(this);
-    }
-
-    /// <summary>
-    /// Essential function for drawing the selection box.
-    /// </summary>
-    void OnGUI()
-    {
-        Rect rect = Utils.GetScreenRect(m_MousePos, Input.mousePosition);
-        Utils.DrawScreenRect(rect, BOX_INTERIOR_COLOR);
-        Utils.DrawScreenRectBorder(rect, 2, BOX_BORDER_COLOR);
-    }
-
-    void Update () {
-        m_CurrentState.StateUpdate();
-        CheckForInput();
-    }
+    // **          //
+    // * METHODS * //
+    //          ** // 
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
-        foreach (IObserver o in m_Observers)
+        foreach (IObserver o in observers)
         {
             o.OnNotify(this, invoke, data);
         }
@@ -112,7 +73,7 @@ public class CameraController : MonoBehaviour, IObservable {
     public void CenterCameraBehindPosition(Vector3 target)
     {
         // Reset camera to center of map
-        m_CameraRig.transform.position = DEFAULT_CAMERA_LOC;
+        camRig.transform.position = DEFAULT_CAMERA_LOC;
         // Get rotation looking away from target
         Quaternion rotation = Quaternion.LookRotation(-target);
         rotation.x = 0; rotation.z = 0; // We don't care about these values
@@ -123,7 +84,48 @@ public class CameraController : MonoBehaviour, IObservable {
         position *= CAMERA_BEHIND_OFFSET;
         position.y = DEFAULT_CAMERA_LOC.y; // ignore y component of dest
 
-        m_CameraRig.transform.SetPositionAndRotation(position, rotation);
+        camRig.transform.SetPositionAndRotation(position, rotation);
+    }
+
+    /// <summary>
+    /// Responsible for initialization.
+    /// </summary>
+    void Start()
+    {
+        observers = new List<IObserver>
+        {
+            Toolbox.GameObserver,
+            Toolbox.UIObserver
+        };
+        selectedUnits = new List<MobileUnit>();
+
+        cam = Camera.main;
+        camRig = GameObject.FindGameObjectWithTag(CAMERA_RIG_TAG).transform;
+
+        screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0f);
+        // Rectangle that contains everything EXCEPT the screen border
+        screenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
+
+        state = new SelectedState(this);
+    }
+
+    /// <summary>
+    /// Essential function for drawing the selection box.
+    /// </summary>
+    void OnGUI()
+    {
+        Rect rect = Utils.GetScreenRect(mousePos, Input.mousePosition);
+        Utils.DrawScreenRect(rect, BOX_INTERIOR_COLOR);
+        Utils.DrawScreenRectBorder(rect, 2, BOX_BORDER_COLOR);
+    }
+
+    /// <summary>
+    /// Handles input.
+    /// </summary>
+    void Update()
+    {
+        state.StateUpdate();
+        CheckForInput();
     }
 
     /// <summary>
@@ -134,8 +136,16 @@ public class CameraController : MonoBehaviour, IObservable {
         Scroll();
         ArrowMove();
         EdgePan();
-        Pause();
-        PauseMenu();
+
+        if (Input.GetKeyDown(pause))
+        {
+            NotifyAll(Invocation.TOGGLE_PAUSE);
+        }
+
+        if (Input.GetKeyDown(escMenu))
+        {
+            NotifyAll(Invocation.PAUSE_AND_LOCK);
+        }
     }
 
     /// <summary>
@@ -143,11 +153,11 @@ public class CameraController : MonoBehaviour, IObservable {
     /// </summary>
     private void Scroll() { 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
-        float size = m_Camera.orthographicSize;
+        float size = cam.orthographicSize;
         size -= scroll * SCROLLSPEED;
         size = Mathf.Max(size, MIN_CAMERA_SIZE);
         size = Mathf.Min(size, MAX_CAMERA_SIZE);
-        m_Camera.orthographicSize = size;
+        cam.orthographicSize = size;
     }
 
     /// <summary>
@@ -158,25 +168,25 @@ public class CameraController : MonoBehaviour, IObservable {
         arrowMoving = false;
         direction = Vector3.zero;
 
-        if (Input.GetKey(m_MoveCameraForward))
+        if (Input.GetKey(moveForward))
         {
             direction += Vector3.forward;
             arrowMoving = true;
         }
 
-        if (Input.GetKey(m_MoveCameraLeft))
+        if (Input.GetKey(moveLeft))
         {
             direction += Vector3.left;
             arrowMoving = true;
         }
 
-        if (Input.GetKey(m_MoveCameraRight))
+        if (Input.GetKey(moveRight))
         {
             direction += Vector3.right;
             arrowMoving = true;
         }
 
-        if (Input.GetKey(m_MoveCameraBack))
+        if (Input.GetKey(moveBack))
         {
             direction += Vector3.back;
             arrowMoving = true;
@@ -197,9 +207,9 @@ public class CameraController : MonoBehaviour, IObservable {
         if (arrowMoving) { return; }
 
         // Is the mouse at the edge of the screen?
-        if (!m_ScreenBorderInverse.Contains(m_MousePos))
+        if (!screenBorderInverse.Contains(mousePos))
         {
-            direction = SCREEN_CENTER - m_MousePos;
+            direction = screenCenter - mousePos;
             direction.x = -direction.x;
             direction.z = -direction.y;
             MoveCamera(direction);
@@ -209,7 +219,7 @@ public class CameraController : MonoBehaviour, IObservable {
     /// <summary>
     /// Moves the camera in a direction relative to the rotation of the 
     /// CameraRig. Since the local axis of the transform is importnat, we 
-    /// CANNOT use the Camera's primary transform (as it is pointed at the 
+    /// CANNOT use the main Camera's transform (as it is pointed at the 
     /// ground--if we moved it forward, the view would go into the ground).
     /// </summary>
     private void MoveCamera(Vector3 direction)
@@ -217,29 +227,7 @@ public class CameraController : MonoBehaviour, IObservable {
         direction.y = 0f;
         direction.Normalize();
         direction *= SPEED;
-        m_CameraRig.transform.Translate(direction, Space.Self);
-    }
-
-    /// <summary>
-    /// Pauses the game when the pause button is pressed.
-    /// </summary>
-    private void Pause()
-    {
-        if (Input.GetKeyDown(m_Pause))
-        {
-            NotifyAll(Invocation.TOGGLE_PAUSE);
-        }
-    }
-    
-    /// <summary>
-    /// Expresses that the button to open the pause menu has been pressed.
-    /// </summary>
-    private void PauseMenu()
-    {
-        if (Input.GetKeyDown(m_PauseMenu))
-        {
-            NotifyAll(Invocation.PAUSE_AND_LOCK);
-        }
+        camRig.transform.Translate(direction, Space.Self);
     }
 
     /// <summary>
@@ -248,7 +236,7 @@ public class CameraController : MonoBehaviour, IObservable {
     /// <param name="newPos"></param>
     private void StoreMousePos(Vector3 newPos)
     {
-        m_MousePos = newPos;
+        mousePos = newPos;
     }
 
     /// <summary>
@@ -261,32 +249,43 @@ public class CameraController : MonoBehaviour, IObservable {
         NotifyAll(Invocation.UNITS_DESELECTED);
     }
 
-    /// <summary>
-    /// Handles all state involved with selected units after drawing the 
-    /// selection rectangle is completed.
-    /// </summary>
-    private class SelectedState : State
+    /*
+     * Handles all state involved with selected units after drawing the
+     * selection rectangle is completed.
+     * **/
+    private class SelectedState : IState
     {
-        private CameraController m_CameraController;
+        // **         //
+        // * FIELDS * //
+        //         ** //
+
+        private CameraController controller;
+
+        // **              //
+        // * CONSTRUCTOR * //
+        //              ** // 
 
         public SelectedState(CameraController controller)
         {
-            m_CameraController = controller;
+            this.controller = controller;
         }
 
-        public void HandleInput()
+        // **          //
+        // * METHODS * //
+        //          ** // 
+
+        public void StateUpdate()
         {
             // Store the current mouse position.
-            m_CameraController.StoreMousePos(Input.mousePosition);
+            controller.StoreMousePos(Input.mousePosition);
 
             // Deselect units when the deselect key is pressed
-            if (Input.GetKey(DESELECT_KEY))
+            if (Input.GetKey(controller.deselect))
             {
-                m_CameraController.DeselectAll();
+                controller.DeselectAll();
             }
 
-            // Starts drawing when left mouse button is pressed by switching
-            // to DrawingState
+            // Check to see if the user wants to draw a selection box
             if (Input.GetMouseButtonDown(0))
             {
                 // Ignore user clicking on UI
@@ -304,19 +303,13 @@ public class CameraController : MonoBehaviour, IObservable {
                     if (hit.collider.CompareTag(RTS_Terrain.TERRAIN_TAG))
                     {
                         // Start drawing.
-                        m_CameraController.m_CurrentState = new DrawingState(m_CameraController);
+                        controller.state = new DrawingState(controller);
                         return;
                     }
 
                 }
 
             }
-
-        }
-
-        public void StateUpdate()
-        {
-            HandleInput();
         }
 
 
@@ -326,16 +319,28 @@ public class CameraController : MonoBehaviour, IObservable {
     /// State that handles all behavior involving drawing a box, but NOT with
     /// selecting units.
     /// </summary>
-    private class DrawingState : State
+    private class DrawingState : IState
     {
-        private CameraController m_CameraController;
-        private Camera m_Camera;
+        // **         //
+        // * FIELDS * //
+        //         ** //
+
+        private CameraController controller;
+        private Camera cam;
+
+        // **              //
+        // * CONSTRUCTOR * //
+        //              ** // 
 
         public DrawingState(CameraController controller)
         {
-            m_CameraController = controller;
-            m_Camera = controller.m_Camera;
+            this.controller = controller;
+            cam = controller.cam;
         }
+
+        // **          //
+        // * METHODS * //
+        //          ** // 
 
         /// <summary>
         /// Determines if the state needs to be switched (when the user stops 
@@ -346,8 +351,8 @@ public class CameraController : MonoBehaviour, IObservable {
             // When mouse button is up, switch back to drawing state.
             if (Input.GetMouseButtonUp(0))
             {
-                m_CameraController.NotifyAll(Invocation.UNITS_SELECTED, m_CameraController.m_SelectedUnits);
-                m_CameraController.m_CurrentState = new SelectedState(m_CameraController);
+                controller.NotifyAll(Invocation.UNITS_SELECTED, controller.selectedUnits);
+                controller.state = new SelectedState(controller);
                 return;
             }
 
@@ -367,21 +372,23 @@ public class CameraController : MonoBehaviour, IObservable {
                 if (IsWithinSelectionBounds(s))
                 {
                     s.Highlight();
-                    m_CameraController.m_SelectedUnits.Add(s);
+                    controller.selectedUnits.Add(s);
                 }
                 else
                 {
                     s.RemoveHighlight();
-                    m_CameraController.m_SelectedUnits.Remove(s);
+                    controller.selectedUnits.Remove(s);
                 }
             }
         }
 
-        // Checks to see if a given object is within the area being selected
+        /// <summary>
+        /// Checks to see if a given unit is within the area being selected.
+        /// </summary>
         private bool IsWithinSelectionBounds(MobileUnit unit)
         {
-            Bounds viewportBounds = Utils.GetViewportBounds(m_Camera, m_CameraController.m_MousePos, Input.mousePosition);
-            return viewportBounds.Contains(m_Camera.WorldToViewportPoint(unit.transform.position));
+            Bounds viewportBounds = Utils.GetViewportBounds(cam, controller.mousePos, Input.mousePosition);
+            return viewportBounds.Contains(cam.WorldToViewportPoint(unit.transform.position));
         }
     }
 

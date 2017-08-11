@@ -6,21 +6,30 @@ using UnityEngine;
 /*
  * @author Paul Galatic
  * 
- * Sends a set of MobileUnits to a location.
- * 
- * Because of how this is set up, all units will attempt to move to the same
- * spot (this should be counterbalanced by flocking behaviors).
+ * Sends a set of MobileUnits to a location by setting a new PointOfInterest.
  * **/
 public class SendMobilesToLoc : PlayerThought
 {
+    // **         //
+    // * FIELDS * //
+    //         ** //
+
     private List<MobileUnit> mobiles;
     private Vector3 location;
+
+    // **              //
+    // * CONSTRUCTOR * //
+    //              ** // 
 
     public SendMobilesToLoc(List<MobileUnit> mobiles, Vector3 location)
     {
         this.mobiles = mobiles;
         this.location = location;
     }
+
+    // **          //
+    // * METHODS * //
+    //          ** // 
 
     public override void Act()
     {

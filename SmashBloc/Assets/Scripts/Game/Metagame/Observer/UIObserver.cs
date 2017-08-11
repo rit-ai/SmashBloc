@@ -6,24 +6,21 @@ using UnityEngine;
  * @author Paul Galatic
  * 
  * This class listens to other classes to determine which menus should be
- * displayed.
+ * displayed, and then relays that information to the UIManager.
  * **/
-public class UIObserver : MonoBehaviour, IObserver {
-    // Private constant fields
-    // We keep a reference to the UI Manager to tell it what we want it to show
+public class UIObserver : MonoBehaviour, IObserver
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
+
+    private const string START_GAME_TEXT = "BEGIN!";
+    private const string END_GAME_TEXT = "FINISH!";
     private static UIManager manager;
-    private static string START_GAME_TEXT = "BEGIN!";
-    private static string END_GAME_TEXT = "FINISH!";
 
-    /// <summary>
-    /// Find the UI Manager and store a reference to it.
-    /// </summary>
-    private void Start()
-    {
-        manager = Toolbox.UIManager;
-
-        Debug.Assert(manager);
-    }
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     /// <summary>
     /// Determines which type of menu to raise, depending on the entity 
@@ -40,33 +37,40 @@ public class UIObserver : MonoBehaviour, IObserver {
             case Invocation.GAME_STARTING:
                 StartCoroutine(manager.AnimateText(START_GAME_TEXT));
                 break;
+
             // Plays the ending animation text
             case Invocation.GAME_ENDING:
                 StartCoroutine(manager.AnimateText(END_GAME_TEXT));
                 break;
+
             // Opens the pause menu
             case Invocation.PAUSE_AND_LOCK:
                 manager.TogglePauseMenu();
                 goto case Invocation.TOGGLE_PAUSE;
+
             // Toggles the pause text
             case Invocation.TOGGLE_PAUSE:
                 manager.TogglePauseText();
                 break;
+
             // Display unit info
             case Invocation.UNIT_MENU:
                 Debug.Assert(entity is MobileUnit); // don't pass bad objects
                 manager.DisplayUnitInfo((MobileUnit)entity);
                 break;
+
             // Display city info
             case Invocation.CITY_MENU:
                 Debug.Assert(entity is City); // don't pass bad objects
                 manager.DisplayCityInfo((City)entity);
                 break;
+
             // Moves and renders the target ring
             case Invocation.TARGET_RING:
                 Debug.Assert(entity is RTS_Terrain);
                 manager.DisplayTargetRing((RTS_Terrain)entity);
                 break;
+
             // Hides all menus and selection elements
             case Invocation.CLOSE_ALL:
                 foreach (Unit u in Utils.AllUnits())
@@ -82,6 +86,16 @@ public class UIObserver : MonoBehaviour, IObserver {
             // Invocation not found? Must be for someone else. Ignore.
 
         }
+    }
+
+    /// <summary>
+    /// Finds and stores a reference to the UIManager.
+    /// </summary>
+    private void Start()
+    {
+        manager = Toolbox.UIManager;
+
+        Debug.Assert(manager);
     }
 
 }

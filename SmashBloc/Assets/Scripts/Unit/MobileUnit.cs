@@ -13,23 +13,39 @@ using UnityEngine;
  * **/
 public abstract class MobileUnit : Unit
 {
+    // **         //
+    // * FIELDS * //
+    //         ** //
+
     public LayerMask ignoreAllButMobiles;
 
     protected MobileAI brain;
-    protected Vector3 newPos;
     protected Vector3 movingTo; // the exact position we're moving to
     protected Vector3 pointOfInterest; // the location of where we want to go
     protected float damage;
     protected float sightRange;
     protected float attackRange;
 
-    // Private constants
     private const float PASS_INFO_RATE = 1f;
 
-    // Private fields
     private MobileInfo info;
 
-    // Set initial state for when a MobileUnit is created
+    // **          //
+    // * METHODS * //
+    //          ** //
+
+    /// <summary>
+    /// Causes the unit's health to become zero.
+    /// </summary>
+    public void ForceKill()
+    {
+        health = 0;
+        OnDeath(null);
+    }
+
+    /// <summary>
+    /// Activates the Mobile and initializes its brain.
+    /// </summary>
     public override void Activate()
     {
         // Units wait near their spawn position until given orders
@@ -43,18 +59,13 @@ public abstract class MobileUnit : Unit
         base.Activate();
     }
 
-    public void Deactivate()
-    {
-        StopAllCoroutines();
-    }
-
     /// <summary>
-    /// Causes the unit's health to become zero.
+    /// Deactivates the Mobile and removes it from its team.
     /// </summary>
-    public void ForceKill()
+    public override void Deactivate()
     {
-        health = 0;
-        OnDeath(null);
+        team.mobiles.Remove(this);
+        base.Deactivate();
     }
 
     /// <summary>
@@ -107,33 +118,6 @@ public abstract class MobileUnit : Unit
 
     }
 
-    /// <summary>
-    /// Kill this instance.
-    /// </summary>
-    protected override void OnDeath(Unit killer)
-    {
-        StartCoroutine(DeathAnimation());
-    }
-
-    /// <summary>
-    /// "Animates" the death of the unit, which can be handled as the 
-    /// implementer sees fit. The default behavior is to become very heavy and
-    /// then fade out.
-    /// </summary>
-    protected virtual IEnumerator DeathAnimation()
-    {
-        Color fadeOut = m_Surface.material.color;
-
-        GetComponent<Rigidbody>().mass *= 100;
-        for (float x = 1; x > 0; x -= 0.01f)
-        {
-            fadeOut.a = x;
-            m_Surface.material.color = fadeOut;
-            yield return 0f;
-        }
-
-        yield return null;
-    }
 
     /// <summary>
     /// Units take damage when they collide with a unit of the enemy team.
@@ -148,6 +132,32 @@ public abstract class MobileUnit : Unit
     }
 
     /// <summary>
+    /// Kill this instance.
+    /// </summary>
+    protected override void OnDeath(Unit killer)
+    {
+        if (gameObject.activeSelf) { StartCoroutine(DeathAnimation()); }
+    }
+
+    /// <summary>
+    /// "Animates" the death of the unit, which can be handled as the 
+    /// implementer sees fit. The default behavior is to become very heavy and
+    /// then fade out.
+    /// </summary>
+    protected virtual IEnumerator DeathAnimation()
+    {
+        Color fadeOut = surface.material.color;
+
+        GetComponent<Rigidbody>().mass *= 100;
+        for (float x = 1; x > 0; x -= 0.01f)
+        {
+            fadeOut.a = x;
+            surface.material.color = fadeOut;
+            yield return 0f;
+        }
+    }
+
+    /// <summary>
     /// All Mobile Units must be able to shoot at other Units.
     /// </summary>
     public abstract IEnumerator Shoot(Unit target, float maxAimTime);
@@ -155,6 +165,17 @@ public abstract class MobileUnit : Unit
     public abstract override int Cost();
 
     public abstract override string Identity();
+
+    /// <summary>
+    /// Logic handler for when the unit is individually selected, including
+    /// notifying proper menu observers.
+    /// </summary>
+    private void OnMouseDown()
+    {
+        Highlight();
+        NotifyAll(Invocation.ONE_SELECTED);
+        NotifyAll(Invocation.UNIT_MENU);
+    }
 
     /// <summary>
     /// The Unit's brain.
@@ -166,15 +187,12 @@ public abstract class MobileUnit : Unit
     }
 
     /// <summary>
-    /// This unit's current destination.
+    /// This unit's current destination. Its Y component is removed.
     /// </summary>
     public Vector3 Destination
     {
         get { return movingTo; }
-        set {
-            value.y = 0;
-            movingTo = value;
-        }
+        set { movingTo = value; }
     }
 
     public Vector3 PointOfInterest
@@ -196,17 +214,6 @@ public abstract class MobileUnit : Unit
     public float Range
     {
         get { return attackRange; }
-    }
-
-    /// <summary>
-    /// Logic handler for when the unit is individually selected, including
-    /// notifying proper menu observers.
-    /// </summary>
-    private void OnMouseDown()
-    {
-        Highlight();
-        NotifyAll(Invocation.ONE_SELECTED);
-        NotifyAll(Invocation.UNIT_MENU);
     }
 
 }

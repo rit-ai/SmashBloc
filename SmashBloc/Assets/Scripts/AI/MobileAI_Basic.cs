@@ -19,6 +19,7 @@ public sealed class MobileAI_Basic : MobileAI
 
     protected override IThought Think()
     {
+        
         return new Move(info.pointOfInterest);
     }
 }

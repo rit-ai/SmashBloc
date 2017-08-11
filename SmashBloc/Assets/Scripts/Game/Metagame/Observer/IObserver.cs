@@ -5,9 +5,11 @@ using UnityEngine;
 /*
  * @author Paul Galatic
  * 
- * Interface designed to represent classes that observe the behavior of other,
- * unrelated objects and establish functionality outside the scope of said
- * classes.
+ * Interface designed to represent classes that observe the behavior of 
+ * objects and handle cases where they must interact with each other. By hiding
+ * this interaction behind the Observer, the two interacting classes can stay
+ * more effectively decoupled, keeping the scripts more maintainable in the 
+ * long run.
  * **/
 public interface IObserver {
 

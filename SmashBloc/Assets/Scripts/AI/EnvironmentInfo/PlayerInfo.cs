@@ -7,23 +7,15 @@ using UnityEngine;
  * 
  * Class designed to represent all the state that should be passed to a 
  * PlayerAI in order for it to evaluate its current situation and make a 
- * decision. This struct should NOT contain anything particular to a specific
- * type of unit, as different AIs will be implemented for different Unit types.
- * 
- * This is a class, as opposed to a struct, because it must be nullable in 
- * order to play nice with the AI heirarchy.
+ * decision.
  * **/
-public class PlayerInfo {
+public struct PlayerInfo {
+
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
     public Team team;
     public int goldAmount;
-
-    public PlayerInfo() { }
-
-    public PlayerInfo(Team team, int goldAmount = 0)
-    {
-        this.team = team;
-        this.goldAmount = goldAmount;
-    }
 
 }

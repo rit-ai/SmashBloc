@@ -17,28 +17,34 @@ using System.Linq;
  * and end).
  * 
  * Everything that involves changing the state of the game as a whole should go
- * in this class.
+ * in this class. It will be split into smaller files as necessary.
  * **/
-public class GameManager : MonoBehaviour, IObservable {
-
-    // Public constants
+public class GameManager : MonoBehaviour, IObservable
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
     [HideInInspector]
     public bool playContinuous; // restart game once it's over
+    [HideInInspector]
+    public bool pauseOnFinish; // pause game when it's over
 
     private const string CITY_SPAWN_TAG = "CitySpawn";
     private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
     private const int MAX_MONEY = 999; // richness ceiling
     private const int NUM_AI_PLAYERS = 1;
 
-    private CameraController m_CameraController;
-    private GameObject[] citySpawnPoints;
-
+    private List<IObserver> observers;
     private List<Team> teams;
     private List<Player> players;
-    private List<IObserver> observers;
-
+    private CameraController cameraController;
+    private GameObject[] citySpawnPoints;
     private int activeTeams;
+
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
@@ -69,11 +75,16 @@ public class GameManager : MonoBehaviour, IObservable {
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Team playerTeam = Toolbox.PLAYER.Team;
-        if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrain.ignoreAllButTerrain))
         {
-            // Set the destination of all the selected units the player owns
-            List<MobileUnit> validUnits = selectedUnits.Where(unit => unit.Team == Toolbox.PLAYER.Team).ToList();
-            new SendMobilesToLoc(validUnits, hit.point).Act();
+            // A Thought is used here so that the Player doesn't have a greater
+            // degree of control over Mobiles than the AI
+            new SendMobilesToLoc(
+                // Get all the units selected that the player owns
+                selectedUnits.Where(unit => unit.Team == Toolbox.PLAYER.Team).ToList(),
+                // Send them to this location
+                hit.point
+            ).Act();
         }
     }
 
@@ -85,20 +96,17 @@ public class GameManager : MonoBehaviour, IObservable {
     /// <param name="newTeam">The team the city will be transferred to.</param>
     public void TransferCity(City city, Team newTeam)
     {
+        Team loser = city.Team;
         city.Team.cities.Remove(city);
         newTeam.cities.Add(city);
 
-        // Don't chance the city's team until the end
+        // Don't change the city's team until this point
         city.Team = newTeam;
 
-        // Have all the team's cities been eliminated?
-        foreach (Team t in teams)
+        if (loser.IsActive && loser.cities.Count == 0)
         {
-            if (t.IsActive && t.cities.Count == 0)
-            {
-                t.Deactivate();
-                activeTeams--;
-            }
+            loser.Deactivate();
+            activeTeams--;
         }
     }
 
@@ -107,17 +115,13 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     public void ResetGame()
     {
-        // DEACTIVATION
+        StopAllCoroutines();
+        NotifyAll(Invocation.CLOSE_ALL);
 
-        // Deactivate all teams
         foreach (Team t in teams)
         {
             t.Deactivate();
         }
-
-        StopAllCoroutines();
-
-        NotifyAll(Invocation.CLOSE_ALL);
 
         // REACTIVATION
 
@@ -132,8 +136,8 @@ public class GameManager : MonoBehaviour, IObservable {
         activeTeams = teams.Count;
 
         // Set main camera to be behind the first city
-        // TODO make this more exact
-        m_CameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
+        // TODO make this more flexible
+        cameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
 
         StartCoroutine(GameLoop());
     }
@@ -143,10 +147,10 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private void Start()
     {
-        m_CameraController = Camera.main.GetComponent<CameraController>();
+        cameraController = Camera.main.GetComponent<CameraController>();
         citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
 
-        Debug.Assert(m_CameraController != null);
+        Debug.Assert(cameraController != null);
         Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
 
         teams = Toolbox.GameSetup.Teams;
@@ -168,7 +172,7 @@ public class GameManager : MonoBehaviour, IObservable {
 
         // Set main camera to be behind a city, preferrably the player's
         // Somewhat inexact, TODO make sure it finds the first city every time
-        m_CameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
+        cameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
 
         StartCoroutine(GameLoop());
 
@@ -218,8 +222,7 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private IEnumerator RoundEnding()
     {
-        // Stop IEnumerators
-        StopCoroutine(IncrementGold());
+        StopAllCoroutines();
 
         // waitingOnAnimation = true; // TODO wait for ending animation
         NotifyAll(Invocation.GAME_ENDING);
@@ -230,8 +233,12 @@ public class GameManager : MonoBehaviour, IObservable {
             ResetGame();
             yield break;
         }
-        TogglePause();
-        NotifyAll(Invocation.PAUSE_AND_LOCK);
+
+        if (pauseOnFinish)
+        {
+            TogglePause();
+            NotifyAll(Invocation.PAUSE_AND_LOCK);
+        }
     }
 
     /// <summary>
@@ -296,6 +303,4 @@ public class GameManager : MonoBehaviour, IObservable {
 
         }
     }
-
-    public enum GameState { STARTING, PLAYING, ENDING }
 }
