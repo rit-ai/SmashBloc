@@ -2,6 +2,7 @@
 
 /// <summary>
 /// Source: http://wiki.unity3d.com/index.php/Toolbox
+/// @author Paul Galatic
 /// 
 /// A heavy-handed design pattern to be used as sparingly as possible. Useful 
 /// in cases where the game is designed to only have one of a particular class
@@ -11,9 +12,17 @@
 /// </summary>
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
-    private static T _instance;
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
+    private static T _instance;
     private static object _lock = new object();
+    private static bool applicationIsQuitting = false;
+
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     public static T Instance
     {
@@ -65,7 +74,6 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
 
-    private static bool applicationIsQuitting = false;
     /// <summary>
     /// When Unity quits, it destroys objects in a random order.
     /// In principle, a Singleton is only destroyed when application quits.

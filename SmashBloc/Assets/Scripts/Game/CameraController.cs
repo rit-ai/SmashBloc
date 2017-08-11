@@ -40,7 +40,7 @@ public class CameraController : MonoBehaviour, IObservable
     private const float BORDER_SIZE = 10f;
     private const float SPEED = 4f;
 
-    private State state;
+    private IState state;
     private List<IObserver> observers;
     private List<MobileUnit> selectedUnits;
     private Camera cam;
@@ -253,7 +253,7 @@ public class CameraController : MonoBehaviour, IObservable
      * Handles all state involved with selected units after drawing the
      * selection rectangle is completed.
      * **/
-    private class SelectedState : State
+    private class SelectedState : IState
     {
         // **         //
         // * FIELDS * //
@@ -319,7 +319,7 @@ public class CameraController : MonoBehaviour, IObservable
     /// State that handles all behavior involving drawing a box, but NOT with
     /// selecting units.
     /// </summary>
-    private class DrawingState : State
+    private class DrawingState : IState
     {
         // **         //
         // * FIELDS * //

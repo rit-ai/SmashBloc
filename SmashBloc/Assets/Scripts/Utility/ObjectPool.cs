@@ -12,10 +12,18 @@ using UnityEngine;
  * issues caused by instantiating objects during gameplay. It utilizes a queue 
  * structure to accomplish this.
  * **/
-public sealed class ObjectPool<T> {
+public sealed class ObjectPool<T>
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
-    private Queue<T> pool = new Queue<T>();
+    private Queue<T> pool;
     private Func<T> maker;
+
+    // **              //
+    // * CONSTRUCTOR * //
+    //              ** //
 
     /// <summary>
     /// Creates an object pool with contents of type T.
@@ -27,12 +35,18 @@ public sealed class ObjectPool<T> {
     public ObjectPool(Func<T> maker, int size)
     {
         this.maker = maker;
+
+        pool = new Queue<T>();
         // Create <size> objects of type <T> using the maker() function
         for (int i = 0; i < size; i++)
         {
             pool.Enqueue(maker());
         }
     }
+
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     /// <summary>
     /// Lends an object for use. Use "Pool.Return" to give it back.

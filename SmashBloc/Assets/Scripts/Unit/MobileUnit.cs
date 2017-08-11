@@ -13,6 +13,10 @@ using UnityEngine;
  * **/
 public abstract class MobileUnit : Unit
 {
+    // **         //
+    // * FIELDS * //
+    //         ** //
+
     public LayerMask ignoreAllButMobiles;
 
     protected MobileAI brain;
@@ -22,13 +26,26 @@ public abstract class MobileUnit : Unit
     protected float sightRange;
     protected float attackRange;
 
-    // Private constants
     private const float PASS_INFO_RATE = 1f;
 
-    // Private fields
     private MobileInfo info;
 
-    // Set initial state for when a MobileUnit is created
+    // **          //
+    // * METHODS * //
+    //          ** //
+
+    /// <summary>
+    /// Causes the unit's health to become zero.
+    /// </summary>
+    public void ForceKill()
+    {
+        health = 0;
+        OnDeath(null);
+    }
+
+    /// <summary>
+    /// Activates the Mobile and initializes its brain.
+    /// </summary>
     public override void Activate()
     {
         // Units wait near their spawn position until given orders
@@ -42,19 +59,13 @@ public abstract class MobileUnit : Unit
         base.Activate();
     }
 
+    /// <summary>
+    /// Deactivates the Mobile and removes it from its team.
+    /// </summary>
     public override void Deactivate()
     {
         team.mobiles.Remove(this);
         base.Deactivate();
-    }
-
-    /// <summary>
-    /// Causes the unit's health to become zero.
-    /// </summary>
-    public void ForceKill()
-    {
-        health = 0;
-        OnDeath(null);
     }
 
     /// <summary>
@@ -107,6 +118,19 @@ public abstract class MobileUnit : Unit
 
     }
 
+
+    /// <summary>
+    /// Units take damage when they collide with a unit of the enemy team.
+    /// </summary>
+    protected override void OnCollisionEnter(Collision collision)
+    {
+        Unit unit = collision.gameObject.GetComponent<Unit>();
+        if (unit != null && !(unit.Team.Equals(team)))
+        {
+            base.UpdateHealth(-UnityEngine.Random.Range(10f, 20f), unit);
+        }
+    }
+
     /// <summary>
     /// Kill this instance.
     /// </summary>
@@ -134,18 +158,6 @@ public abstract class MobileUnit : Unit
     }
 
     /// <summary>
-    /// Units take damage when they collide with a unit of the enemy team.
-    /// </summary>
-    protected override void OnCollisionEnter(Collision collision)
-    {
-        Unit unit = collision.gameObject.GetComponent<Unit>();
-        if (unit != null && !(unit.Team.Equals(team)))
-        {
-            base.UpdateHealth(-UnityEngine.Random.Range(10f, 20f), unit);
-        }
-    }
-
-    /// <summary>
     /// All Mobile Units must be able to shoot at other Units.
     /// </summary>
     public abstract IEnumerator Shoot(Unit target, float maxAimTime);
@@ -153,6 +165,17 @@ public abstract class MobileUnit : Unit
     public abstract override int Cost();
 
     public abstract override string Identity();
+
+    /// <summary>
+    /// Logic handler for when the unit is individually selected, including
+    /// notifying proper menu observers.
+    /// </summary>
+    private void OnMouseDown()
+    {
+        Highlight();
+        NotifyAll(Invocation.ONE_SELECTED);
+        NotifyAll(Invocation.UNIT_MENU);
+    }
 
     /// <summary>
     /// The Unit's brain.
@@ -164,15 +187,12 @@ public abstract class MobileUnit : Unit
     }
 
     /// <summary>
-    /// This unit's current destination.
+    /// This unit's current destination. Its Y component is removed.
     /// </summary>
     public Vector3 Destination
     {
         get { return movingTo; }
-        set {
-            value.y = 0;
-            movingTo = value;
-        }
+        set { movingTo = value; }
     }
 
     public Vector3 PointOfInterest
@@ -194,17 +214,6 @@ public abstract class MobileUnit : Unit
     public float Range
     {
         get { return attackRange; }
-    }
-
-    /// <summary>
-    /// Logic handler for when the unit is individually selected, including
-    /// notifying proper menu observers.
-    /// </summary>
-    private void OnMouseDown()
-    {
-        Highlight();
-        NotifyAll(Invocation.ONE_SELECTED);
-        NotifyAll(Invocation.UNIT_MENU);
     }
 
 }

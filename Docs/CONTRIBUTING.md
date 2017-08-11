@@ -31,6 +31,12 @@ If you contribute successfully to the project, we'll add you as a collaborator a
 * Check for unnecessary whitespace and leftover comments with `git diff --check` before committing.
 * Make sure your commit messages follow [best practices](https://www.slideshare.net/TarinGamberini/commit-messages-goodpractices).
 
+## Code Style
+
+We follow the Unity3D [style guidelines](http://wiki.unity3d.com/index.php/Csharp_Coding_Guidelines). We put properties after methods because we find that properties clutter up the middle of a file, and they don't need to be edited as frequently as methods or fields do.
+
+Code style will be proofread and adjusted before we merge a pull request, so don't worry about it too much so long as you're following the principles in the above guide.
+
 ## Submitting Changes
 
 * Push your changes to a branch in your fork of the repository.
@@ -54,6 +60,6 @@ Some terms:
 * **Brain:** The mind of the agent. It can't access the Body's state naturally and thus relies on information that the Body passes in.
 * **Command:** An object that implements ICommand (SmashBloc/Assets/Scripts/AI/Commands). Commands are constructed in the Brain with relevant State that they use to execute specific functions in the Body.
 
-EnvironmentInfo classes are independent. Body classes generally extend MobileUnit. Brain classes usually extend MobileAI. Command classes usually extent MobileCommand.
+EnvironmentInfos are independent. Bodies generally extend MobileUnit. Brains usually extend MobileAI. Commands usually extend MobileCommand.
 
 There are a few examples of implemented AIs already in the project. If you have any further questions, please [contact us directly](mailto:smashbloc@gmail.com).

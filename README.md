@@ -35,7 +35,7 @@ See also the list of [contributors](https://github.com/RITficialIntelligence/Sma
 
 ## License
 
-This project is licensed under the [MIT License](Docs/LICENSE.md).
+See our [license](Docs/LICENSE).
 
 ## Acknowledgments
 

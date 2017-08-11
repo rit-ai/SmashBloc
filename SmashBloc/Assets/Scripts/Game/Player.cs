@@ -130,7 +130,6 @@ public class Player : MonoBehaviour
             MobileUnit newUnit = Utils.IdentityToGameObject(toSpawn);
             newUnit.Team = team;
             newUnit.transform.position = toSpawnAt.SpawnPoint.transform.position;
-            newUnit.SetName(newUnit.UnitName + team.mobiles.Count.ToString());
             team.mobiles.Add(newUnit);
             newUnit.gameObject.SetActive(true);
             newUnit.Activate();

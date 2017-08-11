@@ -16,21 +16,18 @@ using UnityEngine;
  * overall code readability. However, functions like IdentityToGameObject() 
  * should be phased out.
  * **/
-public class Utils : MonoBehaviour {
+public class Utils : MonoBehaviour
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
     private static Player playerOne;
-
     static Texture2D whiteTexture;
-	public static Texture2D WhiteTexture {
-		get {
-			if(whiteTexture == null) {
-				whiteTexture = new Texture2D(1,1);
-				whiteTexture.SetPixel(0, 0, Color.white);
-				whiteTexture.Apply();
-			}
-			return whiteTexture;
-		}
-	}
+
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     /// <summary>
     /// Draws a rectangle with the passed in color to the screen
@@ -42,7 +39,7 @@ public class Utils : MonoBehaviour {
 	}
 
     /// <summary>
-    /// Creates a border of a rectangle
+    /// Creates a border of a rectangle.
     /// </summary>
     public static void DrawScreenRectBorder( Rect rect, float thickness, Color color )
 	{
@@ -57,9 +54,7 @@ public class Utils : MonoBehaviour {
 	}
 
     /// <summary>
-    /// Returns a rectangle based on the 2 input screen positions
-    /// 
-    /// FIXME Currently unused
+    /// Returns a rectangle based on the 2 input screen positions.
     /// </summary>
     public static Rect GetScreenRect(Vector3 screenPos1, Vector3 screenPos2){
 		// Move origin from bottom left to top left
@@ -74,7 +69,7 @@ public class Utils : MonoBehaviour {
 
     /// <summary>
     /// Creates a bound, based on where the mouse dragged, that will contain 
-    /// the object top be selected
+    /// the object to be selected.
     /// </summary>
     public static Bounds GetViewportBounds( Camera camera, Vector3 screenPosition1, Vector3 screenPosition2 )
 	{
@@ -84,8 +79,6 @@ public class Utils : MonoBehaviour {
 		var max = Vector3.Max( v1, v2 );
 		min.z = camera.nearClipPlane;
 		max.z = camera.farClipPlane;
-		//min.z = 0.0f;
-		//max.z = 1.0f;
 
 		var bounds = new Bounds();
 		bounds.SetMinMax( min, max );
@@ -116,8 +109,6 @@ public class Utils : MonoBehaviour {
     {
         return new List<City>(FindObjectsOfType<City>());
     }
-
-
 
     /// <summary>
     /// Returns the prefab associated with a particular type of Unit.
@@ -166,6 +157,24 @@ public class Utils : MonoBehaviour {
             }
 
             yield return 0f;
+        }
+    }
+
+    /// <summary>
+    /// Returns a white texture, creating and storing it if it doesn't already
+    /// exist.
+    /// </summary>
+    public static Texture2D WhiteTexture
+    {
+        get
+        {
+            if (whiteTexture == null)
+            {
+                whiteTexture = new Texture2D(1, 1);
+                whiteTexture.SetPixel(0, 0, Color.white);
+                whiteTexture.Apply();
+            }
+            return whiteTexture;
         }
     }
 }

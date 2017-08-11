@@ -12,17 +12,17 @@ using UnityEngine;
  * **/
 public class City : Unit
 {
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
-    // Public constants
+    public Transform spawnPoint;
+    public SpawnRingRig spawnRingRig;
+
     public const string IDENTITY = "CITY";
     public const float MAX_HEALTH = 500f;
     public const int MAX_INCOME_LEVEL = 8;
 
-    // Public fields
-    public Transform spawnPoint;
-    public SpawnRingRig spawnRingRig;
-
-    // Private constants
     private const string DEFAULT_NAME = "Dylanto";
     // The health a city has just after it's captured
     private const float CAPTURED_HEALTH = 50f;
@@ -37,10 +37,32 @@ public class City : Unit
     private const int MIN_INCOME_LEVEL = 1;
     private const int DEFAULT_INCOME_LEVEL = 8;
 
-    // Private fields
     private int incomeLevel;
     private bool delayRegen = true;
 
+    // **          //
+    // * METHODS * //
+    //          ** //
+
+    /// <summary>
+    /// Returns the class name of the unit in the form of a string.
+    /// </summary>
+    public override string Identity()
+    {
+        return IDENTITY;
+    }
+
+    /// <summary>
+    /// Returns how much a city would cost to place.
+    /// </summary>
+    public override int Cost()
+    {
+        return COST;
+    }
+
+    /// <summary>
+    /// Activates the city.
+    /// </summary>
     public override void Activate()
     {
         maxHealth = MAX_HEALTH;
@@ -52,6 +74,9 @@ public class City : Unit
         base.Activate();
     }
 
+    /// <summary>
+    /// Deactivates the city.
+    /// </summary>
     public override void Deactivate()
     {
         base.Deactivate();
@@ -71,38 +96,6 @@ public class City : Unit
     }
 
     /// <summary>
-    /// Returns the location at which to spawn units.
-    /// </summary>
-    public Transform SpawnPoint
-    {
-        get { return spawnPoint; }
-    }
-
-    /// <summary>
-    /// Gets the Income Level of the city.
-    /// </summary>
-    public int IncomeLevel
-    {
-        get { return incomeLevel; }
-    }
-
-    /// <summary>
-    /// Returns the class name of the unit in the form of a string.
-    /// </summary>
-    public override string Identity()
-    {
-        return IDENTITY;
-    }
-
-    /// <summary>
-    /// Returns how much a city would cost to place.
-    /// </summary>
-    public override int Cost()
-    {
-        return COST;
-    }
-
-    /// <summary>
     /// What to do when the unit collides with another unit that's not on the 
     /// same team.
     /// </summary>
@@ -114,7 +107,7 @@ public class City : Unit
         {
             Rigidbody body = collision.gameObject.GetComponent<Rigidbody>();
             // Add audiovisuals here
-            body.AddExplosionForce(BLOWBACK_FORCE, transform.position - body.transform.position, BLOWBACK_RADIUS);
+            body.AddExplosionForce(BLOWBACK_FORCE, transform.position - body.transform.position, BLOWBACK_RADIUS, BLOWBACK_FORCE, ForceMode.Acceleration);
             UpdateHealth(-UnityEngine.Random.Range(10f, 20f), unit);
         }
     }
@@ -169,4 +162,21 @@ public class City : Unit
         Highlight();
         NotifyAll(Invocation.CITY_MENU);
     }
+
+    /// <summary>
+    /// Returns the location at which to spawn units.
+    /// </summary>
+    public Transform SpawnPoint
+    {
+        get { return spawnPoint; }
+    }
+
+    /// <summary>
+    /// Gets the Income Level of the city.
+    /// </summary>
+    public int IncomeLevel
+    {
+        get { return incomeLevel; }
+    }
+
 }

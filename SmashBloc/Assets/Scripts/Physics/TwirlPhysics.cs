@@ -9,11 +9,15 @@ using UnityEngine;
  * this file are designed in such a way to reasonably accomodate being called
  * many times a second. Being that this design precludes the use of conditional
  * branches, it may be a bit confusing to read.
+ * 
+ * This class should have no public state or methods. Avoid conditional 
+ * branches and jumps as much as possible.
  * **/
-public class TwirlPhysics : MobilePhysics {
-
-    // This class should have no public state or methods besides its 
-    // constructor and ComponentUpdate().
+public class TwirlPhysics : MobilePhysics
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
     // Thresholds for unit convergence and separation
     private const float MAX_DISTANCE_FROM = 400f; // "sight range"
@@ -21,7 +25,7 @@ public class TwirlPhysics : MobilePhysics {
     // Height above ground at which float force is applied
     private const float MAX_FLOAT_THRESHOLD = 12f;
     // Distance from destination at which deceleration begins (squared)
-    private const float DECELERATION_THRESHOLD_SQRD = 15000f;
+    private const float DECELERATION_THRESHOLD_SQRD = 10000f;
     private const float UP_FORCE = 100f;
     // Default steering force strength
     private const float SPEED = 200f;
@@ -32,35 +36,20 @@ public class TwirlPhysics : MobilePhysics {
     // How many colliders to keep track of
     private const int COLLIDER_MEM = 50;
 
-    // Private fields
+    private Collider[] convergeWith;
+    private Collider[] divergeWith;
+    private Vector3 converge;
+    private Vector3 diverge;
     private Twirl parent;
     private Rigidbody body;
     private Rigidbody hoverBall;
     private Rigidbody bottomWeight;
-
-    private Collider[] convergeWith;
-    private Collider[] divergeWith;
-
-    private Vector3 converge;
-    private Vector3 diverge;
-
     private int convergeCount;
     private int divergeCount;
 
-    private void Start()
-    {
-        // Private fields
-        parent = GetComponent<Twirl>();
-        body = parent.GetComponent<Rigidbody>();
-        hoverBall = parent.hoverBall;
-        bottomWeight = parent.bottomWeight;
-
-        convergeWith = new Collider[COLLIDER_MEM];
-        divergeWith = new Collider[COLLIDER_MEM];
-
-        body.useGravity = true;
-        bottomWeight.useGravity = true;
-    }
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     /// <summary>
     /// Blanket to update all private methods.
@@ -218,6 +207,23 @@ public class TwirlPhysics : MobilePhysics {
     {
         const float SCALE_FACTOR = 1.442f; // DO NOT CHANGE
         return Mathf.Min(SCALE_FACTOR * Mathf.Log(Mathf.Pow(distanceToDestRatio + 1f, 0.33333333f), Mathf.Exp(1)), 1f);
+    }
+
+    /// <summary>
+    /// Initialize state.
+    /// </summary>
+    private void Start()
+    {
+        parent = GetComponent<Twirl>();
+        body = parent.GetComponent<Rigidbody>();
+        hoverBall = parent.hoverBall;
+        bottomWeight = parent.bottomWeight;
+
+        convergeWith = new Collider[COLLIDER_MEM];
+        divergeWith = new Collider[COLLIDER_MEM];
+
+        body.useGravity = true;
+        bottomWeight.useGravity = true;
     }
 
 }

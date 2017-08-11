@@ -13,7 +13,11 @@ using UnityEngine.UI;
  * One and only one of this object should be placed into every Scene, as it 
  * constructs and initializes the Object Pools, Managers, and others.
  * **/
-public sealed class Toolbox : Singleton<Toolbox> {
+public sealed class Toolbox : Singleton<Toolbox>
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
     // The first created player, which will always be the main player.
     public static Player player;
@@ -25,7 +29,6 @@ public sealed class Toolbox : Singleton<Toolbox> {
 
     private const int SMALL_POOL = 10;
     private const int MEDIUM_POOL = 100;
-
     private static ObjectPool<Twirl> twirlPool;
     private static ObjectPool<City> cityPool;
     private static UIManager uiManager;
@@ -33,70 +36,26 @@ public sealed class Toolbox : Singleton<Toolbox> {
     private static UIObserver uiObserver;
     private static GameObserver gameObserver;
     private static GameSetup gameSetup;
-
     private static City cityPrefab;
     private static MobileUnit twirlPrefab;
     private static MobileUnit tankPrefab;
-
     private static RTS_Terrain terrain;
+    private static GameObject cityPoolWrapper;
+    private static GameObject twirlPoolWrapper;
 
-    GameObject cityPoolWrapper;
-    GameObject twirlPoolWrapper;
+    // **              //
+    // * CONSTRUCTOR * //
+    //              ** //
 
-    // Public accessors and private variables to ensure that the contents of 
-    // the variables will never change
-    public static ObjectPool<Twirl> TwirlPool
-    {
-        get { return twirlPool; }
-    }
-    public static ObjectPool<City> CityPool
-    {
-        get { return cityPool; }
-    }
-    public static UIManager UIManager
-    {
-        get { return uiManager; }
-    }
-    public static GameManager GameManager
-    {
-        get { return gameManager; }
-    }
-    public static UIObserver UIObserver
-    {
-        get { return uiObserver; }
-    }
-    public static GameObserver GameObserver
-    {
-        get { return gameObserver; }
-    }
-    public static GameSetup GameSetup
-    {
-        get { return gameSetup; }
-    }
-    public static City CityPrefab
-    {
-        get { return cityPrefab; }
-    }
-    public static MobileUnit TwirlPrefab
-    {
-        get { return twirlPrefab; }
-    }
-    public static MobileUnit TankPrefab
-    {
-        get { return tankPrefab; }
-    }
-    public static RTS_Terrain Terrain
-    {
-        get { return terrain; }
-    }
-    public static Player PLAYER
-    {
-        get { return player; }
-    }
-
-    // A private constructor makes sure that this object will never be 
-    // accidentally created in code
+    /// <summary>
+    /// A private constructor makes sure that this object will never be 
+    /// accidentally created in code.
+    /// </summary>
     private Toolbox() { }
+
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     /// <summary>
     /// Order in this function is EXTREMELY important.
@@ -152,6 +111,9 @@ public sealed class Toolbox : Singleton<Toolbox> {
         // Toolbox.
     }
 
+    /// <summary>
+    /// Pass any necessary state to the game manager.
+    /// </summary>
     private void Start()
     {
         gameManager.playContinuous = playContinuous;
@@ -167,7 +129,7 @@ public sealed class Toolbox : Singleton<Toolbox> {
         newTwirl.gameObject.AddComponent<TwirlPhysics>();
         newTwirl.AI = newTwirl.gameObject.AddComponent<MobileAI_Basic>();
         newTwirl.AI.Body = newTwirl;
-        newTwirl.Init();
+        newTwirl.Build();
 
         return newTwirl;
     }
@@ -179,9 +141,60 @@ public sealed class Toolbox : Singleton<Toolbox> {
     {
         City city = Instantiate(CityPrefab, cityPoolWrapper.transform);
         city.gameObject.SetActive(false);
-        city.Init();
+        city.Build();
 
         return city;
+    }
+
+    // Public accessors and private variables to ensure that the contents of 
+    // the variables will never change
+    public static ObjectPool<Twirl> TwirlPool
+    {
+        get { return twirlPool; }
+    }
+    public static ObjectPool<City> CityPool
+    {
+        get { return cityPool; }
+    }
+    public static UIManager UIManager
+    {
+        get { return uiManager; }
+    }
+    public static GameManager GameManager
+    {
+        get { return gameManager; }
+    }
+    public static UIObserver UIObserver
+    {
+        get { return uiObserver; }
+    }
+    public static GameObserver GameObserver
+    {
+        get { return gameObserver; }
+    }
+    public static GameSetup GameSetup
+    {
+        get { return gameSetup; }
+    }
+    public static City CityPrefab
+    {
+        get { return cityPrefab; }
+    }
+    public static MobileUnit TwirlPrefab
+    {
+        get { return twirlPrefab; }
+    }
+    public static MobileUnit TankPrefab
+    {
+        get { return tankPrefab; }
+    }
+    public static RTS_Terrain Terrain
+    {
+        get { return terrain; }
+    }
+    public static Player PLAYER
+    {
+        get { return player; }
     }
 }
 

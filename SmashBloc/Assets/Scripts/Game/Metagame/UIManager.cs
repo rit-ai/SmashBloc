@@ -137,7 +137,7 @@ public class UIManager : MonoBehaviour, IObservable
 
         // Handle unit name input field
         unitMenuName.enabled = unit.Team == Toolbox.PLAYER.Team;
-        unitMenuName.placeholder.GetComponent<Text>().text = unit.UnitName;
+        unitMenuName.placeholder.GetComponent<Text>().text = unit.Name;
 
         // Handle health slider
         unitMenuHealth.maxValue = unit.MaxHealth;
@@ -167,7 +167,7 @@ public class UIManager : MonoBehaviour, IObservable
 
         // Handle city name input field
         cityMenuName.enabled = city.Team == Toolbox.PLAYER.Team;
-        cityMenuName.placeholder.GetComponent<Text>().text = city.UnitName;
+        cityMenuName.placeholder.GetComponent<Text>().text = city.Name;
 
         // Handle spawn button
         cityMenuSpawn.enabled = city.Team == Toolbox.PLAYER.Team;
@@ -329,7 +329,7 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void UpdateUnitName()
     {
-        unitCurrentlyDisplayed.SetCustomName(unitMenuName.text);
+        unitCurrentlyDisplayed.CustomName = unitMenuName.text;
     }
 
     /// <summary>
@@ -337,7 +337,7 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void UpdateCityName()
     {
-        cityCurrentlyDisplayed.SetCustomName(cityMenuName.text);
+        cityCurrentlyDisplayed.CustomName = cityMenuName.text;
     }
 
     /// <summary>
