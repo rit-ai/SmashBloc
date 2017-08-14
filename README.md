@@ -35,7 +35,7 @@ See also the list of [contributors](https://github.com/RITficialIntelligence/Sma
 
 ## License
 
-See our [license](Docs/LICENSE).
+See our [license](LICENSE).
 
 ## Acknowledgments
 
