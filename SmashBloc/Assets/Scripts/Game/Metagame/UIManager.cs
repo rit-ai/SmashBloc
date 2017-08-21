@@ -25,6 +25,7 @@ public class UIManager : MonoBehaviour, IObservable
     // MENU
     public Canvas pauseMenu;
     public Button resetButton;
+    public Button exitButton;
     // HEADER
     public Dropdown unitSelect;
     public Text currentGoldAmount;
@@ -266,6 +267,7 @@ public class UIManager : MonoBehaviour, IObservable
         // Handlers for pressing a button on a menu
         cityMenuSpawn.onClick.AddListener(delegate { SpawnUnit(); });
         resetButton.onClick.AddListener(delegate { ResetButtonPressed(); });
+        exitButton.onClick.AddListener(delegate { ExitButtonPressed(); });
     }
 
     // Initialize whenever this object loads
@@ -309,6 +311,19 @@ public class UIManager : MonoBehaviour, IObservable
     {
         CloseAll();
         NotifyAll(Invocation.RESET_GAME);
+    }
+
+    /// <summary>
+    /// Exits the game.
+    /// </summary>
+    /// TODO allow exit back to main menu.
+    private void ExitButtonPressed()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     /// <summary>

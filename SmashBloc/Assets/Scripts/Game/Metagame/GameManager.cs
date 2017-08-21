@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour, IObservable
     public bool playContinuous; // restart game once it's over
     [HideInInspector]
     public bool pauseOnFinish; // pause game when it's over
+    [HideInInspector]
+    public bool resetCamera; // reset the camera at the start of a game
 
     private const string CITY_SPAWN_TAG = "CitySpawn";
     private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
@@ -137,7 +139,7 @@ public class GameManager : MonoBehaviour, IObservable
 
         // Set main camera to be behind the first city
         // TODO make this more flexible
-        cameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
+        if (resetCamera) { cameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position); }
 
         StartCoroutine(GameLoop());
     }
@@ -222,8 +224,6 @@ public class GameManager : MonoBehaviour, IObservable
     /// </summary>
     private IEnumerator RoundEnding()
     {
-        StopAllCoroutines();
-
         // waitingOnAnimation = true; // TODO wait for ending animation
         NotifyAll(Invocation.GAME_ENDING);
         yield return new WaitForSeconds(3f);

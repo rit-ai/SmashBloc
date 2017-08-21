@@ -26,6 +26,8 @@ public sealed class Toolbox : Singleton<Toolbox>
     public bool playContinuous;
     [Tooltip("Causes the game to pause when it ends.")]
     public bool pauseOnFinish;
+    [Tooltip("Causes the camera to reset at the start of a game.")]
+    public bool resetCamera;
 
     private const int SMALL_POOL = 10;
     private const int MEDIUM_POOL = 100;
@@ -62,7 +64,7 @@ public sealed class Toolbox : Singleton<Toolbox>
     /// </summary>
     private void Awake()
     {
-        // First came the Game...
+        // ...and from me came the game...
         gameSetup = GetComponent<GameSetup>();
         gameSetup.Init();
         if (gameSetup.Locked)
@@ -101,14 +103,22 @@ public sealed class Toolbox : Singleton<Toolbox>
         cityPool = new ObjectPool<City>(MakeCity, SMALL_POOL);
 
         // ...and all of that is me.
-        Debug.Assert(CityPrefab);
-        Debug.Assert(TwirlPrefab);
-        Debug.Assert(TankPrefab);
+        Debug.Assert(cityPrefab);
+        Debug.Assert(twirlPrefab);
+        Debug.Assert(tankPrefab);
         Debug.Assert(gameManager);
         Debug.Assert(uiManager);
         Debug.Assert(uiObserver);
         Debug.Assert(gameObserver);
         // Toolbox.
+        DontDestroyOnLoad(cityPrefab.transform.gameObject);
+        DontDestroyOnLoad(twirlPrefab.transform.gameObject);
+        DontDestroyOnLoad(tankPrefab.transform.gameObject);
+        DontDestroyOnLoad(gameManager.transform.gameObject);
+        DontDestroyOnLoad(uiManager.transform.root.gameObject);
+        DontDestroyOnLoad(gameObserver.transform.gameObject);
+        DontDestroyOnLoad(uiObserver.transform.gameObject);
+        DontDestroyOnLoad(gameObject.transform.gameObject);
     }
 
     /// <summary>
@@ -117,6 +127,7 @@ public sealed class Toolbox : Singleton<Toolbox>
     private void Start()
     {
         gameManager.playContinuous = playContinuous;
+        gameManager.resetCamera = resetCamera;
     }
 
     /// <summary>

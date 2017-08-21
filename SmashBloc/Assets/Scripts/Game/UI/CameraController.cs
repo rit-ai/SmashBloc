@@ -20,6 +20,8 @@ public class CameraController : MonoBehaviour, IObservable
     // * FIELDS * //
     //         ** //
 
+    public Transform camRig;
+
     public KeyCode pause;
     public KeyCode escMenu;
     public KeyCode deselect;
@@ -44,7 +46,6 @@ public class CameraController : MonoBehaviour, IObservable
     private List<IObserver> observers;
     private List<MobileUnit> selectedUnits;
     private Camera cam;
-    private Transform camRig;
     private Rect screenBorderInverse;
     private Vector3 screenCenter;
     private Vector3 mousePos;
@@ -100,11 +101,11 @@ public class CameraController : MonoBehaviour, IObservable
         selectedUnits = new List<MobileUnit>();
 
         cam = Camera.main;
-        camRig = GameObject.FindGameObjectWithTag(CAMERA_RIG_TAG).transform;
+        //camRig = GameObject.FindGameObjectWithTag(CAMERA_RIG_TAG).transform;
 
         screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0f);
         // Rectangle that contains everything EXCEPT the screen border
-        screenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE);
+        screenBorderInverse = new Rect(BORDER_SIZE, BORDER_SIZE, Screen.width - BORDER_SIZE * 2, Screen.height - BORDER_SIZE * 4);
 
         state = new SelectedState(this);
     }

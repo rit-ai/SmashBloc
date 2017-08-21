@@ -28,11 +28,11 @@ public class TwirlPhysics : MobilePhysics
     private const float DECELERATION_THRESHOLD_SQRD = 10000f;
     private const float UP_FORCE = 100f;
     // Default steering force strength
-    private const float SPEED = 200f;
+    private const float SPEED = 300f;
     // Adjusts the intensity of steering forces
     private const float GUIDANCE_FACTOR = 1f;
     private const float CONVERGE_FACTOR = 0.25f;
-    private const float DIVERGE_FACTOR = 100f;
+    private const float DIVERGE_FACTOR = 1f;
     // How many colliders to keep track of
     private const int COLLIDER_MEM = 50;
 
@@ -142,7 +142,7 @@ public class TwirlPhysics : MobilePhysics
     /// divergent and alignment forces.</returns>
     private void Flock()
     {
-        // Get all units that are within a very small "sight" range.
+        // Get all units that are within "sight" range.
         convergeCount = Physics.OverlapSphereNonAlloc(transform.position, MAX_DISTANCE_FROM, convergeWith, parent.ignoreAllButMobiles);
         divergeCount = Physics.OverlapSphereNonAlloc(transform.position, MIN_DISTANCE_FROM, divergeWith, parent.ignoreAllButMobiles);
 
