@@ -13,24 +13,21 @@ using UnityEngine;
  * down.
  * 
  * Some methods, like MouseIsOverUI(), are worthwhile in that they increase 
- * overall code readability. However, functions like IdentityToPrefab() should 
- * be phased out. TODO
+ * overall code readability. However, functions like IdentityToGameObject() 
+ * should be phased out.
  * **/
-public class Utils : MonoBehaviour {
+public class Utils : MonoBehaviour
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
     private static Player playerOne;
-
     static Texture2D whiteTexture;
-	public static Texture2D WhiteTexture {
-		get {
-			if(whiteTexture == null) {
-				whiteTexture = new Texture2D(1,1);
-				whiteTexture.SetPixel(0, 0, Color.white);
-				whiteTexture.Apply();
-			}
-			return whiteTexture;
-		}
-	}
+
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     /// <summary>
     /// Draws a rectangle with the passed in color to the screen
@@ -42,7 +39,7 @@ public class Utils : MonoBehaviour {
 	}
 
     /// <summary>
-    /// Creates a border of a rectangle
+    /// Creates a border of a rectangle.
     /// </summary>
     public static void DrawScreenRectBorder( Rect rect, float thickness, Color color )
 	{
@@ -57,9 +54,7 @@ public class Utils : MonoBehaviour {
 	}
 
     /// <summary>
-    /// Returns a rectangle based on the 2 input screen positions
-    /// 
-    /// FIXME Currently unused
+    /// Returns a rectangle based on the 2 input screen positions.
     /// </summary>
     public static Rect GetScreenRect(Vector3 screenPos1, Vector3 screenPos2){
 		// Move origin from bottom left to top left
@@ -74,7 +69,7 @@ public class Utils : MonoBehaviour {
 
     /// <summary>
     /// Creates a bound, based on where the mouse dragged, that will contain 
-    /// the object top be selected
+    /// the object to be selected.
     /// </summary>
     public static Bounds GetViewportBounds( Camera camera, Vector3 screenPosition1, Vector3 screenPosition2 )
 	{
@@ -84,8 +79,6 @@ public class Utils : MonoBehaviour {
 		var max = Vector3.Max( v1, v2 );
 		min.z = camera.nearClipPlane;
 		max.z = camera.farClipPlane;
-		//min.z = 0.0f;
-		//max.z = 1.0f;
 
 		var bounds = new Bounds();
 		bounds.SetMinMax( min, max );
@@ -117,8 +110,6 @@ public class Utils : MonoBehaviour {
         return new List<City>(FindObjectsOfType<City>());
     }
 
-
-
     /// <summary>
     /// Returns the prefab associated with a particular type of Unit.
     /// </summary>
@@ -135,4 +126,55 @@ public class Utils : MonoBehaviour {
         throw new KeyNotFoundException("Bad value passed to UnitToPrefab()");
     }
 
+    /// <summary>
+    /// Animates a transform so that it hovers.
+    /// </summary>
+    /// <param name="hover">The magnitude of the hover.</param>
+    /// <param name="time">A temporal offset (so that the hovers are out of 
+    /// sync.</param>
+    public static IEnumerator AnimateHover(Transform hoverer, float hover, float time = 0f)
+    {
+        float temp; // for swapping
+        float localTime = time;
+        float max = -hover * 60;
+        float min = hover * 60;
+        float hoverOffset;
+
+        while (true)
+        {
+            hoverOffset = Mathf.Lerp(min, max, localTime);
+            hoverer.transform.position = new Vector3(hoverer.transform.position.x, hoverer.transform.position.y + hoverOffset * Time.deltaTime, hoverer.transform.position.z);
+
+            localTime += Time.deltaTime;
+
+            // Swap min and max to reverse direction
+            if (localTime > 1f)
+            {
+                temp = max;
+                max = min;
+                min = temp;
+                localTime -= 1f;
+            }
+
+            yield return 0f;
+        }
+    }
+
+    /// <summary>
+    /// Returns a white texture, creating and storing it if it doesn't already
+    /// exist.
+    /// </summary>
+    public static Texture2D WhiteTexture
+    {
+        get
+        {
+            if (whiteTexture == null)
+            {
+                whiteTexture = new Texture2D(1, 1);
+                whiteTexture.SetPixel(0, 0, Color.white);
+                whiteTexture.Apply();
+            }
+            return whiteTexture;
+        }
+    }
 }

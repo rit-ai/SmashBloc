@@ -17,13 +17,9 @@ using UnityEngine;
 public sealed class MobileAI_Basic : MobileAI
 {
 
-    protected override void Start()
-    {
-        base.Start();
-    }
-
-    protected override void Decide()
+    protected override IThought Think()
     {
         
+        return new Move(info.pointOfInterest);
     }
 }

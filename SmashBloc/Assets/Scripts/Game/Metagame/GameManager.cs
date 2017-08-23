@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 /*
  * @author Paul Galatic
@@ -16,28 +17,36 @@ using UnityEngine;
  * and end).
  * 
  * Everything that involves changing the state of the game as a whole should go
- * in this class.
+ * in this class. It will be split into smaller files as necessary.
  * **/
-public class GameManager : MonoBehaviour, IObservable {
+public class GameManager : MonoBehaviour, IObservable
+{
+    // **         //
+    // * FIELDS * //
+    //         ** //
 
-    // Public constants
-    // The first created player, which will always be the main player.
-    public static Player PLAYER;
+    [HideInInspector]
+    public bool playContinuous; // restart game once it's over
+    [HideInInspector]
+    public bool pauseOnFinish; // pause game when it's over
+    [HideInInspector]
+    public bool resetCamera; // reset the camera at the start of a game
 
     private const string CITY_SPAWN_TAG = "CitySpawn";
     private const float GOLD_INCREMENT_RATE = 0.1f; // higher is slower
     private const int MAX_MONEY = 999; // richness ceiling
     private const int NUM_AI_PLAYERS = 1;
 
-    private CameraController m_CameraController;
-    private GameObject[] citySpawnPoints;
-
+    private List<IObserver> observers;
     private List<Team> teams;
     private List<Player> players;
-    private List<IObserver> observers;
-
+    private CameraController cameraController;
+    private GameObject[] citySpawnPoints;
     private int activeTeams;
-    private bool waitingOnAnimation = false;
+
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
@@ -58,30 +67,26 @@ public class GameManager : MonoBehaviour, IObservable {
 
     /// <summary>
     /// Sets the new destination for the unit, if the unit is of the player's
-    /// team. New destinations take the form of MoveCommands, which means that 
-    /// the unit will deviate from its destination based on its 
-    /// destDeviationRadius value.
+    /// team. Should only be called via a user's actions.
     /// </summary>
     /// <param name="terrain">The terrain, which was right clicked such to 
     /// invoke this method.</param>
-    public void SetNewDestination(HashSet<MobileUnit> selectedUnits, RTS_Terrain terrain)
+    public void SetNewDestination(List<MobileUnit> selectedUnits, RTS_Terrain terrain)
     {
         if (selectedUnits == null) { return; }
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Team playerTeam = PLAYER.Team;
-        if (Physics.Raycast(ray, out hit, terrain.ignoreAllButTerrain))
+        Team playerTeam = Toolbox.PLAYER.Team;
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, terrain.ignoreAllButTerrain))
         {
-            // Set the destination of all the units
-            MoveCommand move = new MoveCommand(hit.point);
-            foreach (MobileUnit u in selectedUnits)
-            {
-                if (u.Team == playerTeam)
-                {
-                    move.Body = u;
-                    move.Execute();
-                }
-            }
+            // A Thought is used here so that the Player doesn't have a greater
+            // degree of control over Mobiles than the AI
+            new SendMobilesToLoc(
+                // Get all the units selected that the player owns
+                selectedUnits.Where(unit => unit.Team == Toolbox.PLAYER.Team).ToList(),
+                // Send them to this location
+                hit.point
+            ).Act();
         }
     }
 
@@ -93,20 +98,17 @@ public class GameManager : MonoBehaviour, IObservable {
     /// <param name="newTeam">The team the city will be transferred to.</param>
     public void TransferCity(City city, Team newTeam)
     {
+        Team loser = city.Team;
         city.Team.cities.Remove(city);
         newTeam.cities.Add(city);
 
-        // Don't chance the city's team until the end
+        // Don't change the city's team until this point
         city.Team = newTeam;
 
-        // Have all the team's cities been eliminated?
-        foreach (Team t in teams)
+        if (loser.IsActive && loser.cities.Count == 0)
         {
-            if (t.IsActive && t.cities.Count == 0)
-            {
-                t.Deactivate();
-                activeTeams--;
-            }
+            loser.Deactivate();
+            activeTeams--;
         }
     }
 
@@ -116,52 +118,30 @@ public class GameManager : MonoBehaviour, IObservable {
     public void ResetGame()
     {
         StopAllCoroutines();
+        NotifyAll(Invocation.CLOSE_ALL);
 
-        // Destroy all teams
         foreach (Team t in teams)
         {
             t.Deactivate();
+        }
+
+        // REACTIVATION
+
+        DistributeCities();
+
+        // Activate all the teams
+        foreach (Team t in teams)
+        {
             t.Activate();
         }
 
         activeTeams = teams.Count;
 
-        Start();
-    }
+        // Set main camera to be behind the first city
+        // TODO make this more flexible
+        if (resetCamera) { cameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position); }
 
-    /// <summary>
-    /// EXTREMELY IMPORTANT INITAILIZATION METHOD.
-    /// 
-    /// This is one of the first initialization methods to occur in the game. 
-    /// Since Game Manager forwards its state to many other classes, ensuring 
-    /// said state is valid and accurate is very important to avoid crashes.
-    /// 
-    /// When editing this method, take care to validate you additions with 
-    /// Debug.Assert().
-    /// </summary>
-    private void Awake()
-    {
-        m_CameraController = Camera.main.GetComponent<CameraController>();
-        citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
-
-        Debug.Assert(m_CameraController != null);
-        Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
-
-        teams = new List<Team>
-        {
-            new Team("Dylante", Color.cyan),
-            new Team("AI Team", Color.red)
-        };
-
-        activeTeams = teams.Count;
-
-        players = new List<Player>
-        {
-            Player.MakePlayer(false, teams[0]),
-            Player.MakePlayer(true, teams[1])
-        };
-
-        PLAYER = players[0];
+        StartCoroutine(GameLoop());
     }
 
     /// <summary>
@@ -169,6 +149,16 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private void Start()
     {
+        cameraController = Camera.main.GetComponent<CameraController>();
+        citySpawnPoints = GameObject.FindGameObjectsWithTag(CITY_SPAWN_TAG);
+
+        Debug.Assert(cameraController != null);
+        Debug.Assert(citySpawnPoints != null && citySpawnPoints.Length > 1);
+
+        teams = Toolbox.GameSetup.Teams;
+        players = Toolbox.GameSetup.Players;
+        activeTeams = teams.Count;
+
         observers = new List<IObserver>
         {
             Toolbox.UIObserver
@@ -176,8 +166,15 @@ public class GameManager : MonoBehaviour, IObservable {
 
         DistributeCities();
 
-        // Set main camera to be behind the player's first city
-        m_CameraController.CenterCameraBehindPosition(PLAYER.Team.cities[0].transform.position);
+        // Activate all the teams
+        foreach (Team t in teams)
+        {
+            t.Activate();
+        }
+
+        // Set main camera to be behind a city, preferrably the player's
+        // Somewhat inexact, TODO make sure it finds the first city every time
+        cameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position);
 
         StartCoroutine(GameLoop());
 
@@ -227,13 +224,21 @@ public class GameManager : MonoBehaviour, IObservable {
     /// </summary>
     private IEnumerator RoundEnding()
     {
-        // Stop IEnumerators
-        StopCoroutine(IncrementGold());
-
-        waitingOnAnimation = true; // wait for ending animation
+        // waitingOnAnimation = true; // TODO wait for ending animation
         NotifyAll(Invocation.GAME_ENDING);
-        yield return new WaitUntil(() => waitingOnAnimation == false);
-        NotifyAll(Invocation.PAUSE_AND_LOCK);
+        yield return new WaitForSeconds(3f);
+        if (playContinuous)
+        {
+            NotifyAll(Invocation.RESET_GAME);
+            ResetGame();
+            yield break;
+        }
+
+        if (pauseOnFinish)
+        {
+            TogglePause();
+            NotifyAll(Invocation.PAUSE_AND_LOCK);
+        }
     }
 
     /// <summary>
@@ -250,14 +255,26 @@ public class GameManager : MonoBehaviour, IObservable {
         Debug.Assert(citySpawnPoints.Length >= NUM_AI_PLAYERS + 1);
 
         City city;
-        for (int x = 0; ((x < citySpawnPoints.Length) && (x < NUM_AI_PLAYERS + 1)); x++)
+        int currTeam = 0;
+        int currCity = 0;
+
+        // Don't distrubute cities if there aren't any teams
+        if (teams.Count < 1) { Debug.Log("Did you forget to set the number of teams?");  return; }
+
+        // Run until we run out of spawn points or we run out of players
+        while (currCity < citySpawnPoints.Length && currCity < NUM_AI_PLAYERS + 1)
         {
+            // Grab a city from the city pool and initialize it
             city = Toolbox.CityPool.Rent();
-            city.Team = teams[x];
-            city.transform.position = citySpawnPoints[x].transform.position;
-            teams[x].cities.Add(city);
+            city.Team = teams[currTeam];
+            teams[currTeam].cities.Add(city);
+            city.transform.position = citySpawnPoints[currCity].transform.position;
             city.gameObject.SetActive(true);
             city.Activate();
+            // Increment and wrap around the list of teams
+            currTeam = ++currTeam % teams.Count;
+            // Increment the city spawn counter
+            currCity++;
         }
     }
 

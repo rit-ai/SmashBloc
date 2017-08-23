@@ -1,0 +1,43 @@
+Mono path[0] = 'C:/Users/PGALATIC/Documents/SmashBloc/SmashBloc/Builds/smashbloc_v0_0_1_2_Data/Managed'
+Mono path[1] = 'C:/Users/PGALATIC/Documents/SmashBloc/SmashBloc/Builds/smashbloc_v0_0_1_2_Data/Mono'
+Mono config path = 'C:/Users/PGALATIC/Documents/SmashBloc/SmashBloc/Builds/smashbloc_v0_0_1_2_Data/Mono/etc'
+PlayerConnection initialized from C:/Users/PGALATIC/Documents/SmashBloc/SmashBloc/Builds/smashbloc_v0_0_1_2_Data (debug = 0)
+PlayerConnection initialized network socket : 0.0.0.0 55384
+Multi-casting "[IP] 10.140.162.214 [Port] 55384 [Flags] 3 [Guid] 2575205278 [EditorId] 1844596416 [Version] 1048832 [Id] WindowsPlayer(MM229877-PC) [Debug] 1" to [225.0.0.222:54997]...
+Waiting for connection from host on [0.0.0.0:55384]...
+PlayerConnection accepted from [10.140.162.214] handle:0x314
+Started listening to [0.0.0.0:55384]
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,defer=y,address=0.0.0.0:56278
+PlayerConnection already initialized - listening to [0.0.0.0:55384]
+Player data archive not found at `C:/Users/PGALATIC/Documents/SmashBloc/SmashBloc/Builds/smashbloc_v0_0_1_2_Data/data.unity3d`, using local filesystemInitialize engine version: 5.6.2f1 (a2913c821e27)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: Intel(R) HD Graphics 530 (ID=0x191b)
+    Vendor:   Intel
+    VRAM:     2146 MB
+    Driver:   21.20.16.4627
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\PGALATIC\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_1_2_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\PGALATIC\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_1_2_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\PGALATIC\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_1_2_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\PGALATIC\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_1_2_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\PGALATIC\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_1_2_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\PGALATIC\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_1_2_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\PGALATIC\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_1_2_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\PGALATIC\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_1_2_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.039 seconds
+Platform assembly: C:\Users\PGALATIC\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_1_2_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\PGALATIC\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_1_2_Data\Managed\System.dll (this message is harmless)
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
+<RI> Initializing input.
+XInput1_3.dll not found. Trying XInput9_1_0.dll instead...
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 5.281595 ms
+Setting up 4 worker threads for Enlighten.
+  Thread -> id: e08 -> priority: 1 
+  Thread -> id: 61fc -> priority: 1 
+  Thread -> id: 5c98 -> priority: 1 
+  Thread -> id: 6528 -> priority: 1 
+Waiting for finish
