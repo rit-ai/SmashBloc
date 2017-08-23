@@ -18,24 +18,35 @@ public class MainMenuManager : MonoBehaviour
     //         ** //
 
     public Button startButton;
+    public Button optionsButton;
     public Button quitButton;
+
+    private bool inOptions;
+
+
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     // Initialize only once
     private void Awake()
     {
+        inOptions = false;
         startButton.onClick.AddListener(StartButtonPressed);
+        optionsButton.onClick.AddListener(OptionsButtonPressed);
         quitButton.onClick.AddListener(QuitButtonPressed);
     }
 
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    private void Update()
+    {
+        if (inOptions && Input.GetKeyDown(KeyCode.Escape))
+        {
+            startButton.gameObject.SetActive(true);
+            optionsButton.gameObject.SetActive(true);
+            quitButton.gameObject.SetActive(true);
+            inOptions = false;
+        }
+    }
 
     /// <summary>
     /// Loads the demo scene (starts the game)
@@ -51,5 +62,17 @@ public class MainMenuManager : MonoBehaviour
     private void QuitButtonPressed()
     {
         Application.Quit();
+    }
+
+    /// <summary>
+    /// Nullifies the other buttons/activates them
+    /// TODO: Create a more modular menu/options system that is re-usable
+    /// </summary>
+    private void OptionsButtonPressed()
+    {
+        startButton.gameObject.SetActive(false);
+        optionsButton.gameObject.SetActive(false);
+        quitButton.gameObject.SetActive(false);
+        inOptions = true;
     }
 }
