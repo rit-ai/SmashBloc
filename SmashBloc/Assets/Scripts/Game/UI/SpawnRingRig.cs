@@ -35,13 +35,11 @@ public class SpawnRingRig : MonoBehaviour
         innerRing.GetComponent<MeshRenderer>().material.color = color;
     }
 
-	void Start () {
+    public void Init(Color color)
+    {
         StartCoroutine(Utils.AnimateHover(outerRing, hoverHeight));
         StartCoroutine(Utils.AnimateHover(innerRing, hoverHeight / 2f, 0.5f));
-
-        // A complex way of saying we want to be the same color as the parent.
-        outerRing.GetComponent<MeshRenderer>().material.color = GetComponentInParent<City>().gameObject.GetComponent<MeshRenderer>().material.color;
-        innerRing.GetComponent<MeshRenderer>().material.color = GetComponentInParent<City>().gameObject.GetComponent<MeshRenderer>().material.color;
+        UpdateColor(color);
     }
 	
 	// Rotates about the Y axis

@@ -66,12 +66,14 @@ public class City : Unit
     public override void Activate()
     {
         maxHealth = MAX_HEALTH;
-        // Default values
         incomeLevel = DEFAULT_INCOME_LEVEL;
+
+        base.Activate();
+
+        spawnRingRig.Init(surface.material.color);
 
         StartCoroutine(Regenerate());
 
-        base.Activate();
     }
 
     /// <summary>
@@ -161,6 +163,11 @@ public class City : Unit
     {
         Highlight();
         NotifyAll(Invocation.CITY_MENU);
+    }
+
+    private void Start()
+    {
+        spawnRingRig = GetComponentInChildren<SpawnRingRig>();
     }
 
     /// <summary>

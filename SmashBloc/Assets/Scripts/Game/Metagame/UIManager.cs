@@ -253,6 +253,7 @@ public class UIManager : MonoBehaviour, IObservable
 
         message.enabled = false;
         NotifyAll(Invocation.ANIMATION_FINISHED);
+        yield break;
     }
 
     // Initialize only once

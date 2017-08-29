@@ -13,7 +13,7 @@ using UnityEngine;
  * **/
 public class GameSetup : MonoBehaviour
 {
-    // **         //
+    // **         
     // * FIELDS * //
     //         ** //
 
@@ -22,6 +22,14 @@ public class GameSetup : MonoBehaviour
     [Tooltip("Minimum: 1; Maximum: Number of CitySpawnPoints")]
     public int numberOfTeams;
 
+    // 'Standard' colors to make teams easily distinguishible
+    private List<Color> DEFAULT_COLORS = new List<Color>
+        {
+            Color.cyan,
+            Color.red,
+            Color.yellow,
+            Color.green
+        };
     private List<Team> teams;
     private List<Player> players;
     private bool locked; // Are the controls locked?
@@ -39,7 +47,7 @@ public class GameSetup : MonoBehaviour
         players = new List<Player>();
         teams = new List<Team>
         {
-            new Team("TEAM ONE", Random.ColorHSV(0f, 1f))
+            new Team("TEAM ONE", DEFAULT_COLORS[0])
         };
 
         if (hasPlayer)
@@ -57,7 +65,7 @@ public class GameSetup : MonoBehaviour
         // The rest are AI teams
         for (int x = 1; x < numberOfTeams; x++)
         {
-            teams.Add(new Team(x.ToString(), Random.ColorHSV(0f, 1f)));
+            teams.Add(new Team(x.ToString(), DEFAULT_COLORS[x]));
             players.Add(Player.MakePlayer(true, teams[x]));
         }
 

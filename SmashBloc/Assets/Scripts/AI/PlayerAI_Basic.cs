@@ -31,6 +31,10 @@ public sealed class PlayerAI_Basic : PlayerAI {
         {
             target = info.team.enemies[0].cities[0];
         }
+        else if (info.team.enemies.Count == 0)
+        {
+            Debug.LogWarning("Could not find an enemy.");
+        }
 
         if (cooldown <= 0 && info.team.mobiles.Count >= ARMY_SIZE && target != null)
         {
