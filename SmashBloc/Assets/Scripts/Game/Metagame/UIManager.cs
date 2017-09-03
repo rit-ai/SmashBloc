@@ -30,6 +30,8 @@ public class UIManager : MonoBehaviour, IObservable {
     // MENU
     public Canvas m_PauseMenu;
     public Canvas m_DevMenu;
+    public GameObject m_MainPausePanel;
+    public GameObject m_OptionsPausePanel;
     public Button m_ResetButton;
     public Button m_OptionsButton;
     public Toggle m_OptionsMenuDevModeToggle;
@@ -95,9 +97,11 @@ public class UIManager : MonoBehaviour, IObservable {
     {
         // Toggling buttons on/off and the inOptionsMenu boolean
         inOptionsMenu = !inOptionsMenu;
-        m_ResetButton.gameObject.SetActive(!m_ResetButton.gameObject.activeSelf);
-        m_OptionsButton.gameObject.SetActive(!m_OptionsButton.gameObject.activeSelf);
-        m_OptionsMenuDevModeToggle.gameObject.SetActive(!m_OptionsMenuDevModeToggle.gameObject.activeSelf);
+        //m_ResetButton.gameObject.SetActive(!m_ResetButton.gameObject.activeSelf);
+        //m_OptionsButton.gameObject.SetActive(!m_OptionsButton.gameObject.activeSelf);
+        //m_OptionsMenuDevModeToggle.gameObject.SetActive(!m_OptionsMenuDevModeToggle.gameObject.activeSelf);
+        m_MainPausePanel.gameObject.SetActive(!m_MainPausePanel.gameObject.activeSelf);
+        m_OptionsPausePanel.gameObject.SetActive(!m_OptionsPausePanel.gameObject.activeSelf);
         // Notifies all observers of the current menu state
         if (!inOptionsMenu)
         {
@@ -288,6 +292,9 @@ public class UIManager : MonoBehaviour, IObservable {
     // Initialize only once
     private void Awake()
     {
+        // Disable objects
+        m_OptionsPausePanel.gameObject.SetActive(false);
+
         // Set UI handlers
         // Handlers for changing a dropdown value
         m_UnitSelect.onValueChanged.AddListener(delegate { SetUnitToSpawn(); });
