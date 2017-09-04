@@ -23,18 +23,28 @@ public class UIManager : MonoBehaviour, IObservable
     public Camera cam;
     public Canvas pauseText;
     // MENU
+<<<<<<< HEAD
+    public Canvas m_PauseMenu;
+    public Canvas m_DevMenu;
+    public GameObject m_MainPausePanel;
+    public GameObject m_OptionsPausePanel;
+    public Button m_ResetButton;
+    public Button m_OptionsButton;
+    public Toggle m_OptionsMenuDevModeToggle;
+    // HEADER
+    public Dropdown m_UnitSelect;
+    public Text m_CurrentGoldAmount;
+    public Text m_CurrentUnitAmount;
+    public Button m_DevMenuButton;
+=======
     public Canvas pauseMenu;
-    public Canvas devMenu;
-    public Canvas mainPausePanel;
-    public Canvas optionsPausePanel;
-    public Button reset;
-    public Button options;
-    public Button exit;
+    public Button resetButton;
+    public Button exitButton;
     // HEADER
     public Dropdown unitSelect;
-    public Text currentGold;
-    public Text currentUnits;
-    public Button devMenuButton;
+    public Text currentGoldAmount;
+    public Text currentUnitAmount;
+>>>>>>> master
     // STARTING AND ENDING GAME
     public Text message;
     // UNIT MENU
@@ -81,14 +91,15 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void ToggleMenu()
     {
+<<<<<<< HEAD
         if(inOptionsMenu)
         {
             ToggleOptionsMenu();
         }
         else
         {
-            pauseMenu.enabled = !(pauseMenu.enabled);
-            pauseMenu.transform.SetAsLastSibling();
+            m_PauseMenu.enabled = !(m_PauseMenu.enabled);
+            m_PauseMenu.transform.SetAsLastSibling();
         }
         
     }
@@ -104,13 +115,21 @@ public class UIManager : MonoBehaviour, IObservable
         //m_ResetButton.gameObject.SetActive(!m_ResetButton.gameObject.activeSelf);
         //m_OptionsButton.gameObject.SetActive(!m_OptionsButton.gameObject.activeSelf);
         //m_OptionsMenuDevModeToggle.gameObject.SetActive(!m_OptionsMenuDevModeToggle.gameObject.activeSelf);
-        mainPausePanel.gameObject.SetActive(!mainPausePanel.gameObject.activeSelf);
-        optionsPausePanel.gameObject.SetActive(!optionsPausePanel.gameObject.activeSelf);
+        m_MainPausePanel.gameObject.SetActive(!m_MainPausePanel.gameObject.activeSelf);
+        m_OptionsPausePanel.gameObject.SetActive(!m_OptionsPausePanel.gameObject.activeSelf);
         // Notifies all observers of the current menu state
         if (!inOptionsMenu)
         {
             NotifyAll(Invocation.IN_MAINMENU);
         }
+        else
+        {
+            NotifyAll(Invocation.IN_SUBMENU);
+        }
+=======
+        pauseMenu.enabled = !(pauseMenu.enabled);
+        pauseMenu.transform.SetAsLastSibling();
+>>>>>>> master
     }
 
     /// <summary>
@@ -118,9 +137,12 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void TogglePauseText()
     {
-        reset.enabled = !(reset);
-        reset.enabled = !(reset.enabled);
+<<<<<<< HEAD
+        m_ResetButton.enabled = !(m_ResetButton);
+        m_ResetButton.enabled = !(m_ResetButton.enabled);
+=======
         pauseText.enabled = !(pauseText.enabled);
+>>>>>>> master
     }
 
     /// <summary>
@@ -297,7 +319,7 @@ public class UIManager : MonoBehaviour, IObservable
     private void Awake()
     {
         // Disable objects
-        optionsPausePanel.gameObject.SetActive(false);
+        m_OptionsPausePanel.gameObject.SetActive(false);
 
         // Set UI handlers
         // Handlers for changing a dropdown value
@@ -306,14 +328,18 @@ public class UIManager : MonoBehaviour, IObservable
         unitMenuName.onEndEdit.AddListener(delegate { UpdateUnitName(); });
         unitMenuName.onEndEdit.AddListener(delegate { UpdateCityName(); });
         // Handlers for pressing a button on a menu
-        cityMenuSpawn.onClick.AddListener(delegate { SpawnUnit(); });
-        reset.onClick.AddListener(delegate { ResetButtonPressed(); });
-        options.onClick.AddListener(delegate { OptionsButtonPressed(); });
-        devMenuButton.onClick.AddListener(delegate { DevButtonPressed(); });
+<<<<<<< HEAD
+        m_CityMenuSpawnButton.onClick.AddListener(delegate { SpawnUnit(); });
+        m_ResetButton.onClick.AddListener(delegate { ResetButtonPressed(); });
+        m_OptionsButton.onClick.AddListener(delegate { OptionsButtonPressed(); });
+        m_DevMenuButton.onClick.AddListener(delegate { DevButtonPressed(); });
         //Handlers for pressing a toggle
+        m_OptionsMenuDevModeToggle.onValueChanged.AddListener((e) => { DevToggleListener(e); });
+=======
         cityMenuSpawn.onClick.AddListener(delegate { SpawnUnit(); });
-        reset.onClick.AddListener(delegate { ResetButtonPressed(); });
-        exit.onClick.AddListener(delegate { ExitButtonPressed(); });
+        resetButton.onClick.AddListener(delegate { ResetButtonPressed(); });
+        exitButton.onClick.AddListener(delegate { ExitButtonPressed(); });
+>>>>>>> master
     }
 
     // Initialize whenever this object loads
@@ -336,7 +362,7 @@ public class UIManager : MonoBehaviour, IObservable
         // Initialization
         SetUnitToSpawn();
         
-        devMenuButton.gameObject.SetActive(false);
+        m_DevMenuButton.gameObject.SetActive(false);
 
     }
 
@@ -363,6 +389,7 @@ public class UIManager : MonoBehaviour, IObservable
     }
 
     /// <summary>
+<<<<<<< HEAD
     /// Calls ToggleOptionsMenu()
     /// </summary>
     private void OptionsButtonPressed()
@@ -375,9 +402,8 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     private void DevButtonPressed()
     {
-        devMenu.enabled = !(devMenu.enabled);
-    }
-
+        m_DevMenu.enabled = !(m_DevMenu.enabled);
+=======
     /// Exits the game.
     /// </summary>
     /// TODO allow exit back to main menu.
@@ -388,6 +414,7 @@ public class UIManager : MonoBehaviour, IObservable
 #else
         Application.Quit();
 #endif
+>>>>>>> master
     }
 
     /// <summary>
@@ -448,16 +475,25 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void CloseAll()
     {
+<<<<<<< HEAD
         if(Time.timeScale != 0)
         {
-            targetRing.gameObject.SetActive(false);
-            pauseText.enabled = false;
-            pauseMenu.enabled = false;
-            devMenu.enabled = false;
-            unitMenu.enabled = false;
-            cityMenu.enabled = false;
-            message.enabled = false;
+            m_TargetRing.gameObject.SetActive(false);
+            m_PauseText.enabled = false;
+            m_PauseMenu.enabled = false;
+            m_DevMenu.enabled = false;
+            m_UnitMenu.enabled = false;
+            m_CityMenu.enabled = false;
+            m_Message.enabled = false;
         }
+=======
+        targetRing.gameObject.SetActive(false);
+        pauseText.enabled = false;
+        pauseMenu.enabled = false;
+        unitMenu.enabled = false;
+        cityMenu.enabled = false;
+        message.enabled = false;
+>>>>>>> master
     }
 
     /// <summary>
@@ -479,7 +515,7 @@ public class UIManager : MonoBehaviour, IObservable
     /// should be visible</param>
     private void DevToggleListener(bool isOn)
     {
-        devMenuButton.gameObject.SetActive(isOn);
+        m_DevMenuButton.gameObject.SetActive(isOn);
     }
 
     /// <summary>
@@ -489,7 +525,7 @@ public class UIManager : MonoBehaviour, IObservable
     {
         int gold = Toolbox.PLAYER.Gold;
         string goldText = gold.ToString();
-        currentGold.text = goldText;
+        currentGoldAmount.text = goldText;
     }
 
     /// <summary>
@@ -499,6 +535,6 @@ public class UIManager : MonoBehaviour, IObservable
     {
         int units = Toolbox.PLAYER.Team.mobiles.Count;
         string unitText = units.ToString();
-        currentUnits.text = unitText;
+        currentUnitAmount.text = unitText;
     }
 }

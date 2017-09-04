@@ -43,7 +43,15 @@ public class GameManager : MonoBehaviour, IObservable
     private CameraController cameraController;
     private GameObject[] citySpawnPoints;
     private int activeTeams;
+<<<<<<< HEAD
+    private bool waitingOnAnimation = false;
     private bool inSubMenu = false;
+=======
+
+    // **          //
+    // * METHODS * //
+    //          ** //
+>>>>>>> master
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
@@ -51,6 +59,15 @@ public class GameManager : MonoBehaviour, IObservable
         {
             o.OnNotify(this, invoke, data);
         }
+    }
+
+    /// <summary>
+    /// Getter/Setter for inSubMenu
+    /// </summary>
+    public bool InSubMenu
+    {
+        get { return inSubMenu; }
+        set { inSubMenu = value; }
     }
 
     /// <summary>
@@ -302,14 +319,5 @@ public class GameManager : MonoBehaviour, IObservable
             yield return new WaitForSeconds(GOLD_INCREMENT_RATE);
 
         }
-    }
-
-    /// <summary>
-    /// Getter/Setter for inSubMenu
-    /// </summary>
-    public bool InSubMenu
-    {
-        get { return inSubMenu; }
-        set { inSubMenu = value; }
     }
 }
