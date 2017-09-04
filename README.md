@@ -1,6 +1,6 @@
 ![Screenshot](Docs/logo_v1.png)
 
-# SmashBloc (v0.0.1.1)
+# SmashBloc (v0.0.1.3)
 
 Breaking into AI concepts without formal education on the subject can be tricky, and most universities shutter AI-related courses behind layers of prerequisites. After all, in order to program an effective AI, it's absolutely necessary to have a rigorous understanding of data structures and algorithmic computation.
 
@@ -35,7 +35,7 @@ See also the list of [contributors](https://github.com/RITficialIntelligence/Sma
 
 ## License
 
-This project is licensed under the [MIT License](Docs/LICENSE.md).
+See our [license](LICENSE).
 
 ## Acknowledgments
 

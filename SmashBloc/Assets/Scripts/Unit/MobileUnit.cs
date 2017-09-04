@@ -13,40 +13,26 @@ using UnityEngine;
  * **/
 public abstract class MobileUnit : Unit
 {
+    // **         //
+    // * FIELDS * //
+    //         ** //
+
     public LayerMask ignoreAllButMobiles;
 
-    protected MobileAI ai;
-    protected Vector3 newPos;
-    protected Vector3 destination;
-    protected Vector3 storedDestination = default(Vector3);
-    protected float destDeviationRadius;
+    protected MobileAI brain;
+    protected Vector3 movingTo; // the exact position we're moving to
+    protected Vector3 pointOfInterest; // the location of where we want to go
     protected float damage;
     protected float sightRange;
     protected float attackRange;
 
-    // Private constants
     private const float PASS_INFO_RATE = 1f;
 
-    // Private fields
-    private MobileUnitInfo info;
+    private MobileInfo info;
 
-    // Set initial state for when a MobileUnit is created
-    public override void Activate()
-    {
-        // Units, by default, hover a a short distance around their spawn pos
-        MoveCommand idle = new MoveCommand(transform.position)
-        {
-            Body = this
-        };
-        idle.Execute();
-
-        // Pass info to the AI component every second
-        info = new MobileUnitInfo();
-        StartCoroutine(PassInfo());
-
-        base.Activate();
-    }
-
+    // **          //
+    // * METHODS * //
+    //          ** //
 
     /// <summary>
     /// Causes the unit's health to become zero.
@@ -58,76 +44,80 @@ public abstract class MobileUnit : Unit
     }
 
     /// <summary>
+    /// Activates the Mobile and initializes its brain.
+    /// </summary>
+    public override void Activate()
+    {
+        // Units wait near their spawn position until given orders
+        pointOfInterest = transform.position;
+
+        // Pass info to the AI component every second
+        info = new MobileInfo();
+        StartCoroutine(PassInfo());
+
+        brain.Activate();
+        base.Activate();
+    }
+
+    /// <summary>
+    /// Deactivates the Mobile and removes it from its team.
+    /// </summary>
+    public override void Deactivate()
+    {
+        team.mobiles.Remove(this);
+        base.Deactivate();
+    }
+
+    /// <summary>
     /// Grabs all relevant information and builds it into an EnvironmentInfo 
     /// struct to pass into the unit's AI component.
     /// </summary>
     protected IEnumerator PassInfo()
     {
         // Add all units within line of sight to the unitsInSightRange list.
-        Unit current;
-        List<Unit> enemiesInSight = new List<Unit>();
-        List<Unit> alliesInSight = new List<Unit>();
-        List<Unit> enemiesInAttackRange = new List<Unit>();
-        List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButMobiles));
-        foreach (Collider c in collidersInSight)
+        while (true)
         {
-            current = c.gameObject.GetComponent<Unit>();
-            // Only be aggressive to units on the other team.
-            if (current.Team != team)
+            Unit current;
+            List<Unit> enemiesInSight = new List<Unit>();
+            List<Unit> alliesInSight = new List<Unit>();
+            List<Unit> enemiesInAttackRange = new List<Unit>();
+            List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButMobiles));
+            foreach (Collider c in collidersInSight)
             {
-                // If they're close enough to attack, add them to the second list.
-                if (c.transform.position.magnitude - transform.position.magnitude < attackRange)
-                    enemiesInAttackRange.Add(current);
-                enemiesInSight.Add(current);
+                current = c.gameObject.GetComponent<Unit>();
+                // Only be aggressive to units on the other team.
+                if (current.Team != team)
+                {
+                    // If they're close enough to attack, add them to the second list.
+                    if (c.transform.position.magnitude - transform.position.magnitude < attackRange)
+                        enemiesInAttackRange.Add(current);
+
+                    enemiesInSight.Add(current);
+                }
+                else
+                {
+                    alliesInSight.Add(current);
+                }
             }
-            else
-            {
-                alliesInSight.Add(current);
-            }
+
+            // Build the info object.
+            info.team = team;
+            info.healthPercentage = health / maxHealth;
+            info.damage = damage;
+
+            info.enemiesInSight = enemiesInSight;
+            info.alliesInSight = alliesInSight;
+            info.enemiesInAttackRange = enemiesInAttackRange;
+
+            info.movingTo = movingTo;
+            info.pointOfInterest = pointOfInterest;
+
+            brain.Info = info;
+            yield return new WaitForSeconds(PASS_INFO_RATE);
         }
 
-        // Build the info object.
-        info.team = team;
-        info.healthPercentage = health / maxHealth;
-        info.damage = damage;
-
-        info.enemiesInSight = enemiesInSight;
-        info.alliesInSight = alliesInSight;
-        info.enemiesInAttackRange = enemiesInAttackRange;
-
-        ai.UpdateInfo(info);
-        yield return new WaitForSeconds(PASS_INFO_RATE);
     }
 
-    /// <summary>
-    /// Kill this instance.
-    /// </summary>
-    protected override void OnDeath(Unit killer)
-    {
-        StartCoroutine(DeathAnimation());
-    }
-
-    /// <summary>
-    /// "Animates" the death of the unit, which can be handled as the 
-    /// implementer sees fit. The default behavior is to become very heavy and
-    /// then fade out.
-    /// </summary>
-    protected virtual IEnumerator DeathAnimation()
-    {
-        Color fadeOut = m_Surface.material.color;
-
-        GetComponent<Rigidbody>().mass *= 100;
-        for (float x = 1; x > 0; x -= 0.01f)
-        {
-            fadeOut.a = x;
-            m_Surface.material.color = fadeOut;
-            yield return 0f;
-        }
-
-
-
-        yield return null;
-    }
 
     /// <summary>
     /// Units take damage when they collide with a unit of the enemy team.
@@ -137,7 +127,33 @@ public abstract class MobileUnit : Unit
         Unit unit = collision.gameObject.GetComponent<Unit>();
         if (unit != null && !(unit.Team.Equals(team)))
         {
-            base.TakeDamage(UnityEngine.Random.Range(10f, 20f), unit);
+            base.UpdateHealth(-UnityEngine.Random.Range(10f, 20f), unit);
+        }
+    }
+
+    /// <summary>
+    /// Kill this instance.
+    /// </summary>
+    protected override void OnDeath(Unit killer)
+    {
+        if (gameObject.activeSelf) { StartCoroutine(DeathAnimation()); }
+    }
+
+    /// <summary>
+    /// "Animates" the death of the unit, which can be handled as the 
+    /// implementer sees fit. The default behavior is to become very heavy and
+    /// then fade out.
+    /// </summary>
+    protected virtual IEnumerator DeathAnimation()
+    {
+        Color fadeOut = surface.material.color;
+
+        GetComponent<Rigidbody>().mass *= 100;
+        for (float x = 1; x > 0; x -= 0.01f)
+        {
+            fadeOut.a = x;
+            surface.material.color = fadeOut;
+            yield return 0f;
         }
     }
 
@@ -151,41 +167,37 @@ public abstract class MobileUnit : Unit
     public abstract override string Identity();
 
     /// <summary>
+    /// Logic handler for when the unit is individually selected, including
+    /// notifying proper menu observers.
+    /// </summary>
+    private void OnMouseDown()
+    {
+        Highlight();
+        NotifyAll(Invocation.ONE_SELECTED);
+        NotifyAll(Invocation.UNIT_MENU);
+    }
+
+    /// <summary>
     /// The Unit's brain.
     /// </summary>
     public MobileAI AI
     {
-        get { return ai; }
-        set { ai = value; }
+        get { return brain; }
+        set { brain = value; }
     }
 
     /// <summary>
-    /// Units will deviate from any assigned movement by an amount based on 
-    /// this radius. Set to 0 to disable.
-    /// </summary>
-    public float DestDeviationRadius
-    {
-        get { return destDeviationRadius; }
-    }
-
-    /// <summary>
-    /// This unit's current destination.
+    /// This unit's current destination. Its Y component is removed.
     /// </summary>
     public Vector3 Destination
     {
-        get { return destination; }
-        set {
-            // Don't change the destination if we're currently waiting to fire
-            if (storedDestination != default(Vector3)) {
-                value.y = 0;
-                storedDestination = value;
-            }
-            else
-            {
-                value.y = 0;
-                destination = value;
-            }
-        }
+        get { return movingTo; }
+        set { movingTo = value; }
+    }
+
+    public Vector3 PointOfInterest
+    {
+        set { pointOfInterest = value; }
     }
 
     /// <summary>
@@ -203,4 +215,5 @@ public abstract class MobileUnit : Unit
     {
         get { return attackRange; }
     }
+
 }

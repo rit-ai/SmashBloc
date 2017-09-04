@@ -7,67 +7,61 @@ using UnityEngine;
  * @author Paul Galatic
  * 
  * Class created to represent state common across all Unit AIs and providing 
- * details on how to implement a custom one. The basic dataflow of a Unit AI is
- * as follows:
+ * details on how to implement a custom one. The basic dataflow of a Mobile AI 
+ * is as follows:
  * 
  * 1. Receive Info from Body
- * 2. Process Info and form Commands
- * 3. Enqueue Commands
- * 4. Wait for more Info
+ * 2. Process Info and execute ICommand
  * 
- * Step one is called by the body in UpdateInfo(). Step two is Decide(). Step
- * three is AddCommand(). Children classes only have to worry about 
- * implementing Decide(), building Commands, and calling AddCommand(). 
- * Everything else is handled externally.
+ * Step one is called by the body in UpdateInfo(). Step two is Decide(). 
+ * Children classes only have to worry about implementing Decide().
  * **/
 public abstract class MobileAI : AbstractAI
 {
     // Unit AIs control Units. However, the AIs aren't allowed to reference
     // their Units themselves—they can only do so through Commands.
-    new private MobileUnit body;
+    private MobileUnit body;
     // This is the most updated information the AI has from its body.
-    protected MobileUnitInfo info;
-    // The absolute destination of the unit, separate from the local 
-    // destination (which this AI should freely change). This value is set by 
-    // either the player, or by a "parent AI" that controls all the units.
-    protected Vector3 absoluteDest;
+    protected MobileInfo info;
 
     public MobileUnit Body { set { body = value; } }
+    // It's the Body's responsibility to keep this value updated, but it won't
+    // be sampled more frequently than INFO_SAMPLING_RATE.
+    public MobileInfo Info { set { info = value; } }
 
     /// <summary>
-    /// Decide how to handle new information. Will be called after every update
-    /// to info.
+    /// Periodically makes a decision based on current known info.
     /// </summary>
-    protected abstract void Decide();
-
-    // Sealed and protected, to handle the requirements of BaseAI
-    public sealed override void UpdateInfo(object info)
+    protected sealed override IEnumerator Thinking(float SAMPLING_RATE)
     {
-        if (!(info is MobileUnitInfo))
-        {
-            throw new ArgumentException("Attempted to call UpdateState with wrong Info type.", "info");
-        }
-        this.info = (info as MobileUnitInfo);
-        Decide();
-    }
+        IThought thought;
 
-    // Sealed and protected, to handle the requirements of BaseAI
-    protected sealed override void SetCurrentCommand(ICommand command)
-    {
-        if (!(command is MobileCommand))
+        while (true)
         {
-            throw new ArgumentException("Attempted to call AddCommand with wrong Command type.", "command");
+            // Use sensory info to determine a course of action
+            thought = Think();
+            // Beware of impure thoughts
+            if (thought != null && thought is MobileThought)
+            {
+                // If the thought is pure, act on it
+                ((MobileThought)thought).Body = body;
+                thought.Act();
+                priorThought = thought;
+                thought = null;
+            }
+            else
+            {
+                Debug.Log("WARN: MobileAI has bad thoughts.");
+            }
+
+            yield return new WaitForSeconds(SAMPLING_RATE);
         }
-        SetCurrentCommand(command as MobileCommand);
+
     }
 
     /// <summary>
-    /// Enqueues a command to the commandQueue.
+    /// The responsibility of this function is to evaluate the current info and 
+    /// return a Thought intended to advance the Player's goals.
     /// </summary>
-    /// <param name="command">The command to enqueue.</param>
-    protected void SetCurrentCommand(MobileCommand command)
-    {
-        command.Body = body;
-        currentCommand = command;
-    }
+    protected abstract override IThought Think();
 }
