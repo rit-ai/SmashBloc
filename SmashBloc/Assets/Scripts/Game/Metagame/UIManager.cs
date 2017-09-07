@@ -61,7 +61,6 @@ public class UIManager : MonoBehaviour, IObservable
     private City cityCurrentlyDisplayed;
     private Vector3 oldMousePos;
     private Vector3 menuSpawnPos;
-    private bool inOptionsMenu = false;
 
     // **          //
     // * METHODS * //
@@ -81,13 +80,13 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void ToggleMenu()
     {
-        if(inOptionsMenu)
+        if(optionsPausePanel.gameObject.activeSelf)
         {
             ToggleOptionsMenu();
         }
         else
         {
-            pauseMenu.enabled = !(pauseMenu.enabled);
+            pauseMenu.gameObject.SetActive(!(pauseMenu.gameObject.activeSelf));
             pauseMenu.transform.SetAsLastSibling();
         }
         
@@ -99,15 +98,10 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void ToggleOptionsMenu()
     {
-        // Toggling buttons on/off and the inOptionsMenu boolean
-        inOptionsMenu = !inOptionsMenu;
-        //m_ResetButton.gameObject.SetActive(!m_ResetButton.gameObject.activeSelf);
-        //m_OptionsButton.gameObject.SetActive(!m_OptionsButton.gameObject.activeSelf);
-        //m_OptionsMenuDevModeToggle.gameObject.SetActive(!m_OptionsMenuDevModeToggle.gameObject.activeSelf);
         mainPausePanel.gameObject.SetActive(!mainPausePanel.gameObject.activeSelf);
         optionsPausePanel.gameObject.SetActive(!optionsPausePanel.gameObject.activeSelf);
         // Notifies all observers of the current menu state
-        if (!inOptionsMenu)
+        if (!optionsPausePanel.gameObject.activeSelf)
         {
             NotifyAll(Invocation.IN_MAINMENU);
         }
@@ -118,9 +112,10 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void TogglePauseText()
     {
-        reset.enabled = !(reset);
-        reset.enabled = !(reset.enabled);
-        pauseText.enabled = !(pauseText.enabled);
+        if (!pauseMenu.gameObject.activeSelf)
+        {
+            pauseText.enabled = !(pauseText.enabled);
+        }
     }
 
     /// <summary>
@@ -298,6 +293,7 @@ public class UIManager : MonoBehaviour, IObservable
     {
         // Disable objects
         optionsPausePanel.gameObject.SetActive(false);
+        pauseMenu.gameObject.SetActive(false);
 
         // Set UI handlers
         // Handlers for changing a dropdown value
