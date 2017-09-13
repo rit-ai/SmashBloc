@@ -22,14 +22,17 @@ public class UIManager : MonoBehaviour, IObservable
     // GENERAL
     public Camera cam;
     public Canvas pauseText;
-    // MENU
+    // MAIN MENU
     public GameObject pauseMenu;
-    public Canvas devMenu;
     public GameObject mainPausePanel;
-    public Canvas optionsPausePanel;
     public Button reset;
     public Button options;
     public Button exit;
+    // OPTIONS MENU
+    public GameObject optionsPausePanel;
+    public Toggle enableDevToggle;
+    // DEV MENU
+    public GameObject devMenu;
     // HEADER
     public Dropdown unitSelect;
     public Text currentGold;
@@ -310,10 +313,12 @@ public class UIManager : MonoBehaviour, IObservable
         reset.onClick.AddListener(delegate { ResetButtonPressed(); });
         options.onClick.AddListener(delegate { OptionsButtonPressed(); });
         devMenuButton.onClick.AddListener(delegate { DevButtonPressed(); });
-        //Handlers for pressing a toggle
         cityMenuSpawn.onClick.AddListener(delegate { SpawnUnit(); });
         reset.onClick.AddListener(delegate { ResetButtonPressed(); });
         exit.onClick.AddListener(delegate { ExitButtonPressed(); });
+        //Handlers for pressing a toggle
+
+        enableDevToggle.onValueChanged.AddListener(DevTogglePressed);
     }
 
     // Initialize whenever this object loads
@@ -335,8 +340,7 @@ public class UIManager : MonoBehaviour, IObservable
 
         // Initialization
         SetUnitToSpawn();
-        
-        devMenuButton.gameObject.SetActive(false);
+
 
     }
 
@@ -375,7 +379,7 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     private void DevButtonPressed()
     {
-        devMenu.enabled = !(devMenu.enabled);
+        devMenu.gameObject.SetActive(!devMenu.gameObject.activeSelf);
     }
 
     /// Exits the game.
@@ -388,6 +392,11 @@ public class UIManager : MonoBehaviour, IObservable
 #else
         Application.Quit();
 #endif
+    }
+
+    private void DevTogglePressed(bool selected)
+    {
+        devMenuButton.gameObject.SetActive(selected);
     }
 
     /// <summary>
@@ -454,7 +463,7 @@ public class UIManager : MonoBehaviour, IObservable
             pauseText.enabled = false;
             targetRing.gameObject.SetActive(false);
             pauseMenu.gameObject.SetActive(false);
-            devMenu.gameObject.SetActive(false);
+            devMenuButton.gameObject.SetActive(false);
             unitMenu.enabled = false;
             cityMenu.enabled = false;
             message.enabled = false;
