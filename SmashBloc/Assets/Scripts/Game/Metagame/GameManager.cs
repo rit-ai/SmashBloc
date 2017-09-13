@@ -44,6 +44,8 @@ public class GameManager : MonoBehaviour, IObservable
     private GameObject[] citySpawnPoints;
     private int activeTeams;
     private bool inSubMenu = false;
+    private bool inMenu = false;
+    private bool paused = false;
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
@@ -58,12 +60,10 @@ public class GameManager : MonoBehaviour, IObservable
     /// </summary>
     public void TogglePause()
     {
-        if(!inSubMenu)
-        {
-            // Set to 1 if 0, and 0 if 1.
-            Time.timeScale = (Time.timeScale == 0) ? 1 : 0;
-        }
+        // Set to 1 if 0, and 0 if 1.
+        Time.timeScale = (Time.timeScale == 0) ? 1 : 0;
     }
+
 
     /// <summary>
     /// Sets the new destination for the unit, if the unit is of the player's
@@ -305,11 +305,26 @@ public class GameManager : MonoBehaviour, IObservable
     }
 
     /// <summary>
+    /// Getter/Setter for inMenu
+    /// </summary>
+    public bool InMenu
+    {
+        get { return inMenu; }
+        set { inMenu = value; }
+    }
+
+    /// <summary>
     /// Getter/Setter for inSubMenu
     /// </summary>
     public bool InSubMenu
     {
         get { return inSubMenu; }
         set { inSubMenu = value; }
+    }
+
+    public bool Paused
+    {
+        get { return paused; }
+        set { paused = value; }
     }
 }

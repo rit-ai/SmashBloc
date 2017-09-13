@@ -23,9 +23,9 @@ public class UIManager : MonoBehaviour, IObservable
     public Camera cam;
     public Canvas pauseText;
     // MENU
-    public Canvas pauseMenu;
+    public GameObject pauseMenu;
     public Canvas devMenu;
-    public Canvas mainPausePanel;
+    public GameObject mainPausePanel;
     public Canvas optionsPausePanel;
     public Button reset;
     public Button options;
@@ -104,6 +104,10 @@ public class UIManager : MonoBehaviour, IObservable
         if (!optionsPausePanel.gameObject.activeSelf)
         {
             NotifyAll(Invocation.IN_MAINMENU);
+        }
+        else
+        {
+            NotifyAll(Invocation.IN_SUBMENU);
         }
     }
 
@@ -446,13 +450,22 @@ public class UIManager : MonoBehaviour, IObservable
     {
         if(Time.timeScale != 0)
         {
+            //TODO: Re-implement this 
+            pauseText.enabled = false;
             targetRing.gameObject.SetActive(false);
+            pauseMenu.gameObject.SetActive(false);
+            devMenu.gameObject.SetActive(false);
+            unitMenu.enabled = false;
+            cityMenu.enabled = false;
+            message.enabled = false;
+
+            /*targetRing.gameObject.SetActive(false);
             pauseText.enabled = false;
             pauseMenu.enabled = false;
             devMenu.enabled = false;
             unitMenu.enabled = false;
             cityMenu.enabled = false;
-            message.enabled = false;
+            message.enabled = false;*/
         }
     }
 

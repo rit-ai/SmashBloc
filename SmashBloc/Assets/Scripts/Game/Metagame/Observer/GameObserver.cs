@@ -38,10 +38,21 @@ public class GameObserver : MonoBehaviour, IObserver
     {
         switch (invoke)
         {
-            // Pause the game
+            
             case Invocation.PAUSE_AND_LOCK:
+                manager.InMenu = !manager.InMenu;
+                if(!manager.Paused && !manager.InSubMenu)
+                {
+                    manager.TogglePause();
+                }
+                break;
+            //Pause the game
             case Invocation.TOGGLE_PAUSE:
-                manager.TogglePause();
+                if(!manager.InMenu)
+                {
+                    manager.Paused = !manager.Paused;
+                    manager.TogglePause();
+                }
                 break;
 
             // Reset the game
