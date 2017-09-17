@@ -20,22 +20,27 @@ public class TwirlPhysics : MobilePhysics
     //         ** //
 
     // Thresholds for unit convergence and separation
-    private const float MAX_DISTANCE_FROM = 400f; // "sight range"
-    private const float MIN_DISTANCE_FROM = 100f;
+    private const float MAX_DISTANCE_FROM = 4f; // "sight range"
+    private const float MIN_DISTANCE_FROM = 1f;
     // Height above ground at which float force is applied
-    private const float MAX_FLOAT_THRESHOLD = 12f;
+    private const float MAX_FLOAT_THRESHOLD = 10f;
     // Distance from destination at which deceleration begins (squared)
-    private const float DECELERATION_THRESHOLD_SQRD = 10000f;
-    private const float UP_FORCE = 100f;
+    private const float DECELERATION_THRESHOLD_SQRD = 16f;
+    private const float UP_FORCE = 5f;
     // Default steering force strength
-    private const float SPEED = 300f;
+    private const float SPEED = 20f;
     // Adjusts the intensity of steering forces
-    private const float GUIDANCE_FACTOR = 1f;
-    private const float CONVERGE_FACTOR = 0.25f;
-    private const float DIVERGE_FACTOR = 1f;
+    private const float GUIDANCE_FACTOR = 0.5f;
+    private const float CONVERGE_FACTOR = 0.5f;
+    private const float DIVERGE_FACTOR = 0.5f;
     // How many colliders to keep track of
     private const int COLLIDER_MEM = 50;
 
+    // DEBUG FIELDS
+    private HighlightCircle innerRadius;
+    private HighlightCircle outerRadius;
+
+    // STANDARD FIELDS
     private Collider[] convergeWith;
     private Collider[] divergeWith;
     private Vector3 converge;
@@ -60,7 +65,7 @@ public class TwirlPhysics : MobilePhysics
         if (Hover())
         {
             Guide();
-            Flock();
+            //Flock();
         }
     }
 
@@ -112,7 +117,7 @@ public class TwirlPhysics : MobilePhysics
         // of this vector will always be the target hover height.
         Vector3 desire = new Vector3(
                 parent.Destination.x - parent.transform.position.x,
-                MAX_FLOAT_THRESHOLD - parent.transform.position.y,
+                0,
                 parent.Destination.z - parent.transform.position.z
             );
         // Store the magnitude for later use
@@ -129,7 +134,7 @@ public class TwirlPhysics : MobilePhysics
         desire = Vector3.ClampMagnitude(desire, MAX_VECTOR_FORCE);
         // Reduce the amount of force if not hovering
         // Add the force
-        hoverBall.AddForce(desire, ForceMode.Acceleration);
+        hoverBall.AddForce(desire, ForceMode.VelocityChange);
     }
 
     /// <summary>
@@ -154,8 +159,8 @@ public class TwirlPhysics : MobilePhysics
         converge = Vector3.ClampMagnitude(converge * SPEED * CONVERGE_FACTOR, MAX_VECTOR_FORCE);
         diverge = Vector3.ClampMagnitude(diverge * SPEED * DIVERGE_FACTOR, MAX_VECTOR_FORCE);
 
-        body.AddForce(converge, ForceMode.Acceleration);
-        body.AddForce(diverge, ForceMode.Acceleration);
+        hoverBall.AddForce(converge, ForceMode.VelocityChange);
+        hoverBall.AddForce(diverge, ForceMode.VelocityChange);
     }
 
     /// <summary>
@@ -224,6 +229,15 @@ public class TwirlPhysics : MobilePhysics
 
         body.useGravity = true;
         bottomWeight.useGravity = true;
+
+        if (Debug.isDebugBuild)
+        {
+            //outerRadius = parent.gameObject.AddComponent<HighlightCircle>();
+            //outerRadius.Init(MAX_DISTANCE_FROM, Color.red);
+
+            //innerRadius = parent.gameObject.AddComponent<HighlightCircle>();
+            //innerRadius.Init(MIN_DISTANCE_FROM, Color.blue);
+        }
     }
 
 }
