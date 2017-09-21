@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 /*
  * @author Paul Galatic
+ * @author Lachezar Todorov
  * 
  * Class designed to handle any UI-specific information that shows up on the
  * main overlay. Should **avoid** logic on what to display or what to pass
