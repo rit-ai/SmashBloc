@@ -6,6 +6,7 @@ using UnityEngine;
 /*
  * @author Ben Fairlamb
  * @author Paul Galatic
+ * @author Mark Lipina
  * 
  * The Twirl is the most basic unit of a Player's arsenal.
  * **/
