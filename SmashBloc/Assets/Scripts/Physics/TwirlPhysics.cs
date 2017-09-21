@@ -235,8 +235,8 @@ public class TwirlPhysics : MobilePhysics
             //outerRadius = parent.gameObject.AddComponent<HighlightCircle>();
             //outerRadius.Init(MAX_DISTANCE_FROM, Color.red);
 
-            //innerRadius = parent.gameObject.AddComponent<HighlightCircle>();
-            //innerRadius.Init(MIN_DISTANCE_FROM, Color.blue);
+            innerRadius = parent.gameObject.AddComponent<HighlightCircle>();
+            innerRadius.Init(MIN_DISTANCE_FROM, Color.blue);
         }
     }
 
