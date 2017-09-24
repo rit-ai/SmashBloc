@@ -103,6 +103,7 @@ public sealed class Toolbox : Singleton<Toolbox>
         cityPool = new ObjectPool<City>(MakeCity, SMALL_POOL);
 
         // ...and all of that is me.
+        Debug.Assert(terrain);
         Debug.Assert(cityPrefab);
         Debug.Assert(twirlPrefab);
         Debug.Assert(tankPrefab);
