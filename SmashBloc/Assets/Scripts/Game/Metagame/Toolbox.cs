@@ -30,13 +30,14 @@ public sealed class Toolbox : Singleton<Toolbox>
     public bool resetCamera;
 
     private const int SMALL_POOL = 10;
-    private const int MEDIUM_POOL = 100;
+    private const int MEDIUM_POOL = 200;
     private static ObjectPool<Twirl> twirlPool;
     private static ObjectPool<City> cityPool;
     private static UIManager uiManager;
     private static GameManager gameManager;
     private static UIObserver uiObserver;
     private static GameObserver gameObserver;
+    private static Debuggy debuggy;
     private static GameSetup gameSetup;
     private static City cityPrefab;
     private static MobileUnit twirlPrefab;
@@ -44,6 +45,9 @@ public sealed class Toolbox : Singleton<Toolbox>
     private static RTS_Terrain terrain;
     private static GameObject cityPoolWrapper;
     private static GameObject twirlPoolWrapper;
+
+    private const string UNIT_LAYER_NAME = "Units";
+    private const string MOBILE_LAYER_NAME = "Mobiles";
 
     // **              //
     // * CONSTRUCTOR * //
@@ -77,6 +81,9 @@ public sealed class Toolbox : Singleton<Toolbox>
             // Else they're the first player
             player = gameSetup.Players[0];
         }
+
+        // ...WHOOPS PLEASE EDIT...
+        debuggy = GetComponent<Debuggy>();
 
         // ...and from the game came the land...
         terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
@@ -188,6 +195,10 @@ public sealed class Toolbox : Singleton<Toolbox>
     {
         get { return gameSetup; }
     }
+    public static Debuggy Debuggy
+    {
+        get { return debuggy; }
+    }
     public static City CityPrefab
     {
         get { return cityPrefab; }
@@ -208,5 +219,13 @@ public sealed class Toolbox : Singleton<Toolbox>
     {
         get { return player; }
     }
+    public static LayerMask UnitLayer
+    {
+        get { return LayerMask.NameToLayer(UNIT_LAYER_NAME); }
+    }
+    public static LayerMask MobileLayer
+    {
+        get { return LayerMask.NameToLayer(MOBILE_LAYER_NAME); }
+    } 
 }
 

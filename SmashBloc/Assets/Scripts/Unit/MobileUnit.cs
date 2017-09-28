@@ -17,8 +17,6 @@ public abstract class MobileUnit : Unit
     // * FIELDS * //
     //         ** //
 
-    public LayerMask ignoreAllButMobiles;
-
     protected MobileAI brain;
     protected Vector3 movingTo; // the exact position we're moving to
     protected Vector3 pointOfInterest; // the location of where we want to go
@@ -81,7 +79,7 @@ public abstract class MobileUnit : Unit
             List<Unit> enemiesInSight = new List<Unit>();
             List<Unit> alliesInSight = new List<Unit>();
             List<Unit> enemiesInAttackRange = new List<Unit>();
-            List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ignoreAllButMobiles));
+            List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, (Toolbox.UnitLayer | Toolbox.MobileLayer)));
             foreach (Collider c in collidersInSight)
             {
                 current = c.gameObject.GetComponent<Unit>();
