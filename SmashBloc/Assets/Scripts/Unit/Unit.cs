@@ -93,6 +93,9 @@ public abstract class Unit : MonoBehaviour, IObservable
     {
         health = maxHealth;
         projector = GetComponentInChildren<Projector>();
+        Debug.Assert(projector);
+        projector.enabled = false;
+        
         surface = GetComponent<MeshRenderer>();
         surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
     }
@@ -165,6 +168,15 @@ public abstract class Unit : MonoBehaviour, IObservable
             }
             return Identity();
         }
+    }
+
+    /// <summary>
+    /// Called after all other Update() methods. Currently its only purpose is
+    /// to prevent the Projectors from wobbling around.
+    /// </summary>
+    private void LateUpdate()
+    {
+
     }
 
     /// <summary>
