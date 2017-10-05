@@ -26,7 +26,7 @@ public class TargetRing : MonoBehaviour
 
     // We'd sink into the ground if not for this
     private const float ABOVE_GROUND_OFFSET = 2.25f;
-
+    
     private Transform ring;
     private Transform conerig;
 
@@ -39,8 +39,8 @@ public class TargetRing : MonoBehaviour
     /// of the transform.
     /// </summary>
     private void Start () {
-        ring = GetComponent<Transform>();
-        conerig = transform.GetChild(0).GetComponent<Transform>();
+        ring = transform.GetChild(0).GetComponent<Transform>();
+        conerig = transform.GetChild(0).GetChild(0).GetComponent<Transform>();
 
         spinRate = Mathf.Clamp(spinRate, 0, 2f);
         if (spinClockwise) { spinRate = -spinRate; }
