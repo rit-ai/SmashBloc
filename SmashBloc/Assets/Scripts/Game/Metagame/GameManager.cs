@@ -117,6 +117,7 @@ public class GameManager : MonoBehaviour, IObservable
     /// </summary>
     public void ResetGame()
     {
+
         StopAllCoroutines();
         NotifyAll(Invocation.CLOSE_ALL);
 
@@ -142,6 +143,7 @@ public class GameManager : MonoBehaviour, IObservable
         if (resetCamera) { cameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position); }
 
         StartCoroutine(GameLoop());
+
     }
 
     /// <summary>

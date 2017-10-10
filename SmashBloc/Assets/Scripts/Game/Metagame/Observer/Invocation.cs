@@ -160,7 +160,7 @@ public enum Invocation {
     /// <summary>
     /// Expresses that all menus should be closed.
     /// 
-    /// Entity: CameraController
+    /// Entity: CameraController, RTS_Terrain.cs, GameManager.cs
     /// </summary>
     CLOSE_ALL
 }

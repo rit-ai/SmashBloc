@@ -25,9 +25,9 @@ public class UIManager : MonoBehaviour, IObservable
     // MAIN MENU
     public GameObject pauseMenu;
     public GameObject mainPausePanel;
-    public Button reset;
-    public Button options;
-    public Button exit;
+    public Button restartButton;
+    public Button optionsButton;
+    public Button exitButton;
     // OPTIONS MENU
     public GameObject optionsPausePanel;
     public Toggle enableDevToggle;
@@ -115,10 +115,13 @@ public class UIManager : MonoBehaviour, IObservable
     }
 
     /// <summary>
-    /// Toggles whether or not the pause text is visible.
+    /// Toggles whether or not the pause text is visible. This is called
+    /// because the UI manager holds references to UI elements in the scene
+    /// and GameManager does not. This is called by UIObserver.
     /// </summary>
     public void TogglePauseText()
     {
+        // Do not enable the pauseText if the pauseMenu is brought up
         if (!pauseMenu.gameObject.activeSelf)
         {
             pauseText.enabled = !(pauseText.enabled);
@@ -310,12 +313,11 @@ public class UIManager : MonoBehaviour, IObservable
         unitMenuName.onEndEdit.AddListener(delegate { UpdateCityName(); });
         // Handlers for pressing a button on a menu
         cityMenuSpawn.onClick.AddListener(delegate { SpawnUnit(); });
-        reset.onClick.AddListener(delegate { ResetButtonPressed(); });
-        options.onClick.AddListener(delegate { OptionsButtonPressed(); });
+        restartButton.onClick.AddListener(delegate { ResetButtonPressed(); });
+        exitButton.onClick.AddListener(delegate { ExitButtonPressed(); });
+        optionsButton.onClick.AddListener(delegate { OptionsButtonPressed(); });
         devMenuButton.onClick.AddListener(delegate { DevButtonPressed(); });
         cityMenuSpawn.onClick.AddListener(delegate { SpawnUnit(); });
-        reset.onClick.AddListener(delegate { ResetButtonPressed(); });
-        exit.onClick.AddListener(delegate { ExitButtonPressed(); });
         //Handlers for pressing a toggle
 
         enableDevToggle.onValueChanged.AddListener(DevTogglePressed);
@@ -457,8 +459,8 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void CloseAll()
     {
-        if(Time.timeScale != 0)
-        {
+        //if(Time.timeScale != 0)
+        //{
             //TODO: Re-implement this 
             pauseText.enabled = false;
             targetRing.gameObject.SetActive(false);
@@ -475,7 +477,7 @@ public class UIManager : MonoBehaviour, IObservable
             unitMenu.enabled = false;
             cityMenu.enabled = false;
             message.enabled = false;*/
-        }
+        //}
     }
 
     /// <summary>
