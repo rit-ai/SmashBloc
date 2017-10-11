@@ -82,6 +82,7 @@ public class UIObserver : MonoBehaviour, IObserver
                 {
                     c.RemoveHighlight();
                 }
+                Debug.Log("Manager called CloseAll()");
                 manager.CloseAll();
                 break;
             // Invocation not found? Must be for someone else. Ignore.
