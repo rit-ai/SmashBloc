@@ -381,6 +381,7 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     private void DevButtonPressed()
     {
+        devMenu.transform.SetAsLastSibling();
         devMenu.gameObject.SetActive(!devMenu.gameObject.activeSelf);
     }
 
@@ -455,26 +456,19 @@ public class UIManager : MonoBehaviour, IObservable
     }
 
     /// <summary>
-    /// Hides all currently displayed menus.
+    /// Hides all currently displayed menus and unpauses the game.
     /// </summary>
     public void CloseAll()
     {
         pauseText.gameObject.SetActive(false);
         targetRing.gameObject.SetActive(false);
         pauseMenu.gameObject.SetActive(false);
-        devMenuButton.gameObject.SetActive(false);
+        devMenu.gameObject.SetActive(false);
         unitMenu.enabled = false;
         cityMenu.enabled = false;
         startingMessageText.enabled = false;
 
-            /*targetRing.gameObject.SetActive(false);
-            pauseText.enabled = false;
-            pauseMenu.enabled = false;
-            devMenu.enabled = false;
-            unitMenu.enabled = false;
-            cityMenu.enabled = false;
-            message.enabled = false;*/
-        //}
+        Time.timeScale = 1;
     }
 
     /// <summary>
