@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour, IObservable
 
     // GENERAL
     public Camera cam;
-    public Canvas pauseText;
+    public GameObject pauseText;
     // MAIN MENU
     public GameObject pauseMenu;
     public GameObject mainPausePanel;
@@ -124,7 +124,7 @@ public class UIManager : MonoBehaviour, IObservable
         // Do not enable the pauseText if the pauseMenu is brought up
         if (!pauseMenu.gameObject.activeSelf)
         {
-            pauseText.enabled = !(pauseText.enabled);
+            pauseText.gameObject.SetActive(!pauseText.gameObject.activeSelf);
         }
     }
 
@@ -459,7 +459,7 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void CloseAll()
     {
-        pauseText.enabled = false;
+        pauseText.gameObject.SetActive(false);
         targetRing.gameObject.SetActive(false);
         pauseMenu.gameObject.SetActive(false);
         devMenuButton.gameObject.SetActive(false);
