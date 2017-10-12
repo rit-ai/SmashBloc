@@ -301,9 +301,14 @@ public class UIManager : MonoBehaviour, IObservable
     // Initialize only once
     private void Awake()
     {
-        // Disable objects
+        // Enable/Disable objects
         optionsPausePanel.gameObject.SetActive(false);
         pauseMenu.gameObject.SetActive(false);
+        if (PlayerPrefs.HasKey("enableDevToggle"))
+        {
+            enableDevToggle.isOn = (PlayerPrefs.GetInt("enableDevToggle") == 1);
+            DevTogglePressed((PlayerPrefs.GetInt("enableDevToggle") == 1));
+        }
 
         // Set UI handlers
         // Handlers for changing a dropdown value
