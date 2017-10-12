@@ -231,6 +231,7 @@ public class CameraController : MonoBehaviour, IObservable
         camRig.transform.Translate(direction, Space.Self);
     }
 
+
     /// <summary>
     /// Stores the mouse position variable.
     /// </summary>

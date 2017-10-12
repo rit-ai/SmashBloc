@@ -20,8 +20,10 @@ public class MainMenuManager : MonoBehaviour
     public Button startButton;
     public Button optionsButton;
     public Button quitButton;
+    public Toggle enableDevToggle;
+    public GameObject MainPanel;
+    public GameObject OptionsPanel;
 
-    private bool inOptions;
 
 
     // **          //
@@ -31,7 +33,11 @@ public class MainMenuManager : MonoBehaviour
     // Initialize only once
     private void Awake()
     {
-        inOptions = false;
+        MainPanel.gameObject.SetActive(true);
+        OptionsPanel.gameObject.SetActive(false);
+        if (PlayerPrefs.HasKey("enableDevToggle"))
+            enableDevToggle.isOn = (PlayerPrefs.GetInt("enableDevToggle") == 1);
+
         startButton.onClick.AddListener(StartButtonPressed);
         optionsButton.onClick.AddListener(OptionsButtonPressed);
         quitButton.onClick.AddListener(QuitButtonPressed);
@@ -39,12 +45,30 @@ public class MainMenuManager : MonoBehaviour
 
     private void Update()
     {
-        if (inOptions && Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            startButton.gameObject.SetActive(true);
-            optionsButton.gameObject.SetActive(true);
-            quitButton.gameObject.SetActive(true);
-            inOptions = false;
+            EscKeyPressed();
+        }
+    }
+
+    void OnDisable()
+    {
+        if(enableDevToggle.isOn)
+            PlayerPrefs.SetInt("enableDevToggle", 1);
+        else
+            PlayerPrefs.SetInt("enableDevToggle", 0);
+    }
+
+    /// <summary>
+    /// Called from update whenever KeyCode.Escape is pressed. Will go back to
+    /// previous panel if not in MainMenuPanel
+    /// </summary>
+    private void EscKeyPressed()
+    {
+        if(OptionsPanel.gameObject.activeSelf)
+        {
+            OptionsPanel.gameObject.SetActive(false);
+            MainPanel.gameObject.SetActive(true);
         }
     }
 
@@ -70,9 +94,7 @@ public class MainMenuManager : MonoBehaviour
     /// </summary>
     private void OptionsButtonPressed()
     {
-        startButton.gameObject.SetActive(false);
-        optionsButton.gameObject.SetActive(false);
-        quitButton.gameObject.SetActive(false);
-        inOptions = true;
+        MainPanel.gameObject.SetActive(false);
+        OptionsPanel.gameObject.SetActive(true);
     }
 }

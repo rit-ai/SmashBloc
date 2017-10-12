@@ -21,27 +21,35 @@ public class UIManager : MonoBehaviour, IObservable
 
     // GENERAL
     public Camera cam;
-    public Canvas pauseText;
-    // MENU
-    public Canvas pauseMenu;
-    public Button resetButton;
+    public GameObject pauseText;
+    // MAIN MENU
+    public GameObject pauseMenu;
+    public GameObject mainPausePanel;
+    public Button restartButton;
+    public Button optionsButton;
     public Button exitButton;
+    // OPTIONS MENU
+    public GameObject optionsPausePanel;
+    public Toggle enableDevToggle;
+    // DEV MENU
+    public GameObject devMenu;
     // HEADER
-    public Dropdown unitSelect;
-    public Text currentGoldAmount;
-    public Text currentUnitAmount;
+    public Dropdown unitSelectDropdown;
+    public Text currentGoldText;
+    public Text currentUnitsText;
+    public Button devMenuButton;
     // STARTING AND ENDING GAME
-    public Text message;
+    public Text startingMessageText;
     // UNIT MENU
     public Canvas unitMenu;
-    public InputField unitMenuName;
-    public Slider unitMenuHealth;
+    public InputField unitMenuNameInput;
+    public Slider unitMenuHealthSlider;
     // CITY MENU
     public Canvas cityMenu;
-    public InputField cityMenuName;
-    public Slider cityMenuHealth;
-    public Slider cityMenuIncome;
-    public Button cityMenuSpawn;
+    public InputField cityMenuNameInput;
+    public Slider cityMenuHealthSlider;
+    public Slider cityMenuIncomeSlider;
+    public Button cityMenuSpawnButton;
     // MISC UI
     public TargetRing targetRing;
 
@@ -70,20 +78,54 @@ public class UIManager : MonoBehaviour, IObservable
     }
 
     /// <summary>
-    /// Toggles whether or not the pause menu is visible.
+    /// Toggles whether or not the pause menu is visible. And will toggle back
+    /// to a root menu, if in sub-menu
     /// </summary>
-    public void TogglePauseMenu()
+    public void ToggleMenu()
     {
-        pauseMenu.enabled = !(pauseMenu.enabled);
-        pauseMenu.transform.SetAsLastSibling();
+        if(optionsPausePanel.gameObject.activeSelf)
+        {
+            ToggleOptionsMenu();
+        }
+        else
+        {
+            pauseMenu.gameObject.SetActive(!(pauseMenu.gameObject.activeSelf));
+            pauseMenu.transform.SetAsLastSibling();
+        }
+        
     }
 
     /// <summary>
-    /// Toggles whether or not the pause text is visible.
+    /// Toggles whether or not the buttons related to the options menu are
+    /// visible. Will also notify observers of current menu state
+    /// </summary>
+    public void ToggleOptionsMenu()
+    {
+        mainPausePanel.gameObject.SetActive(!mainPausePanel.gameObject.activeSelf);
+        optionsPausePanel.gameObject.SetActive(!optionsPausePanel.gameObject.activeSelf);
+        // Notifies all observers of the current menu state
+        if (!optionsPausePanel.gameObject.activeSelf)
+        {
+            NotifyAll(Invocation.IN_MAINMENU);
+        }
+        else
+        {
+            NotifyAll(Invocation.IN_SUBMENU);
+        }
+    }
+
+    /// <summary>
+    /// Toggles whether or not the pause text is visible. This is called
+    /// because the UI manager holds references to UI elements in the scene
+    /// and GameManager does not. This is called by UIObserver.
     /// </summary>
     public void TogglePauseText()
     {
-        pauseText.enabled = !(pauseText.enabled);
+        // Do not enable the pauseText if the pauseMenu is brought up
+        if (!pauseMenu.gameObject.activeSelf)
+        {
+            pauseText.gameObject.SetActive(!pauseText.gameObject.activeSelf);
+        }
     }
 
     /// <summary>
@@ -93,7 +135,7 @@ public class UIManager : MonoBehaviour, IObservable
     public void SetUnitToSpawn()
     {
         string toSpawn;
-        switch (unitSelect.value)
+        switch (unitSelectDropdown.value)
         {
             case 0:
                 toSpawn = Twirl.IDENTITY;
@@ -137,12 +179,12 @@ public class UIManager : MonoBehaviour, IObservable
         unitMenu.transform.position = menuSpawnPos;
 
         // Handle unit name input field
-        unitMenuName.enabled = unit.Team == Toolbox.PLAYER.Team;
-        unitMenuName.placeholder.GetComponent<Text>().text = unit.Name;
+        unitMenuNameInput.enabled = unit.Team == Toolbox.PLAYER.Team;
+        unitMenuNameInput.placeholder.GetComponent<Text>().text = unit.Name;
 
         // Handle health slider
-        unitMenuHealth.maxValue = unit.MaxHealth;
-        unitMenuHealth.value = unit.Health;
+        unitMenuHealthSlider.maxValue = unit.MaxHealth;
+        unitMenuHealthSlider.value = unit.Health;
 
         // Once processing is finished, bring to front and enable display
         unitMenu.transform.SetAsLastSibling();
@@ -167,17 +209,17 @@ public class UIManager : MonoBehaviour, IObservable
         cityMenu.transform.position = menuSpawnPos;
 
         // Handle city name input field
-        cityMenuName.enabled = city.Team == Toolbox.PLAYER.Team;
-        cityMenuName.placeholder.GetComponent<Text>().text = city.Name;
+        cityMenuNameInput.enabled = city.Team == Toolbox.PLAYER.Team;
+        cityMenuNameInput.placeholder.GetComponent<Text>().text = city.Name;
 
         // Handle spawn button
-        cityMenuSpawn.enabled = city.Team == Toolbox.PLAYER.Team;
+        cityMenuSpawnButton.enabled = city.Team == Toolbox.PLAYER.Team;
 
         // Handle sliders
-        cityMenuHealth.maxValue = City.MAX_HEALTH;
-        cityMenuHealth.value = city.Health;
-        cityMenuIncome.maxValue = City.MAX_INCOME_LEVEL;
-        cityMenuIncome.value = city.IncomeLevel;
+        cityMenuHealthSlider.maxValue = City.MAX_HEALTH;
+        cityMenuHealthSlider.value = city.Health;
+        cityMenuIncomeSlider.maxValue = City.MAX_INCOME_LEVEL;
+        cityMenuIncomeSlider.value = city.IncomeLevel;
 
         // Once processing is finished, bring to front and enable display
         cityMenu.transform.SetAsLastSibling();
@@ -193,7 +235,7 @@ public class UIManager : MonoBehaviour, IObservable
         if (!unitMenu.enabled) { return; }
 
         // Handle health slider
-        unitMenuHealth.value = unitCurrentlyDisplayed.Health;
+        unitMenuHealthSlider.value = unitCurrentlyDisplayed.Health;
     }
 
     /// <summary>
@@ -204,32 +246,32 @@ public class UIManager : MonoBehaviour, IObservable
     public IEnumerator AnimateText(string text)
     {
         // Don't animate if we're already animating something
-        if (message.enabled) { yield break; }
+        if (startingMessageText.enabled) { yield break; }
 
         const int FRAMES_TO_LINGER = 60;
         const float MOVE_DISTANCE_SMALL = 30f;
         const float MIN_DISTANCE_SQR = 30000f;
         Color textColor = new Color(1f, 1f, 1f, 0f); // white, but invisible
-        Vector3 textPosition = message.transform.position;
+        Vector3 textPosition = startingMessageText.transform.position;
         Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2);
         float MOVE_DISTANCE_LARGE = Screen.width / 2;
         textPosition.x = 0;
 
         yield return null;
 
-        message.text = text;
-        message.color = textColor;
-        message.transform.position = textPosition;
-        message.enabled = true;
+        startingMessageText.text = text;
+        startingMessageText.color = textColor;
+        startingMessageText.transform.position = textPosition;
+        startingMessageText.enabled = true;
 
         // Until the text is near the center of the screen, move it to the 
         // right and raise the alpha
-        while ((message.transform.position - screenCenter).sqrMagnitude > MIN_DISTANCE_SQR)
+        while ((startingMessageText.transform.position - screenCenter).sqrMagnitude > MIN_DISTANCE_SQR)
         {
             textColor.a += 4.5f * Time.deltaTime;
             textPosition.x += MOVE_DISTANCE_LARGE * Time.deltaTime;
-            message.color = textColor;
-            message.transform.position = textPosition;
+            startingMessageText.color = textColor;
+            startingMessageText.transform.position = textPosition;
             yield return null;
         }
 
@@ -237,21 +279,21 @@ public class UIManager : MonoBehaviour, IObservable
         for (int x = 0; x < FRAMES_TO_LINGER; x++)
         {
             textPosition.x += MOVE_DISTANCE_SMALL * Time.deltaTime;
-            message.transform.position = textPosition;
+            startingMessageText.transform.position = textPosition;
             yield return null;
         }
 
         // Until text is offscreen, move to the right and fade out
-        while (message.transform.position.x < Screen.width * 1.5)
+        while (startingMessageText.transform.position.x < Screen.width * 1.5)
         {
             textColor.a -= 4.5f * Time.deltaTime;
             textPosition.x += MOVE_DISTANCE_LARGE * Time.deltaTime;
-            message.color = textColor;
-            message.transform.position = textPosition;
+            startingMessageText.color = textColor;
+            startingMessageText.transform.position = textPosition;
             yield return null;
         }
 
-        message.enabled = false;
+        startingMessageText.enabled = false;
         NotifyAll(Invocation.ANIMATION_FINISHED);
         yield break;
     }
@@ -259,16 +301,31 @@ public class UIManager : MonoBehaviour, IObservable
     // Initialize only once
     private void Awake()
     {
+        // Enable/Disable objects
+        optionsPausePanel.gameObject.SetActive(false);
+        pauseMenu.gameObject.SetActive(false);
+        if (PlayerPrefs.HasKey("enableDevToggle"))
+        {
+            enableDevToggle.isOn = (PlayerPrefs.GetInt("enableDevToggle") == 1);
+            DevTogglePressed((PlayerPrefs.GetInt("enableDevToggle") == 1));
+        }
+
         // Set UI handlers
         // Handlers for changing a dropdown value
-        unitSelect.onValueChanged.AddListener(delegate { SetUnitToSpawn(); });
+        unitSelectDropdown.onValueChanged.AddListener(delegate { SetUnitToSpawn(); });
         // Handlers for finishing changing a name field
-        unitMenuName.onEndEdit.AddListener(delegate { UpdateUnitName(); });
-        unitMenuName.onEndEdit.AddListener(delegate { UpdateCityName(); });
+        unitMenuNameInput.onEndEdit.AddListener(delegate { UpdateUnitName(); });
+        unitMenuNameInput.onEndEdit.AddListener(delegate { UpdateCityName(); });
         // Handlers for pressing a button on a menu
-        cityMenuSpawn.onClick.AddListener(delegate { SpawnUnit(); });
-        resetButton.onClick.AddListener(delegate { ResetButtonPressed(); });
+        cityMenuSpawnButton.onClick.AddListener(delegate { SpawnUnit(); });
+        restartButton.onClick.AddListener(delegate { ResetButtonPressed(); });
         exitButton.onClick.AddListener(delegate { ExitButtonPressed(); });
+        optionsButton.onClick.AddListener(delegate { OptionsButtonPressed(); });
+        devMenuButton.onClick.AddListener(delegate { DevButtonPressed(); });
+        cityMenuSpawnButton.onClick.AddListener(delegate { SpawnUnit(); });
+        //Handlers for pressing a toggle
+
+        enableDevToggle.onValueChanged.AddListener(DevTogglePressed);
     }
 
     // Initialize whenever this object loads
@@ -290,7 +347,9 @@ public class UIManager : MonoBehaviour, IObservable
 
         // Initialization
         SetUnitToSpawn();
-	}
+
+
+    }
 
     /// <summary>
     /// Update the UI display.
@@ -315,6 +374,22 @@ public class UIManager : MonoBehaviour, IObservable
     }
 
     /// <summary>
+    /// Calls ToggleOptionsMenu()
+    /// </summary>
+    private void OptionsButtonPressed()
+    {
+        ToggleOptionsMenu();
+    }
+
+    /// <summary>
+    /// Causes the devmenu to show up
+    /// </summary>
+    private void DevButtonPressed()
+    {
+        devMenu.transform.SetAsLastSibling();
+        devMenu.gameObject.SetActive(!devMenu.gameObject.activeSelf);
+    }
+
     /// Exits the game.
     /// </summary>
     /// TODO allow exit back to main menu.
@@ -327,6 +402,11 @@ public class UIManager : MonoBehaviour, IObservable
 #endif
     }
 
+    private void DevTogglePressed(bool selected)
+    {
+        devMenuButton.gameObject.SetActive(selected);
+    }
+
     /// <summary>
     /// Updates the city menu based on the dynamic status of the city, if a
     /// city is being displayed.
@@ -336,8 +416,8 @@ public class UIManager : MonoBehaviour, IObservable
         if (!cityMenu.enabled) { return; }
 
         // Handle sliders
-        cityMenuHealth.value = cityCurrentlyDisplayed.Health;
-        cityMenuIncome.value = cityCurrentlyDisplayed.IncomeLevel;
+        cityMenuHealthSlider.value = cityCurrentlyDisplayed.Health;
+        cityMenuIncomeSlider.value = cityCurrentlyDisplayed.IncomeLevel;
     }
 
     /// <summary>
@@ -345,7 +425,7 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void UpdateUnitName()
     {
-        unitCurrentlyDisplayed.CustomName = unitMenuName.text;
+        unitCurrentlyDisplayed.CustomName = unitMenuNameInput.text;
     }
 
     /// <summary>
@@ -353,7 +433,7 @@ public class UIManager : MonoBehaviour, IObservable
     /// </summary>
     public void UpdateCityName()
     {
-        cityCurrentlyDisplayed.CustomName = cityMenuName.text;
+        cityCurrentlyDisplayed.CustomName = cityMenuNameInput.text;
     }
 
     /// <summary>
@@ -381,16 +461,19 @@ public class UIManager : MonoBehaviour, IObservable
     }
 
     /// <summary>
-    /// Hides all currently displayed menus.
+    /// Hides all currently displayed menus and unpauses the game.
     /// </summary>
     public void CloseAll()
     {
+        pauseText.gameObject.SetActive(false);
         targetRing.gameObject.SetActive(false);
-        pauseText.enabled = false;
-        pauseMenu.enabled = false;
+        pauseMenu.gameObject.SetActive(false);
+        devMenu.gameObject.SetActive(false);
         unitMenu.enabled = false;
         cityMenu.enabled = false;
-        message.enabled = false;
+        startingMessageText.enabled = false;
+
+        Time.timeScale = 1;
     }
 
     /// <summary>
@@ -406,13 +489,23 @@ public class UIManager : MonoBehaviour, IObservable
     }
 
     /// <summary>
+    /// Enables or disables the DevMenuButton
+    /// </summary>
+    /// /// <param name="isOn">boolean value that determines if the button 
+    /// should be visible</param>
+    private void DevToggleListener(bool isOn)
+    {
+        devMenuButton.gameObject.SetActive(isOn);
+    }
+
+    /// <summary>
     /// Updates the amount of gold a Player has in the overlay.
     /// </summary>
     private void UpdateGoldAmountText()
     {
         int gold = Toolbox.PLAYER.Gold;
         string goldText = gold.ToString();
-        currentGoldAmount.text = goldText;
+        currentGoldText.text = goldText;
     }
 
     /// <summary>
@@ -422,6 +515,6 @@ public class UIManager : MonoBehaviour, IObservable
     {
         int units = Toolbox.PLAYER.Team.mobiles.Count;
         string unitText = units.ToString();
-        currentUnitAmount.text = unitText;
+        currentUnitsText.text = unitText;
     }
 }
