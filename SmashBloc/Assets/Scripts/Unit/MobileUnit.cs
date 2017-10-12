@@ -158,7 +158,7 @@ public abstract class MobileUnit : Unit
     /// <summary>
     /// All Mobile Units must be able to shoot at other Units.
     /// </summary>
-    public abstract IEnumerator Shoot(Unit target, float maxAimTime);
+    public abstract IEnumerator AimShoot(Unit target, float maxAimTime);
 
     public abstract override int Cost();
 

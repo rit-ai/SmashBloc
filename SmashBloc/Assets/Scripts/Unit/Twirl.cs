@@ -20,6 +20,7 @@ public class Twirl : MobileUnit
 
     public Rigidbody hoverBall;
     public Rigidbody bottomWeight;
+    public Laser laser;
 
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
     private const DamageType DMG_TYPE = DamageType.BULLET;
@@ -47,6 +48,8 @@ public class Twirl : MobileUnit
         sightRange = SIGHT_RANGE;
         attackRange = RANGE;
 
+        laser = GetComponentInChildren<Laser>();
+
         base.Build();
     }
 
@@ -55,31 +58,23 @@ public class Twirl : MobileUnit
     /// locked on or after a specified amount of time elapses.
     /// </summary>
     /// <param name="target">The Unit to shoot at.</param>
-    /// <param name="maxAimTime"></param>
+    /// <param name="aimTime"></param>
     /// <returns></returns>
-    public override IEnumerator Shoot(Unit target, float maxAimTime)
+    public override IEnumerator AimShoot(Unit target, float aimTime = 1f)
     {
-        throw new NotImplementedException();
 
-        /*
-        float timeLeft = maxAimTime;
-        // Twirl cannot navigate to a destination and aim at the same time, 
-        // so the destination is temporarily stored.
-        storedDestination = destination;
-
-        while (timeLeft > 0f)
+        while (aimTime > 0f)
         {
             // aim
-            // if (foundTarget) {break;}
-            timeLeft -= Time.deltaTime;
+            Quaternion lookRotation = Quaternion.LookRotation(target.transform.position - transform.position);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime / aimTime);
+            aimTime -= Time.deltaTime;
             yield return null; // waits for next frame
         }
 
         // shoot
-
-        destination = storedDestination;
-        storedDestination = default(Vector3);
-        */
+        laser.Shoot(attackRange, damage);
+        
     }
 
     public override void Deactivate()

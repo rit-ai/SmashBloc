@@ -93,6 +93,8 @@ public sealed class Toolbox : Singleton<Toolbox>
         twirlPrefab = Resources.Load<Twirl>("Prefabs/Units/" + Twirl.IDENTITY);
         tankPrefab = Resources.Load<Boomy>("Prefabs/Units/" + Boomy.IDENTITY);
 
+        Debug.Assert(twirlPrefab);
+
         // ...and from the land came those that managed it...
         uiManager = FindObjectOfType<UIManager>();
         gameManager = gameObject.AddComponent<GameManager>();
