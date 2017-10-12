@@ -62,6 +62,8 @@ public class GameManager : MonoBehaviour, IObservable
     {
         // Set to 1 if 0, and 0 if 1.
         Time.timeScale = (Time.timeScale == 0) ? 1 : 0;
+        if (Time.timeScale == 0) { NotifyAll(Invocation.PAUSE_TEXT_ENABLE); }
+        else { NotifyAll(Invocation.PAUSE_TEXT_DISABLE); }
     }
 
 

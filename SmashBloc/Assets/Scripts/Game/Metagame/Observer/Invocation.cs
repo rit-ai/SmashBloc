@@ -33,11 +33,25 @@ public enum Invocation {
     PAUSE_AND_LOCK,
 
     /// <summary>
-    /// Expresses that the user has paused the game.
+    /// Expresses that the user has toggled whether or not the game is paused.
     /// 
     /// Entity: CameraController
     /// </summary>
     TOGGLE_PAUSE,
+
+    /// <summary>
+    /// Expresses that the pause text should be displayed.
+    /// 
+    /// Entity: GameManager
+    /// </summary>
+    PAUSE_TEXT_ENABLE,
+
+    /// <summary>
+    /// Expresses that the pause text should not be displayed.
+    /// 
+    /// Entity: GameManager
+    /// </summary>
+    PAUSE_TEXT_DISABLE,
 
     /// <summary>
     /// Expresses that the user has entered a menu off of a main menu and

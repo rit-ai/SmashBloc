@@ -119,13 +119,15 @@ public class UIManager : MonoBehaviour, IObservable
     /// because the UI manager holds references to UI elements in the scene
     /// and GameManager does not. This is called by UIObserver.
     /// </summary>
-    public void TogglePauseText()
+    public void EnablePauseText()
     {
         // Do not enable the pauseText if the pauseMenu is brought up
-        if (!pauseMenu.gameObject.activeSelf)
-        {
-            pauseText.gameObject.SetActive(!pauseText.gameObject.activeSelf);
-        }
+        pauseText.gameObject.SetActive(true);
+    }
+
+    public void DisablePauseText()
+    {
+        pauseText.gameObject.SetActive(false);
     }
 
     /// <summary>

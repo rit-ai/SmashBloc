@@ -47,11 +47,15 @@ public class UIObserver : MonoBehaviour, IObserver
             case Invocation.PAUSE_AND_LOCK:
                 manager.ToggleMenu();
                 break;
-                //goto case Invocation.TOGGLE_PAUSE;
+            //goto case Invocation.TOGGLE_PAUSE;
 
             // Toggles the pause text
-            case Invocation.TOGGLE_PAUSE:
-                manager.TogglePauseText();
+            case Invocation.PAUSE_TEXT_ENABLE:
+                manager.EnablePauseText();
+                break;
+
+            case Invocation.PAUSE_TEXT_DISABLE:
+                manager.DisablePauseText();
                 break;
 
             // Display unit info
