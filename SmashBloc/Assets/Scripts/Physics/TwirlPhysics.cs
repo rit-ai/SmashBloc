@@ -20,22 +20,27 @@ public class TwirlPhysics : MobilePhysics
     //         ** //
 
     // Thresholds for unit convergence and separation
-    private const float MAX_DISTANCE_FROM = 400f; // "sight range"
-    private const float MIN_DISTANCE_FROM = 100f;
+    private const float MAX_DISTANCE_FROM = 12f; // "sight range"
+    private const float MIN_DISTANCE_FROM = 4f;
     // Height above ground at which float force is applied
-    private const float MAX_FLOAT_THRESHOLD = 12f;
+    private const float MAX_FLOAT_THRESHOLD = 10f;
     // Distance from destination at which deceleration begins (squared)
-    private const float DECELERATION_THRESHOLD_SQRD = 10000f;
-    private const float UP_FORCE = 100f;
+    private const float DECELERATION_THRESHOLD_SQRD = 16f;
+    private const float UP_FORCE = 5f;
     // Default steering force strength
-    private const float SPEED = 300f;
+    private const float SPEED = 20f;
     // Adjusts the intensity of steering forces
-    private const float GUIDANCE_FACTOR = 1f;
-    private const float CONVERGE_FACTOR = 0.25f;
-    private const float DIVERGE_FACTOR = 1f;
+    private const float GUIDANCE_FACTOR = 1.0f;
+    private const float CONVERGE_FACTOR = 0.2f;
+    private const float DIVERGE_FACTOR = 0.4f;
     // How many colliders to keep track of
     private const int COLLIDER_MEM = 50;
 
+    // DEBUG FIELDS
+    private HighlightCircle innerRadius;
+    private HighlightCircle outerRadius;
+
+    // STANDARD FIELDS
     private Collider[] convergeWith;
     private Collider[] divergeWith;
     private Vector3 converge;
@@ -112,7 +117,7 @@ public class TwirlPhysics : MobilePhysics
         // of this vector will always be the target hover height.
         Vector3 desire = new Vector3(
                 parent.Destination.x - parent.transform.position.x,
-                MAX_FLOAT_THRESHOLD - parent.transform.position.y,
+                0,
                 parent.Destination.z - parent.transform.position.z
             );
         // Store the magnitude for later use
@@ -129,7 +134,7 @@ public class TwirlPhysics : MobilePhysics
         desire = Vector3.ClampMagnitude(desire, MAX_VECTOR_FORCE);
         // Reduce the amount of force if not hovering
         // Add the force
-        hoverBall.AddForce(desire, ForceMode.Acceleration);
+        hoverBall.AddForce(desire, ForceMode.VelocityChange);
     }
 
     /// <summary>
@@ -143,8 +148,8 @@ public class TwirlPhysics : MobilePhysics
     private void Flock()
     {
         // Get all units that are within "sight" range.
-        convergeCount = Physics.OverlapSphereNonAlloc(transform.position, MAX_DISTANCE_FROM, convergeWith, parent.ignoreAllButMobiles);
-        divergeCount = Physics.OverlapSphereNonAlloc(transform.position, MIN_DISTANCE_FROM, divergeWith, parent.ignoreAllButMobiles);
+        convergeCount = Physics.OverlapSphereNonAlloc(transform.position, MAX_DISTANCE_FROM, convergeWith, Toolbox.MobileLayer);
+        divergeCount = Physics.OverlapSphereNonAlloc(transform.position, MIN_DISTANCE_FROM, divergeWith, (Toolbox.UnitLayer | Toolbox.MobileLayer));
 
         // Multiply the components of the convergent force by the components of
         // the divergent force and normalize the result.
@@ -154,8 +159,8 @@ public class TwirlPhysics : MobilePhysics
         converge = Vector3.ClampMagnitude(converge * SPEED * CONVERGE_FACTOR, MAX_VECTOR_FORCE);
         diverge = Vector3.ClampMagnitude(diverge * SPEED * DIVERGE_FACTOR, MAX_VECTOR_FORCE);
 
-        body.AddForce(converge, ForceMode.Acceleration);
-        body.AddForce(diverge, ForceMode.Acceleration);
+        hoverBall.AddForce(converge, ForceMode.VelocityChange);
+        hoverBall.AddForce(diverge, ForceMode.VelocityChange);
     }
 
     /// <summary>
@@ -172,6 +177,7 @@ public class TwirlPhysics : MobilePhysics
             result += goToward[x].GetComponent<Rigidbody>().velocity;
         }
         result.y = 0;
+        result *= WeightedFlock(goToward.Length);
         return (parent.transform.position - result);
     }
 
@@ -187,6 +193,7 @@ public class TwirlPhysics : MobilePhysics
             result -= goAwayFrom[x].transform.position;
         }
         result.y = 0;
+        result *= WeightedFlock(goAwayFrom.Length);
         return (parent.transform.position - result);
     }
 
@@ -196,7 +203,7 @@ public class TwirlPhysics : MobilePhysics
     /// 
     /// 1.442 * ln(^3root(x) + 1)
     /// 
-    /// Or you can paste this into desmos.com/calculator :
+    /// Or you can paste this into desmos.com/calculator:
     /// 
     /// 1.442\ln \left(\sqrt[3]{x}\ +\ 1\right)
     /// </summary>
@@ -207,6 +214,26 @@ public class TwirlPhysics : MobilePhysics
     {
         const float SCALE_FACTOR = 1.442f; // DO NOT CHANGE
         return Mathf.Min(SCALE_FACTOR * Mathf.Log(Mathf.Pow(distanceToDestRatio + 1f, 0.33333333f), Mathf.Exp(1)), 1f);
+    }
+
+    /// <summary>
+    /// Without this function, Twirls will flock relative to any quantity of 
+    /// units. Applying this ratio allows Twirls to ignore small quantities of
+    /// units.
+    /// 
+    /// (log(x + 0.1) + 1) / e
+    /// 
+    /// Or you can pase this into desmos.com/calculator:
+    /// 
+    /// \frac{\left(\log \left(x-0.9\right)\ +\ 1\right)}{e}\ 
+    /// 
+    /// </summary>
+    /// <returns>A value that will generally be between 0 and 1 for most 
+    /// quantities of units, but will tend toward infinity as the number of 
+    /// units increases..</returns>
+    private float WeightedFlock(int units)
+    {
+        return (Mathf.Log10(units + 0.1f) + 1) / Mathf.Exp(1f);
     }
 
     /// <summary>
@@ -224,6 +251,16 @@ public class TwirlPhysics : MobilePhysics
 
         body.useGravity = true;
         bottomWeight.useGravity = true;
+
+        if (Toolbox.Debuggy.Twirls)
+        {
+            // Draws a debug circle of a radius. Unfortunately, it is oriented
+            // incorrectly. FIXME
+            gameObject.AddComponent<LineRenderer>();
+            DebugDrawCircle dc = gameObject.AddComponent<DebugDrawCircle>();
+            dc.radius = MAX_DISTANCE_FROM;
+            dc.Draw();
+        }
     }
 
 }

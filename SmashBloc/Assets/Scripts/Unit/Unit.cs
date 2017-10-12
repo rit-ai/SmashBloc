@@ -26,15 +26,10 @@ public abstract class Unit : MonoBehaviour, IObservable
     // * FIELDS * //
     //         ** //
 
-    public MeshRenderer highlightInner;
-    public MeshRenderer highlightOuter;
-
     // unit management
     protected List<IObserver> observers;
-    // physics
-    protected Rigidbody body;
-    protected Collider collision;
     // graphics
+    protected Projector projector;
     protected MeshRenderer surface;
     // general
     protected Team team;
@@ -66,8 +61,7 @@ public abstract class Unit : MonoBehaviour, IObservable
     /// </summary>
     public void Highlight()
     {
-        highlightInner.enabled = true;
-        highlightOuter.enabled = true;
+        projector.enabled = true;
     }
 
     /// <summary>
@@ -75,8 +69,7 @@ public abstract class Unit : MonoBehaviour, IObservable
     /// </summary>
     public void RemoveHighlight()
     {
-        highlightInner.enabled = false;
-        highlightOuter.enabled = false;
+        projector.enabled = false;
     }
 
     /// <summary>
@@ -99,6 +92,10 @@ public abstract class Unit : MonoBehaviour, IObservable
     public virtual void Activate()
     {
         health = maxHealth;
+        projector = GetComponentInChildren<Projector>();
+        Debug.Assert(projector);
+        projector.enabled = false;
+        
         surface = GetComponent<MeshRenderer>();
         surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
     }
@@ -171,6 +168,15 @@ public abstract class Unit : MonoBehaviour, IObservable
             }
             return Identity();
         }
+    }
+
+    /// <summary>
+    /// Called after all other Update() methods. Currently its only purpose is
+    /// to prevent the Projectors from wobbling around.
+    /// </summary>
+    private void LateUpdate()
+    {
+
     }
 
     /// <summary>

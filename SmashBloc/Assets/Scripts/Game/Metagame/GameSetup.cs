@@ -32,11 +32,31 @@ public class GameSetup : MonoBehaviour
         };
     private List<Team> teams;
     private List<Player> players;
+    [SerializeField]
+    private List<string> teamNames;
     private bool locked; // Are the controls locked?
 
     // **          //
     // * METHODS * //
     //          ** //
+
+    /// <summary>
+    /// Picks A random name from the names list for a team
+    /// </summary>
+    private string chooseName()
+    {
+        //check if there are any names left
+        if(teamNames.Count > 0)
+        {
+            //select the name from a random point in the names array
+            string selectedName = teamNames[(int)(Random.value * teamNames.Count)];
+            //remove the selected name from the list
+            teamNames.Remove(selectedName);
+            Debug.Log("Selected name: " + selectedName);
+            return selectedName;
+        }
+        return "No Names Left";
+    }
 
     /// <summary>
     /// This should be called by Toolbox at the start of the level.
@@ -47,7 +67,7 @@ public class GameSetup : MonoBehaviour
         players = new List<Player>();
         teams = new List<Team>
         {
-            new Team("TEAM ONE", DEFAULT_COLORS[0])
+            new Team(chooseName(), DEFAULT_COLORS[0])
         };
 
         if (hasPlayer)
@@ -65,7 +85,7 @@ public class GameSetup : MonoBehaviour
         // The rest are AI teams
         for (int x = 1; x < numberOfTeams; x++)
         {
-            teams.Add(new Team(x.ToString(), DEFAULT_COLORS[x]));
+            teams.Add(new Team(chooseName(), DEFAULT_COLORS[x]));
             players.Add(Player.MakePlayer(true, teams[x]));
         }
 

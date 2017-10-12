@@ -17,7 +17,7 @@ public abstract class MobilePhysics : MonoBehaviour
     //         ** //
 
     // Max force that can be applied to a rigidbody
-    protected const float MAX_VECTOR_FORCE = 500f;
+    protected const float MAX_VECTOR_FORCE = 1000f;
 
     // **          //
     // * METHODS * //
