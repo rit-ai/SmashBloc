@@ -61,6 +61,7 @@ public class GameObserver : MonoBehaviour, IObserver
             // Reset the game
             case Invocation.RESET_GAME:
                 manager.ResetGame();
+                manager.InMenu = false;
                 break;
 
             case Invocation.IN_SUBMENU:
