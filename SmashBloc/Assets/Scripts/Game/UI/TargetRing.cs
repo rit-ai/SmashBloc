@@ -39,8 +39,8 @@ public class TargetRing : MonoBehaviour
     /// of the transform.
     /// </summary>
     private void Start () {
-        ring = transform.GetChild(0).GetComponent<Transform>();
-        conerig = transform.GetChild(0).GetChild(0).GetComponent<Transform>();
+        ring = transform;
+        conerig = transform.GetChild(0).GetComponent<Transform>();
 
         spinRate = Mathf.Clamp(spinRate, 0, 2f);
         if (spinClockwise) { spinRate = -spinRate; }
