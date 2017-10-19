@@ -67,7 +67,7 @@ public class Boomy : MobileUnit {
         throw new NotImplementedException();
     }
 
-    public override IEnumerator AimShoot(Unit target, float maxAimTime)
+    public override void Shoot(Unit target, float maxAimTime)
     {
         throw new NotImplementedException();
     }

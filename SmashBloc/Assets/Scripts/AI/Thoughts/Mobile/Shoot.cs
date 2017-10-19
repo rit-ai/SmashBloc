@@ -39,6 +39,6 @@ public class Shoot : MobileThought
 
     public override void Act()
     {
-        body.AimShoot(target, aimTime);
+        body.Shoot(target, aimTime);
     }
 }

@@ -26,8 +26,8 @@ public sealed class MobileAI_Basic : MobileAI
 
         shoot += info.enemiesInAttackRange.Count;
         flee += info.enemiesInSight.Count;
-        shoot += info.alliesInSight.Count;
-        move += 10;
+        shoot *= 1 + (info.alliesInSight.Count / 100);
+        move += 1;
 
         Dictionary<EThought, float> weightedVals = new Dictionary<EThought, float>
         {

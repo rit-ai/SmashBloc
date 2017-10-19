@@ -96,7 +96,7 @@ public abstract class Unit : MonoBehaviour, IObservable
         Debug.Assert(projector);
         projector.enabled = false;
         
-        surface = GetComponent<MeshRenderer>();
+        surface = GetComponentInChildren<MeshRenderer>();
         surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
     }
 

@@ -18,6 +18,7 @@ public class Twirl : MobileUnit
     public const string IDENTITY = "Twirl";
     public const int COST = 50;
 
+    public Rigidbody body;
     public Rigidbody hoverBall;
     public Rigidbody bottomWeight;
     public Laser laser;
@@ -30,7 +31,7 @@ public class Twirl : MobileUnit
     private const float MAXHEALTH = 100f;
     private const float DAMAGE = 10f;
     private const float SIGHT_RANGE = 500f;
-    private const float RANGE = 50f;
+    private const float RANGE = 150f;
 
     // **          //
     // * METHODS * //
@@ -54,15 +55,25 @@ public class Twirl : MobileUnit
     }
 
     /// <summary>
+    /// Skeleton function to allow the aiming coroutine to start.
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="maxAimTime"></param>
+    public override void Shoot(Unit target, float maxAimTime)
+    {
+        StartCoroutine(AimShoot(target, maxAimTime));
+    }
+
+    /// <summary>
     /// Prompts an Twirl unit to aim at another Unit, shooting either when
     /// locked on or after a specified amount of time elapses.
     /// </summary>
     /// <param name="target">The Unit to shoot at.</param>
     /// <param name="aimTime"></param>
     /// <returns></returns>
-    public override IEnumerator AimShoot(Unit target, float aimTime = 1f)
+    public IEnumerator AimShoot(Unit target, float aimTime = 1f)
     {
-
+        Debug.Log("Shooting");
         while (aimTime > 0f)
         {
             // aim
