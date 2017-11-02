@@ -83,7 +83,8 @@ public abstract class MobileUnit : Unit
             List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ~Toolbox.Terrain.ignoreAllButTerrain));
             foreach (Collider c in collidersInSight)
             {
-                current = c.gameObject.GetComponent<Unit>();
+                current = c.gameObject.GetComponentInChildren<Unit>();
+                if (!current) { current = c.gameObject.GetComponentInParent<Unit>(); }
                 // Only be aggressive to units on the other team.
                 if (current.Team != team)
                 {
@@ -145,15 +146,8 @@ public abstract class MobileUnit : Unit
     /// </summary>
     protected virtual IEnumerator DeathAnimation()
     {
-        Color fadeOut = surface.material.color;
-
-        GetComponent<Rigidbody>().mass *= 100;
-        for (float x = 1; x > 0; x -= 0.01f)
-        {
-            fadeOut.a = x;
-            surface.material.color = fadeOut;
-            yield return 0f;
-        }
+        // Empty for now
+        yield return null;
     }
 
     /// <summary>

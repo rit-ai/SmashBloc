@@ -18,9 +18,9 @@ public class Twirl : MobileUnit
     public const string IDENTITY = "Twirl";
     public const int COST = 50;
 
-    public Rigidbody body;
     public Rigidbody hoverBall;
     public Rigidbody bottomWeight;
+    public MeshRenderer laserfan;
     public Laser laser;
 
     private const ArmorType ARMOR_TYPE = ArmorType.M_ARMOR;
@@ -41,6 +41,8 @@ public class Twirl : MobileUnit
     /// Used for one-time initialization.
     /// </summary>
     public override void Build () {
+        base.Build();
+        
         // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
@@ -49,9 +51,8 @@ public class Twirl : MobileUnit
         sightRange = SIGHT_RANGE;
         attackRange = RANGE;
 
+        surfaces.Add(laserfan);
         laser = GetComponentInChildren<Laser>();
-
-        base.Build();
     }
 
     /// <summary>
@@ -77,7 +78,7 @@ public class Twirl : MobileUnit
         while (aimTime > 0f)
         {
             // aim
-            Quaternion lookRotation = Quaternion.LookRotation(target.transform.position - transform.position);
+            Quaternion lookRotation = Quaternion.LookRotation(target.transform.position);
             transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime / aimTime);
             aimTime -= Time.deltaTime;
             yield return null; // waits for next frame

@@ -10,9 +10,10 @@ using UnityEngine;
 public class Laser : MonoBehaviour
 {
 
-    private const float DEFAULT_TIME_LINGER = 0.8f;
+    private const float DEFAULT_TIME_LINGER = 0.5f;
     private const float DEFAULT_FORCE_MULT = 10f;
     private LineRenderer laser;
+    private CanvasRenderer canvas;
     private Unit parent;
 	
 	public void Shoot(float range, float damage, float time = DEFAULT_TIME_LINGER)
@@ -26,7 +27,9 @@ public class Laser : MonoBehaviour
     /// <param name="range">The range to which the laser will fire. Experiences falloff.</param>
     /// <param name="damage">The damage the laser deals. Experiences falloff.</param>
     /// <param name="time">The time the laser will linger.</param>
-    /// <returns></returns>
+    /// NOTE: Because of some uninitutitive properties of Line Renderer and 
+    /// Raycasating, please exercise caution before you change where the 
+    /// position of the start and end of the laser are set.
     private IEnumerator Fire(float range, float damage, float time)
     {
         laser.enabled = true;
@@ -34,15 +37,15 @@ public class Laser : MonoBehaviour
 
         while (time > 0f)
         {
-            Ray ray = new Ray(Vector3.zero, Vector3.forward);
+            Ray ray = new Ray(transform.position, transform.forward);
             RaycastHit hit;
 
-            laser.SetPosition(0, ray.origin);
+            laser.SetPosition(0, Vector3.zero);
             laser.GetComponent<Renderer>().material.mainTextureOffset = new Vector2(0, Time.time);
+            if (Toolbox.Debuggy.Lasers) { DebugFire(ray.origin, ray.direction * range); }
 
             if (Physics.Raycast(ray, out hit, range))
             {
-                Debug.Log("yes");
                 // Did we hit a unit?
                 Unit contact = hit.collider.GetComponent<Unit>();
                 if (contact != null)
@@ -55,6 +58,7 @@ public class Laser : MonoBehaviour
                         if (!hitOnce)
                         {
                             contact.UpdateHealth(-(damage * falloff), parent);
+                            Debug.Log("damaged: " + contact.Identity() + contact.Team.title);
                             hitOnce = true;
                         }
                         // If it's a mobile unit, we apply a force.
@@ -66,12 +70,14 @@ public class Laser : MonoBehaviour
                     }
                 }
                 // We hit something, so don't let the laser go through it.
-                laser.SetPosition(1, hit.point);
+                float distance = (transform.position - hit.point).magnitude * 1.05f; // grace value, would rather stop
+                                                                                    // too late than too early
+                laser.SetPosition(1, Vector3.forward * distance);
             }
             else
             {
                 // The laser extends to full range if we don't hit anything.
-                laser.SetPosition(1, ray.GetPoint(range));
+                laser.SetPosition(1, Vector3.forward * range);
             }
 
             time -= Time.deltaTime;
@@ -84,15 +90,25 @@ public class Laser : MonoBehaviour
         yield return null;
     }
 
+    /// <summary>
+    /// Draws where the raycast is actually occurring.
+    /// </summary>
+    private void DebugFire(Vector3 start, Vector3 end)
+    {
+        Debug.DrawRay(start, end, Color.green, 2f, false);
+    }
+
     private void Start()
     {
         laser = GetComponent<LineRenderer>();
+        canvas = GetComponent<CanvasRenderer>();
         parent = GetComponentInParent<Unit>();
-        Debug.Assert(laser);
-        Debug.Assert(parent);
+        Debug.Assert(laser != null);
+        Debug.Assert(canvas != null);
+        Debug.Assert(parent != null);
 
-        laser.startColor = parent.Team.color;
-        laser.endColor = Color.Lerp(parent.Team.color, Color.clear, 0.5f);
+        laser.material.color = parent.Team.color;
+
         laser.enabled = false;
     }
 }

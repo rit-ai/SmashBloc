@@ -242,7 +242,7 @@ public class TwirlPhysics : MobilePhysics
     private void Start()
     {
         parent = GetComponent<Twirl>();
-        body = parent.body;
+        body = parent.GetComponent<Rigidbody>();
         hoverBall = parent.hoverBall;
         bottomWeight = parent.bottomWeight;
 

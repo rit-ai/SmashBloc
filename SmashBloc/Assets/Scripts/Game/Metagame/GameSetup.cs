@@ -43,7 +43,7 @@ public class GameSetup : MonoBehaviour
     /// <summary>
     /// Picks A random name from the names list for a team
     /// </summary>
-    private string chooseName()
+    private string ChooseName()
     {
         //check if there are any names left
         if(teamNames.Count > 0)
@@ -67,7 +67,7 @@ public class GameSetup : MonoBehaviour
         players = new List<Player>();
         teams = new List<Team>
         {
-            new Team(chooseName(), DEFAULT_COLORS[0])
+            new Team(ChooseName(), DEFAULT_COLORS[0])
         };
 
         if (hasPlayer)
@@ -85,7 +85,7 @@ public class GameSetup : MonoBehaviour
         // The rest are AI teams
         for (int x = 1; x < numberOfTeams; x++)
         {
-            teams.Add(new Team(chooseName(), DEFAULT_COLORS[x]));
+            teams.Add(new Team(ChooseName(), DEFAULT_COLORS[x]));
             players.Add(Player.MakePlayer(true, teams[x]));
         }
 

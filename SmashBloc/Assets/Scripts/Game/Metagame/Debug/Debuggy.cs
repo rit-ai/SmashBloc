@@ -10,6 +10,7 @@ using UnityEngine;
 public class Debuggy : MonoBehaviour {
 
     public bool Twirls;
+    public bool Lasers;
     
     // add more debug options here!
 }

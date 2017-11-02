@@ -43,7 +43,7 @@ public sealed class PlayerAI_Basic : PlayerAI {
         }
 
         cooldown--;
-        if (info.team.cities.Count > 0 && info.team.mobiles.Count < 2)
+        if (info.team.cities.Count > 0 && info.team.mobiles.Count < 3)
             return new SpawnMobile(Twirl.IDENTITY, info.team.cities[0]);
 
         return null;

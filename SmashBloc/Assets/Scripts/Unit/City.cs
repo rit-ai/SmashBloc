@@ -70,7 +70,7 @@ public class City : Unit
 
         base.Activate();
 
-        spawnRingRig.Init(surface.material.color);
+        spawnRingRig.Init(team.color);
 
         StartCoroutine(Regenerate());
 
@@ -123,19 +123,10 @@ public class City : Unit
     /// <param name="capturer">The capturer of the city.</param>
     protected override void OnDeath(Unit capturer)
     {
-        ChangeColor(capturer.Team.color);
+        UpdateColor();
+        spawnRingRig.UpdateColor(team.color);
         UpdateHealth(CAPTURED_HEALTH - health, capturer);
         NotifyAll(Invocation.CITY_CAPTURED, capturer.Team);
-    }
-
-    /// <summary>
-    /// Changes the city's color.
-    /// </summary>
-    /// <param name="color"></param>
-    private void ChangeColor(Color color)
-    {
-        surface.material.color = color;
-        spawnRingRig.UpdateColor(color);
     }
 
     /// <summary>
