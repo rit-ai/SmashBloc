@@ -58,7 +58,6 @@ public class Laser : MonoBehaviour
                         if (!hitOnce)
                         {
                             contact.UpdateHealth(-(damage * falloff), parent);
-                            Debug.Log("damaged: " + contact.Identity() + contact.Team.title);
                             hitOnce = true;
                         }
                         // If it's a mobile unit, we apply a force.

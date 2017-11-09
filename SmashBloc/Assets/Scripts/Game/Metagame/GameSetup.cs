@@ -52,7 +52,6 @@ public class GameSetup : MonoBehaviour
             string selectedName = teamNames[(int)(Random.value * teamNames.Count)];
             //remove the selected name from the list
             teamNames.Remove(selectedName);
-            Debug.Log("Selected name: " + selectedName);
             return selectedName;
         }
         return "No Names Left";

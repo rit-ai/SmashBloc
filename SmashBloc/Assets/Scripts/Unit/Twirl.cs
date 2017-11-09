@@ -30,7 +30,7 @@ public class Twirl : MobileUnit
     private const float DEST_DEVIATION_RADIUS = 50f;
     private const float MAXHEALTH = 100f;
     private const float DAMAGE = 10f;
-    private const float SIGHT_RANGE = 500f;
+    private const float SIGHT_RANGE = 150f;
     private const float RANGE = 150f;
 
     // **          //
@@ -74,12 +74,11 @@ public class Twirl : MobileUnit
     /// <returns></returns>
     public IEnumerator AimShoot(Unit target, float aimTime = 1f)
     {
-        Debug.Log("Shooting");
         while (aimTime > 0f)
         {
             // aim
-            Quaternion lookRotation = Quaternion.LookRotation(target.transform.position);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime / aimTime);
+            Quaternion lookRotation = Quaternion.LookRotation(target.transform.position - transform.position);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime);
             aimTime -= Time.deltaTime;
             yield return null; // waits for next frame
         }

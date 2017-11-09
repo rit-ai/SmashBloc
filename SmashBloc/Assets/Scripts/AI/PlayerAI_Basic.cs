@@ -14,10 +14,10 @@ using UnityEngine;
 public sealed class PlayerAI_Basic : PlayerAI {
 
     // Unit count threshold to try an attack
-    private const int ARMY_SIZE = 1;
+    private const int ARMY_SIZE = 20;
 
     private City target;
-    private int cooldown = 1;
+    private int cooldown = ARMY_SIZE;
 
     /// <summary>
     /// This AI attacks on a cooldown, since we want it to be able to spawn 
@@ -43,7 +43,7 @@ public sealed class PlayerAI_Basic : PlayerAI {
         }
 
         cooldown--;
-        if (info.team.cities.Count > 0 && info.team.mobiles.Count < 3)
+        if (info.team.cities.Count > 0)
             return new SpawnMobile(Twirl.IDENTITY, info.team.cities[0]);
 
         return null;

@@ -40,6 +40,8 @@ public class GameObserver : MonoBehaviour, IObserver
         {
             // Pause the game
             case Invocation.PAUSE_AND_LOCK:
+                goto case Invocation.TOGGLE_PAUSE;
+
             case Invocation.TOGGLE_PAUSE:
                 manager.TogglePause();
                 break;
