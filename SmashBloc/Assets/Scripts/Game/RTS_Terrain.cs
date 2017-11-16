@@ -36,12 +36,13 @@ public class RTS_Terrain : MonoBehaviour, IObservable
 
     /// <summary>
     /// When the terrain is left clicked, close all menus.
+    /// TODO: Discuss relevance of this
     /// </summary>
-    public void OnMouseDown()
+    /*public void OnMouseDown()
     {
         if (Utils.MouseIsOverUI()) { return; }
         NotifyAll(Invocation.CLOSE_ALL);
-    }
+    */
 
     /// <summary>
     /// When the terrain is right clicked, set a new destination for all 

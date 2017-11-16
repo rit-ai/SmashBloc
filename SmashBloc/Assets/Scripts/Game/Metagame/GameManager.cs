@@ -43,10 +43,9 @@ public class GameManager : MonoBehaviour, IObservable
     private CameraController cameraController;
     private GameObject[] citySpawnPoints;
     private int activeTeams;
-
-    // **          //
-    // * METHODS * //
-    //          ** //
+    private bool inSubMenu = false;
+    private bool inMenu = false;
+    private bool paused = false;
 
     public void NotifyAll(Invocation invoke, params object[] data)
     {
@@ -63,7 +62,10 @@ public class GameManager : MonoBehaviour, IObservable
     {
         // Set to 1 if 0, and 0 if 1.
         Time.timeScale = (Time.timeScale == 0) ? 1 : 0;
+        if (Time.timeScale == 0) { NotifyAll(Invocation.PAUSE_TEXT_ENABLE); }
+        else { NotifyAll(Invocation.PAUSE_TEXT_DISABLE); }
     }
+
 
     /// <summary>
     /// Sets the new destination for the unit, if the unit is of the player's
@@ -117,6 +119,7 @@ public class GameManager : MonoBehaviour, IObservable
     /// </summary>
     public void ResetGame()
     {
+
         StopAllCoroutines();
         NotifyAll(Invocation.CLOSE_ALL);
 
@@ -142,6 +145,7 @@ public class GameManager : MonoBehaviour, IObservable
         if (resetCamera) { cameraController.CenterCameraBehindPosition(teams[0].cities[0].transform.position); }
 
         StartCoroutine(GameLoop());
+
     }
 
     /// <summary>
@@ -301,5 +305,29 @@ public class GameManager : MonoBehaviour, IObservable
             yield return new WaitForSeconds(GOLD_INCREMENT_RATE);
 
         }
+    }
+
+    /// <summary>
+    /// Getter/Setter for inMenu
+    /// </summary>
+    public bool InMenu
+    {
+        get { return inMenu; }
+        set { inMenu = value; }
+    }
+
+    /// <summary>
+    /// Getter/Setter for inSubMenu
+    /// </summary>
+    public bool InSubMenu
+    {
+        get { return inSubMenu; }
+        set { inSubMenu = value; }
+    }
+
+    public bool Paused
+    {
+        get { return paused; }
+        set { paused = value; }
     }
 }
