@@ -53,6 +53,7 @@ public class Twirl : MobileUnit
 
         surfaces.Add(laserfan);
         laser = GetComponentInChildren<Laser>();
+        laser.Init();
     }
 
     /// <summary>
@@ -118,6 +119,18 @@ public class Twirl : MobileUnit
         Deactivate();
 
         yield return null;
+    }
+
+    /// <summary>
+    /// Used for debugging purposes ONLY. The majority of Unit activation
+    /// occurs in the Activate() and Build() functions.
+    /// </summary>
+    public void Start()
+    {
+        if (DebugOutsideGame)
+        {
+            Toolbox.Debuggy.DebugSetupTwirl(this);
+        }
     }
 
 

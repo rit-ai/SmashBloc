@@ -26,7 +26,9 @@ public abstract class Unit : MonoBehaviour, IObservable
     // * FIELDS * //
     //         ** //
 
-    // graphics
+    [Tooltip("Enables debug functionality for this specific unit. Helpful if it is being used outside scene with teams.")]
+    public bool DebugOutsideGame;
+    [Tooltip("Handles highlighting and selection functions.")]
     public Projector projector;
 
     // unit management

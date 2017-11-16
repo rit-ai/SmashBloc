@@ -22,6 +22,8 @@ public sealed class Toolbox : Singleton<Toolbox>
     // The first created player, which will always be the main player.
     public static Player player;
 
+    [Tooltip("If false, does not set up the game (for debugging purposes).")]
+    public bool isGame;
     [Tooltip("Causes the game to reset automatically when it ends.")]
     public bool playContinuous;
     [Tooltip("Causes the game to pause when it ends.")]
@@ -68,50 +70,42 @@ public sealed class Toolbox : Singleton<Toolbox>
     /// </summary>
     private void Awake()
     {
-        // ...and from me came the game...
-        gameSetup = GetComponent<GameSetup>();
-        gameSetup.Init();
-        if (gameSetup.Locked)
-        {
-            // If the game is locked, make a dummy player & team
-            player = Player.MakePlayer(false, new Team());
-        }
-        else
-        {
-            // Else they're the first player
-            player = gameSetup.Players[0];
-        }
-
-        // ...WHOOPS PLEASE EDIT...
         debuggy = GetComponent<Debuggy>();
 
-        // ...and from the game came the land...
         terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
 
-        // ...and from the land came the prefabs...
         cityPrefab = Resources.Load<City>("Prefabs/Units/" + City.IDENTITY);
         twirlPrefab = Resources.Load<Twirl>("Prefabs/Units/" + Twirl.IDENTITY);
         tankPrefab = Resources.Load<Boomy>("Prefabs/Units/" + Boomy.IDENTITY);
 
-        Debug.Assert(twirlPrefab);
-
-        // ...and from the land came those that managed it...
-        uiManager = FindObjectOfType<UIManager>();
-        gameManager = gameObject.AddComponent<GameManager>();
-
-        // ...and from the land came those that observed it...
-        uiObserver = gameObject.AddComponent<UIObserver>();
-        gameObserver = gameObject.AddComponent<GameObserver>();
-
-        // ...and the observers grouped the prefabs into wrappers...
         twirlPoolWrapper = new GameObject("Twirl Pool");
         cityPoolWrapper = new GameObject("City Pool");
 
-        // ...and the observers said that the prefabs would always be plenty...
         twirlPool = new ObjectPool<Twirl>(MakeTwirl, MEDIUM_POOL);
         cityPool = new ObjectPool<City>(MakeCity, SMALL_POOL);
 
-        // ...and all of that is me.
+        if (isGame)
+        {
+            gameSetup = GetComponent<GameSetup>();
+            gameSetup.Init();
+            if (gameSetup.Locked)
+            {
+                // If the game is locked, make a dummy player & team
+                player = Player.MakePlayer(false, new Team());
+            }
+            else
+            {
+                // Else they're the first player
+                player = gameSetup.Players[0];
+            }
+
+            uiManager = FindObjectOfType<UIManager>();
+            gameManager = gameObject.AddComponent<GameManager>();
+
+            uiObserver = gameObject.AddComponent<UIObserver>();
+            gameObserver = gameObject.AddComponent<GameObserver>();
+        }
+
         Debug.Assert(terrain);
         Debug.Assert(cityPrefab);
         Debug.Assert(twirlPrefab);
@@ -120,7 +114,7 @@ public sealed class Toolbox : Singleton<Toolbox>
         Debug.Assert(uiManager);
         Debug.Assert(uiObserver);
         Debug.Assert(gameObserver);
-        // Toolbox.
+
         DontDestroyOnLoad(cityPrefab.transform.gameObject);
         DontDestroyOnLoad(twirlPrefab.transform.gameObject);
         DontDestroyOnLoad(tankPrefab.transform.gameObject);

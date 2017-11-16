@@ -15,8 +15,25 @@ public class Laser : MonoBehaviour
     private LineRenderer laser;
     private CanvasRenderer canvas;
     private Unit parent;
-	
-	public void Shoot(float range, float damage, float time = DEFAULT_TIME_LINGER)
+
+    /// <summary>
+    /// Initializes the laser.
+    /// </summary>
+    public void Init()
+    {
+        laser = GetComponent<LineRenderer>();
+        canvas = GetComponent<CanvasRenderer>();
+        parent = GetComponentInParent<Unit>();
+        Debug.Assert(laser != null);
+        Debug.Assert(canvas != null);
+        Debug.Assert(parent != null);
+
+        laser.material.color = parent.Team.color;
+
+        laser.enabled = false;
+    }
+
+    public void Shoot(float range, float damage, float time = DEFAULT_TIME_LINGER)
     {
         StartCoroutine(Fire(range, damage, time));
     }
@@ -95,19 +112,5 @@ public class Laser : MonoBehaviour
     private void DebugFire(Vector3 start, Vector3 end)
     {
         Debug.DrawRay(start, end, Color.green, 2f, false);
-    }
-
-    private void Start()
-    {
-        laser = GetComponent<LineRenderer>();
-        canvas = GetComponent<CanvasRenderer>();
-        parent = GetComponentInParent<Unit>();
-        Debug.Assert(laser != null);
-        Debug.Assert(canvas != null);
-        Debug.Assert(parent != null);
-
-        laser.material.color = parent.Team.color;
-
-        laser.enabled = false;
     }
 }

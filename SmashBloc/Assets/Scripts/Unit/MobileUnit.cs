@@ -81,6 +81,7 @@ public abstract class MobileUnit : Unit
             List<Unit> enemiesInAttackRange = new List<Unit>();
             // Get colliders of all units
             List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ~Toolbox.Terrain.ignoreAllButTerrain));
+            collidersInSight.Remove(GetComponent<Collider>()); // don't include self
             foreach (Collider c in collidersInSight)
             {
                 current = c.gameObject.GetComponentInChildren<Unit>();
