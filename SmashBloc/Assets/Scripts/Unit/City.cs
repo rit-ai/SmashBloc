@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 /*
  * @author Ben Fairlamb
@@ -31,11 +32,12 @@ public class City : Unit
     // Regeneration is delayed after taking damage
     private const float REGENERATION_DELAY = 2f;
     // Enemy units will suffer recoil upon contact with a City
-    private const float BLOWBACK_FORCE = 30f;
-    private const float BLOWBACK_RADIUS = 10f;
+    private const float PUSH_FORCE = 400f;
+    private const float PUSH_RADIUS = 50f;
     private const int COST = 500;
     private const int MIN_INCOME_LEVEL = 1;
     private const int DEFAULT_INCOME_LEVEL = 8;
+    private const int PUSH_COOLDOWN = 2;
 
     private int incomeLevel;
     private bool delayRegen = true;
@@ -70,7 +72,7 @@ public class City : Unit
 
         base.Activate();
 
-        spawnRingRig.Init(surface.material.color);
+        spawnRingRig.Init(team.color);
 
         StartCoroutine(Regenerate());
 
@@ -107,9 +109,6 @@ public class City : Unit
         Unit unit = collision.gameObject.GetComponent<Unit>();
         if (unit != null && !(unit.Team.Equals(team)))
         {
-            Rigidbody body = collision.gameObject.GetComponent<Rigidbody>();
-            // Add audiovisuals here
-            body.AddExplosionForce(BLOWBACK_FORCE, transform.position - body.transform.position, BLOWBACK_RADIUS, BLOWBACK_FORCE, ForceMode.Acceleration);
             UpdateHealth(-UnityEngine.Random.Range(10f, 20f), unit);
         }
     }
@@ -123,19 +122,10 @@ public class City : Unit
     /// <param name="capturer">The capturer of the city.</param>
     protected override void OnDeath(Unit capturer)
     {
-        ChangeColor(capturer.Team.color);
-        UpdateHealth(CAPTURED_HEALTH - health, capturer);
         NotifyAll(Invocation.CITY_CAPTURED, capturer.Team);
-    }
-
-    /// <summary>
-    /// Changes the city's color.
-    /// </summary>
-    /// <param name="color"></param>
-    private void ChangeColor(Color color)
-    {
-        surface.material.color = color;
-        spawnRingRig.UpdateColor(color);
+        UpdateColor();
+        spawnRingRig.UpdateColor(team.color);
+        UpdateHealth(CAPTURED_HEALTH - health, capturer);
     }
 
     /// <summary>
@@ -157,6 +147,40 @@ public class City : Unit
     }
 
     /// <summary>
+    /// Pushes all units away from the city.
+    /// 
+    /// Activates every <PUSH_COOLDOWN> seconds.
+    /// </summary>
+    private IEnumerator Push()
+    {
+        Rigidbody body;
+        float cooldown = PUSH_COOLDOWN;
+
+        while (true)
+        {
+            if (cooldown > 0f)
+            {
+                cooldown -= Time.deltaTime;
+                yield return null;
+                continue;
+            }
+
+            Collider[] nearby = Physics.OverlapSphere(transform.position, PUSH_RADIUS, ~Toolbox.Terrain.ignoreAllButTerrain);
+            foreach (Collider c in nearby)
+            {
+                body = c.gameObject.GetComponentInParent<Rigidbody>();
+                if (body)
+                {
+                    body.AddForce((c.gameObject.transform.position - transform.position).normalized * PUSH_FORCE, ForceMode.Impulse);
+                }
+            }
+
+            cooldown = PUSH_COOLDOWN;
+        }
+
+    }
+
+    /// <summary>
     /// Pull up the menu when the unit is clicked.
     /// </summary>
     private void OnMouseDown()
@@ -168,6 +192,7 @@ public class City : Unit
     private void Start()
     {
         spawnRingRig = GetComponentInChildren<SpawnRingRig>();
+        StartCoroutine(Push());
     }
 
     /// <summary>

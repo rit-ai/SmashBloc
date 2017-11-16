@@ -19,7 +19,36 @@ public sealed class MobileAI_Basic : MobileAI
 
     protected override IThought Think()
     {
+
+        int shoot = 0;
+        int flee = 0;
+        int move = 0;
+
+        shoot += info.enemiesInAttackRange.Count;
+        flee += info.enemiesInSight.Count;
+        shoot *= 1 + (info.alliesInSight.Count / 100);
+        move += 1;
+
+        Dictionary<EThought, float> weightedVals = new Dictionary<EThought, float>
+        {
+            { EThought.SHOOT, shoot },
+            { EThought.FLEE, flee },
+            { EThought.MOVE, move }
+        };
+
+        EThought decision = StochasticChoice(weightedVals);
+
+        switch (decision)
+        {
+            case EThought.SHOOT:
+                return new Shoot(info.enemiesInAttackRange[0]);
+            case EThought.FLEE:
+                return new Flee(info.enemiesInSight[0]);
+            case EThought.MOVE:
+                return new Move(info.pointOfInterest);
+            default:
+                throw new Exception("Recieved a bad EThought in MobileAI_Basic.");
+        }
         
-        return new Move(info.pointOfInterest);
     }
 }

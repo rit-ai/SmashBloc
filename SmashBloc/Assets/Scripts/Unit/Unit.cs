@@ -26,11 +26,13 @@ public abstract class Unit : MonoBehaviour, IObservable
     // * FIELDS * //
     //         ** //
 
+    // graphics
+    public Projector projector;
+
     // unit management
     protected List<IObserver> observers;
     // graphics
-    protected Projector projector;
-    protected MeshRenderer surface;
+    protected List<MeshRenderer> surfaces;
     // general
     protected Team team;
     protected string customName; // user-assigned names
@@ -83,7 +85,7 @@ public abstract class Unit : MonoBehaviour, IObservable
             Toolbox.GameObserver,
             Toolbox.UIObserver
         };
-
+        surfaces = new List<MeshRenderer>();
     }
 
     /// <summary>
@@ -95,9 +97,9 @@ public abstract class Unit : MonoBehaviour, IObservable
         projector = GetComponentInChildren<Projector>();
         Debug.Assert(projector);
         projector.enabled = false;
-        
-        surface = GetComponent<MeshRenderer>();
-        surface.material.color = Color.Lerp(Color.black, team.color, health / maxHealth);
+
+        surfaces.Add(GetComponentInChildren<MeshRenderer>());
+        UpdateColor();
     }
 
     /// <summary>
@@ -117,8 +119,16 @@ public abstract class Unit : MonoBehaviour, IObservable
     public virtual void UpdateHealth(float change, Unit source = null)
     {
         health += change;
-        surface.material.color = Color.Lerp(Color.black, team.color, health / MaxHealth);
+        UpdateColor();
         if (health <= 0) { OnDeath(source); }
+    }
+
+    protected virtual void UpdateColor()
+    {
+        foreach (MeshRenderer surface in surfaces)
+        {
+            surface.material.color = Color.Lerp(Color.black, team.color, health / MaxHealth);
+        }
     }
 
     /// <summary>

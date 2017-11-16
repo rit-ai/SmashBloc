@@ -235,7 +235,6 @@ public class GameManager : MonoBehaviour, IObservable
         {
             NotifyAll(Invocation.RESET_GAME);
             ResetGame();
-            yield break;
         }
 
         if (pauseOnFinish)

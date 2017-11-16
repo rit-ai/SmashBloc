@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,6 +28,26 @@ public abstract class AbstractAI : MonoBehaviour {
     /// to info.
     /// </summary>
     protected abstract IThought Think();
+
+    /// <summary>
+    /// Given a dictionary of types, chooses one. Helpful for choosing from a 
+    /// collection of IThoughts.
+    /// 
+    /// This algorithm is O(n) time where n is the size of weightedVals, so 
+    /// don't overuse it.
+    /// </summary>
+    protected EThought StochasticChoice(Dictionary<EThought, float> weightedVals) 
+    {
+        float max = weightedVals.Sum(v => v.Value);
+        float f = UnityEngine.Random.Range(0, max);
+        float total = 0f;
+        foreach (EThought t in weightedVals.Keys)
+        {
+            total += weightedVals[t];
+            if (f < total) { return t; }
+        }
+        throw new Exception("Error in AbstractAI.StochasticChoice(): No value could be chosen");
+    }
 
     // Start thinking.
     public void Activate()

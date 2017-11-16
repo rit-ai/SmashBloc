@@ -37,7 +37,7 @@ public class SpawnMobile : PlayerThought {
     {
         // Cancel trying to spawn a unit at a city we don't own
         if (toSpawnAt.Team != body.Team) {
-            Debug.LogWarning(body.name + "tried to spawn a unit at a city they didn't own.");
+            Debug.LogWarning(body.name + " tried to spawn a unit at a city they didn't own.");
             return;
         }
 

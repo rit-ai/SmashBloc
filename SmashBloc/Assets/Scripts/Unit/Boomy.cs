@@ -57,17 +57,12 @@ public class Boomy : MobileUnit {
 
     }
 
-    protected override IEnumerator DeathAnimation()
-    {
-        yield return null;
-    }
-
     protected override void OnDeath(Unit killer)
     {
         throw new NotImplementedException();
     }
 
-    public override IEnumerator Shoot(Unit target, float maxAimTime)
+    public override void Shoot(Unit target, float maxAimTime)
     {
         throw new NotImplementedException();
     }
