@@ -15,22 +15,22 @@ Platform assembly: C:\Users\Essence\Documents\SmashBloc\SmashBloc\Builds\smashbl
 Loading C:\Users\Essence\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_2_2_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
 Platform assembly: C:\Users\Essence\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_2_2_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
 Loading C:\Users\Essence\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_2_2_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.137 seconds
+- Completed reload, in  0.128 seconds
 Platform assembly: C:\Users\Essence\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_2_2_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\Essence\Documents\SmashBloc\SmashBloc\Builds\smashbloc_v0_0_2_2_Data\Managed\System.dll (this message is harmless)
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 2.097774 ms
+UnloadTime: 2.220243 ms
 Unloading 6 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 4.854510 ms
+UnloadTime: 5.232584 ms
 
-Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 7997.
-Total: 1.937379 ms (FindLiveObjects: 0.343308 ms CreateObjectMapping: 0.112197 ms MarkObjects: 1.466466 ms  DeleteObjects: 0.014617 ms)
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 8001.
+Total: 2.243156 ms (FindLiveObjects: 0.387159 ms CreateObjectMapping: 0.219653 ms MarkObjects: 1.620935 ms  DeleteObjects: 0.015012 ms)
 
 Setting up 4 worker threads for Enlighten.
-  Thread -> id: 12e4 -> priority: 1 
-  Thread -> id: 3bc -> priority: 1 
-  Thread -> id: 3fb4 -> priority: 1 
-  Thread -> id: 39a4 -> priority: 1 
+  Thread -> id: 2e10 -> priority: 1 
+  Thread -> id: 2470 -> priority: 1 
+  Thread -> id: 410c -> priority: 1 
+  Thread -> id: 3fc4 -> priority: 1 
