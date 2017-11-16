@@ -75,6 +75,7 @@ public class UIManager : MonoBehaviour, IObservable
     public void TogglePauseMenu()
     {
         pauseMenu.enabled = !(pauseMenu.enabled);
+        pauseText.enabled = pauseMenu.enabled;
         pauseMenu.transform.SetAsLastSibling();
     }
 

@@ -46,7 +46,7 @@ public class UIObserver : MonoBehaviour, IObserver
             // Opens the pause menu
             case Invocation.PAUSE_AND_LOCK:
                 manager.TogglePauseMenu();
-                goto case Invocation.TOGGLE_PAUSE;
+                break;
 
             // Toggles the pause text
             case Invocation.TOGGLE_PAUSE:
@@ -73,6 +73,11 @@ public class UIObserver : MonoBehaviour, IObserver
 
             // Hides all menus and selection elements
             case Invocation.CLOSE_ALL:
+                manager.CloseAll();
+                break;
+
+            // Remove highlight from all units
+            case Invocation.UNITS_DESELECTED:
                 foreach (Unit u in Utils.AllUnits())
                 {
                     u.RemoveHighlight();
@@ -81,9 +86,9 @@ public class UIObserver : MonoBehaviour, IObserver
                 {
                     c.RemoveHighlight();
                 }
-                manager.CloseAll();
                 break;
-            // Invocation not found? Must be for someone else. Ignore.
+
+                // Invocation not found? Must be for someone else. Ignore.
 
         }
     }
