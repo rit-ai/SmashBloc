@@ -205,6 +205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ef40d360b1eb3f4ea4309b133794968, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugOutsideGame: 0
   projector: {fileID: 0}
 --- !u!114 &114880657935130732
 MonoBehaviour:

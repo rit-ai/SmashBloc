@@ -30,6 +30,7 @@ public class RTS_Terrain : MonoBehaviour, IObservable
     {
         foreach (IObserver o in observers)
         {
+            if (o == null) { continue; }
             o.OnNotify(this, invocation, data);
         }
     }
@@ -42,6 +43,7 @@ public class RTS_Terrain : MonoBehaviour, IObservable
     {
         if (Utils.MouseIsOverUI()) { return; }
         NotifyAll(Invocation.CLOSE_ALL);
+    }
     */
 
     /// <summary>

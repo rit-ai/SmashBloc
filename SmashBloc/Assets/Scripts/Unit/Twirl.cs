@@ -42,7 +42,11 @@ public class Twirl : MobileUnit
     /// </summary>
     public override void Build () {
         base.Build();
-        
+
+        gameObject.AddComponent<TwirlPhysics>();
+        brain = gameObject.AddComponent<MobileAI_Basic>();
+        brain.Body = this;
+
         // Handle default values
         armorType = ARMOR_TYPE;
         dmgType = DMG_TYPE;
@@ -50,10 +54,6 @@ public class Twirl : MobileUnit
         damage = DAMAGE;
         sightRange = SIGHT_RANGE;
         attackRange = RANGE;
-
-        surfaces.Add(laserfan);
-        laser = GetComponentInChildren<Laser>();
-        laser.Init();
     }
 
     /// <summary>
@@ -129,8 +129,12 @@ public class Twirl : MobileUnit
     {
         if (DebugOutsideGame)
         {
-            Toolbox.Debuggy.DebugSetupTwirl(this);
+            Debuggy.DebugSetupTwirl(this);
         }
+
+        surfaces.Add(laserfan);
+        laser = GetComponentInChildren<Laser>();
+        laser.Init();
     }
 
 

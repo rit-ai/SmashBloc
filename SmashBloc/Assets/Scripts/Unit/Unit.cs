@@ -183,15 +183,6 @@ public abstract class Unit : MonoBehaviour, IObservable
     }
 
     /// <summary>
-    /// Called after all other Update() methods. Currently its only purpose is
-    /// to prevent the Projectors from wobbling around.
-    /// </summary>
-    private void LateUpdate()
-    {
-
-    }
-
-    /// <summary>
     /// Gets the type of the unit.
     /// </summary>
     public ArmorType ArmorType

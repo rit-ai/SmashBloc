@@ -57,6 +57,7 @@ GameObject:
   - component: {fileID: 23754826877750770}
   - component: {fileID: 33440255546069928}
   - component: {fileID: 64194866595704510}
+  - component: {fileID: 54283418941125560}
   m_Layer: 8
   m_Name: Skin
   m_TagString: Untagged
@@ -127,7 +128,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4834635711646198}
   - component: {fileID: 114793964979247364}
-  - component: {fileID: 54323957684283056}
   m_Layer: 0
   m_Name: Twirl
   m_TagString: Untagged
@@ -208,7 +208,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1787040646475476}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -48.895035, y: 16.68, z: -129.5696}
+  m_LocalPosition: {x: -27.95, y: 14.7, z: -174.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4039777341635744}
@@ -351,12 +351,12 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!54 &54323957684283056
+--- !u!54 &54283418941125560
 Rigidbody:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1787040646475476}
+  m_GameObject: {fileID: 1231872395689462}
   serializedVersion: 2
   m_Mass: 5
   m_Drag: 0
@@ -428,6 +428,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4488074368214e4b9a72023019db8c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugOutsideGame: 0
   projector: {fileID: 119289970581971644}
   hoverBall: {fileID: 54277290373879788}
   bottomWeight: {fileID: 54452140642064258}
@@ -542,7 +543,7 @@ FixedJoint:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1646916797358842}
-  m_ConnectedBody: {fileID: 54323957684283056}
+  m_ConnectedBody: {fileID: 54283418941125560}
   m_BreakForce: Infinity
   m_BreakTorque: Infinity
   m_EnableCollision: 0
@@ -553,7 +554,7 @@ FixedJoint:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1327627424789758}
-  m_ConnectedBody: {fileID: 54323957684283056}
+  m_ConnectedBody: {fileID: 54283418941125560}
   m_BreakForce: Infinity
   m_BreakTorque: Infinity
   m_EnableCollision: 0

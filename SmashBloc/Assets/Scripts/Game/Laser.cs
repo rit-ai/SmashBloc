@@ -59,7 +59,7 @@ public class Laser : MonoBehaviour
 
             laser.SetPosition(0, Vector3.zero);
             laser.GetComponent<Renderer>().material.mainTextureOffset = new Vector2(0, Time.time);
-            if (Toolbox.Debuggy.Lasers) { DebugFire(ray.origin, ray.direction * range); }
+            if (Debuggy.Lasers) { DebugFire(ray.origin, ray.direction * range); }
 
             if (Physics.Raycast(ray, out hit, range))
             {

@@ -90,7 +90,7 @@ public class TwirlPhysics : MobilePhysics
 
         // If the unit is too far from the floor, don't apply any force to the
         // hoverball
-        if (Physics.Raycast(hoverBall.transform.position, Vector3.down, out hit, MAX_FLOAT_THRESHOLD, Toolbox.Terrain.ignoreAllButTerrain))
+        if (Physics.Raycast(hoverBall.transform.position, Vector3.down, out hit, MAX_FLOAT_THRESHOLD))
         {
             // Get the destination height
             Vector3 destination = Vector3.up * MAX_FLOAT_THRESHOLD * Mathf.Abs(Physics.gravity.y);
@@ -242,7 +242,7 @@ public class TwirlPhysics : MobilePhysics
     private void Start()
     {
         parent = GetComponent<Twirl>();
-        body = parent.GetComponent<Rigidbody>();
+        body = parent.GetComponentInChildren<Rigidbody>();
         hoverBall = parent.hoverBall;
         bottomWeight = parent.bottomWeight;
 
@@ -252,7 +252,7 @@ public class TwirlPhysics : MobilePhysics
         body.useGravity = true;
         bottomWeight.useGravity = true;
 
-        if (Toolbox.Debuggy.Twirls)
+        if (Debuggy.Twirls)
         {
             // Draws a debug circle of a radius. Unfortunately, it is oriented
             // incorrectly. FIXME

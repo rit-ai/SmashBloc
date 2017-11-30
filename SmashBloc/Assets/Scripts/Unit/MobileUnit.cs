@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /*
@@ -46,6 +47,8 @@ public abstract class MobileUnit : Unit
     /// </summary>
     public override void Activate()
     {
+        Debug.Log("2");
+
         // Units wait near their spawn position until given orders
         pointOfInterest = transform.position;
 
@@ -55,6 +58,7 @@ public abstract class MobileUnit : Unit
 
         brain.Activate();
         base.Activate();
+
     }
 
     /// <summary>
@@ -79,8 +83,11 @@ public abstract class MobileUnit : Unit
             List<Unit> enemiesInSight = new List<Unit>();
             List<Unit> alliesInSight = new List<Unit>();
             List<Unit> enemiesInAttackRange = new List<Unit>();
-            // Get colliders of all units
-            List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange, ~Toolbox.Terrain.ignoreAllButTerrain));
+            // Get all colliders in sight
+            List<Collider> collidersInSight = new List<Collider>(Physics.OverlapSphere(transform.position, sightRange));
+            // Remove all that aren't Units
+            collidersInSight.RemoveAll(x => (x.gameObject.GetComponent<Unit>() == null));
+            if (collidersInSight.Count == 0) { Debug.LogWarning("Mobile can't see anything!"); }
             collidersInSight.Remove(GetComponent<Collider>()); // don't include self
             foreach (Collider c in collidersInSight)
             {
@@ -174,7 +181,7 @@ public abstract class MobileUnit : Unit
     /// <summary>
     /// The Unit's brain.
     /// </summary>
-    public MobileAI AI
+    public MobileAI Brain
     {
         get { return brain; }
         set { brain = value; }

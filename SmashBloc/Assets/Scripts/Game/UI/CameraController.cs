@@ -60,6 +60,7 @@ public class CameraController : MonoBehaviour, IObservable
     {
         foreach (IObserver o in observers)
         {
+            if (o == null) { continue; }
             o.OnNotify(this, invoke, data);
         }
     }

@@ -9,26 +9,35 @@ using UnityEngine;
  * **/
 public class Debuggy : MonoBehaviour {
 
-    public bool Twirls;
-    public bool Lasers;
+    public readonly bool twirls;
+    public bool lasers;
 
     // add more debug options here!
 
-    private Team debugTeam = new Team("WHOOPS PLEASE EDIT", Color.white);
+    // These Statics are used by the rest of the program, initialized upon game load.
+    public static bool Twirls = false;
+    public static bool Lasers = false;
+
+    private static Team debugTeam = new Team("WHOOPS PLEASE EDIT", Color.white);
 
     /// <summary>
     /// Sets up a Twirl for the purposes of debugging, NOT for actual play.
     /// </summary>
-    public Twirl DebugSetupTwirl(Twirl t)
+    public static Twirl DebugSetupTwirl(Twirl t)
     {
         t.gameObject.AddComponent<TwirlPhysics>();
         t.Team = debugTeam;
-        Debug.Log("yes");
-        t.AI = t.gameObject.AddComponent<MobileAI_Basic>();
-        t.AI.Body = t;
+        t.Brain = t.gameObject.AddComponent<MobileAI_Basic>();
+        t.Brain.Body = t;
         t.Build();
         t.Activate();
 
         return t;
+    }
+
+    public void Awake()
+    {
+        Twirls = twirls;
+        Lasers = lasers;
     }
 }

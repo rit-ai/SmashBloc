@@ -22,8 +22,6 @@ public sealed class Toolbox : Singleton<Toolbox>
     // The first created player, which will always be the main player.
     public static Player player;
 
-    [Tooltip("If false, does not set up the game (for debugging purposes).")]
-    public bool isGame;
     [Tooltip("Causes the game to reset automatically when it ends.")]
     public bool playContinuous;
     [Tooltip("Causes the game to pause when it ends.")]
@@ -39,7 +37,6 @@ public sealed class Toolbox : Singleton<Toolbox>
     private static GameManager gameManager;
     private static UIObserver uiObserver;
     private static GameObserver gameObserver;
-    private static Debuggy debuggy;
     private static GameSetup gameSetup;
     private static City cityPrefab;
     private static MobileUnit twirlPrefab;
@@ -70,8 +67,6 @@ public sealed class Toolbox : Singleton<Toolbox>
     /// </summary>
     private void Awake()
     {
-        debuggy = GetComponent<Debuggy>();
-
         terrain = GameObject.FindGameObjectWithTag(RTS_Terrain.TERRAIN_TAG).GetComponent<RTS_Terrain>();
 
         cityPrefab = Resources.Load<City>("Prefabs/Units/" + City.IDENTITY);
@@ -84,27 +79,24 @@ public sealed class Toolbox : Singleton<Toolbox>
         twirlPool = new ObjectPool<Twirl>(MakeTwirl, MEDIUM_POOL);
         cityPool = new ObjectPool<City>(MakeCity, SMALL_POOL);
 
-        if (isGame)
+        gameSetup = GetComponent<GameSetup>();
+        gameSetup.Init();
+        if (gameSetup.Locked)
         {
-            gameSetup = GetComponent<GameSetup>();
-            gameSetup.Init();
-            if (gameSetup.Locked)
-            {
-                // If the game is locked, make a dummy player & team
-                player = Player.MakePlayer(false, new Team());
-            }
-            else
-            {
-                // Else they're the first player
-                player = gameSetup.Players[0];
-            }
-
-            uiManager = FindObjectOfType<UIManager>();
-            gameManager = gameObject.AddComponent<GameManager>();
-
-            uiObserver = gameObject.AddComponent<UIObserver>();
-            gameObserver = gameObject.AddComponent<GameObserver>();
+            // If the game is locked, make a dummy player & team
+            player = Player.MakePlayer(false, new Team());
         }
+        else
+        {
+            // Else they're the first player
+            player = gameSetup.Players[0];
+        }
+
+        uiManager = FindObjectOfType<UIManager>();
+        gameManager = gameObject.AddComponent<GameManager>();
+
+        uiObserver = gameObject.AddComponent<UIObserver>();
+        gameObserver = gameObject.AddComponent<GameObserver>();
 
         Debug.Assert(terrain);
         Debug.Assert(cityPrefab);
@@ -123,6 +115,7 @@ public sealed class Toolbox : Singleton<Toolbox>
         DontDestroyOnLoad(gameObserver.transform.gameObject);
         DontDestroyOnLoad(uiObserver.transform.gameObject);
         DontDestroyOnLoad(gameObject.transform.gameObject);
+
     }
 
     /// <summary>
@@ -141,9 +134,6 @@ public sealed class Toolbox : Singleton<Toolbox>
     {
         Twirl newTwirl = Instantiate(TwirlPrefab as Twirl, twirlPoolWrapper.transform);
         newTwirl.gameObject.SetActive(false);
-        newTwirl.gameObject.AddComponent<TwirlPhysics>();
-        newTwirl.AI = newTwirl.gameObject.AddComponent<MobileAI_Basic>();
-        newTwirl.AI.Body = newTwirl;
         newTwirl.Build();
 
         return newTwirl;
@@ -190,10 +180,6 @@ public sealed class Toolbox : Singleton<Toolbox>
     public static GameSetup GameSetup
     {
         get { return gameSetup; }
-    }
-    public static Debuggy Debuggy
-    {
-        get { return debuggy; }
     }
     public static City CityPrefab
     {
